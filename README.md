@@ -68,15 +68,15 @@ environment variable.
 
 | Path | Purpose |
 | --- | --- |
-| `App.xaml`, `MainWindow.xaml` | Current WPF application shell. |
-| `EngineNative.cs` | Versioned native SpriteForge imports and interop data. |
-| `EngineViewport.cs` | Hosted native renderer lifecycle and sprite submission. |
-| `Localization/` | Game-owned localization runtime and message formatter. |
-| `Tools/Localization/` | Source-catalog compiler and validation tools. |
+| `Source/WaterMargin.App/` | Current WPF application, SpriteForge interop, and renderer presentation. |
+| `Source/WaterMargin.Localization/` | Game-owned localization runtime and message formatter. |
+| `Tools/WaterMargin.Localization.Compiler/` | Source-catalog compiler and validation tools. |
 | `Content/Localization/` | Authored catalogs and pinned locale-data notices. |
-| `Tests/Localization/` | Localization contract test project. |
-| `Docs/` | Product and subsystem design documents. |
-| `CMakeLists.txt` | Localization build/catalog targets for parent CMake integration. |
+| `Tests/WaterMargin.Localization.Tests/` | Localization contract test project. |
+| `Docs/Product/` | Product vision and first playable vertical slice. |
+| `Docs/Architecture/` | Current subsystem designs. |
+| `Docs/Archive/` | Historical design explorations. |
+| `Build/` | Focused CMake declarations included by the root project. |
 
 ## Prerequisites
 
@@ -110,8 +110,9 @@ engine binaries:
 
 ```powershell
 $nativeDir = Join-Path $env:SPRITEFORGE_ROOT 'build\windows-msvc-debug\release\bin'
-dotnet build .\Game.slnx -p:SpriteForgeNativeDir="$nativeDir"
-dotnet run --project .\Game.csproj -p:SpriteForgeNativeDir="$nativeDir"
+dotnet build .\WaterMargin.slnx -p:SpriteForgeNativeDir="$nativeDir"
+dotnet run --project .\Source\WaterMargin.App\WaterMargin.App.csproj `
+    -p:SpriteForgeNativeDir="$nativeDir"
 ```
 
 The native DLLs are copied beside the managed output. The current host is
@@ -124,20 +125,25 @@ platforms.
 hard-coded text, clipping, and expansion issues. Compile a source catalog with:
 
 ```powershell
-dotnet run --project .\Tools\Localization\SpriteForge.Localization.Compiler.csproj -- `
+dotnet run --project .\Tools\WaterMargin.Localization.Compiler\WaterMargin.Localization.Compiler.csproj -- `
     compile `
     .\Content\Localization\en-US\core.sfloc.json `
     .\out\Localization\en-US\core.sfloc
 ```
 
-See [`Localization/README.md`](Localization/README.md) for catalog syntax,
-runtime limits, formatting behavior, and tooling commands.
+See
+[`Source/WaterMargin.Localization/README.md`](Source/WaterMargin.Localization/README.md)
+for catalog syntax, runtime limits, formatting behavior, and tooling commands.
 
 ## Documentation
 
-- [`Docs/LocalizationSystem.md`](Docs/LocalizationSystem.md) describes the
+- [`Docs/Product/Vision.md`](Docs/Product/Vision.md) defines the current
+  colony-sandbox direction.
+- [`Docs/Product/VerticalSlice.md`](Docs/Product/VerticalSlice.md) scopes the
+  first complete playable simulation loop.
+- [`Docs/Architecture/Localization.md`](Docs/Architecture/Localization.md) describes the
   implemented localization phases and planned production workflow.
-- [`Docs/GameDesign.md`](Docs/GameDesign.md) is an earlier RTS design
+- [`Docs/Archive/LargeScaleRtsConcept.md`](Docs/Archive/LargeScaleRtsConcept.md) is an earlier RTS design
   exploration. It has not yet been revised for WaterMargin's colony-sandbox
   direction and should not be treated as the current gameplay specification.
 - [`AGENTS.md`](AGENTS.md) defines repository ownership, architecture, and

@@ -18,17 +18,16 @@ and Game-owned localization runtime/tooling. It does not yet contain a playable
 colony simulation. Describe features according to their implemented state and
 label future-facing design as planned.
 
-`Docs/GameDesign.md` predates the current sandbox direction and describes a
-large-scale RTS concept. Treat it as historical exploration until it is
-revised; it is not the authority for new gameplay work.
+`Docs/Archive/LargeScaleRtsConcept.md` predates the current sandbox direction.
+Treat it as historical exploration; it is not the authority for new gameplay
+work. Current product direction lives under `Docs/Product`.
 
 ## Repository and engine boundary
 
 - WaterMargin owns all game-specific simulation, rules, content, UI flows,
   saves, scenarios, localization keys, and presentation decisions.
 - SpriteForge is a separate reusable engine repository. In the standard local
-  layout it is the sibling directory `../SpriteForge`; on the current machine
-  it is located at `C:\Users\ppony\workspace\development\SpriteForge`.
+  layout it is the sibling directory `../SpriteForge`.
 - Do not copy SpriteForge source into this repository or depend on private
   engine implementation headers. Consume deliberate public APIs and the
   versioned native C ABI.
@@ -84,9 +83,9 @@ smallest playable vertical slice before broadening the simulation surface.
 
 ## Managed/native boundary
 
-- `EngineNative.cs` owns the low-level SpriteForge imports. Keep the ABI narrow,
-  versioned, blittable, and explicit about ownership, thread affinity, units,
-  ranges, and error status.
+- `Source/WaterMargin.App/Interop/SpriteForgeNative.cs` owns the low-level
+  SpriteForge imports. Keep the ABI narrow, versioned, blittable, and explicit
+  about ownership, thread affinity, units, ranges, and error status.
 - Do not allow managed exceptions to escape callbacks into native code, or C++
   exceptions to cross the C ABI.
 - Copy values across the boundary or use explicitly scoped borrowed views. Do
@@ -116,14 +115,15 @@ smallest playable vertical slice before broadening the simulation surface.
 
 | Path | Responsibility |
 | --- | --- |
-| `App.xaml*`, `MainWindow.xaml*` | Current WPF application shell and UI-thread ownership. |
-| `EngineNative.cs`, `EngineViewport.cs` | Native SpriteForge renderer interop and hosted viewport. |
-| `Localization/` | Game-owned catalog runtime, formatting, identity, and limits. |
-| `Tools/Localization/` | Offline source-catalog parser and compiler. |
+| `Source/WaterMargin.App/` | Current WPF shell, native interop, and presentation host. |
+| `Source/WaterMargin.Localization/` | Game-owned catalog runtime, formatting, identity, and limits. |
+| `Tools/WaterMargin.Localization.Compiler/` | Offline source-catalog parser and compiler. |
 | `Content/Localization/` | Authored locale catalogs and pinned locale-data notices. |
-| `Tests/Localization/` | Headless localization contracts and corruption/formatting coverage. |
-| `Docs/` | Product and subsystem design documents. |
-| `CMakeLists.txt` | Game localization targets when included by a parent CMake build. |
+| `Tests/WaterMargin.Localization.Tests/` | Headless localization contracts and corruption/formatting coverage. |
+| `Docs/Product/` | Current product direction and playable-slice scope. |
+| `Docs/Architecture/` | Implemented and planned subsystem architecture. |
+| `Docs/Archive/` | Historical design material that is not current product authority. |
+| `Build/` | Focused CMake declarations included by the standalone root project. |
 
 Add new gameplay code under a clearly named game-owned directory rather than
 placing it in `Localization`, the WPF shell, or the native interop layer.
@@ -136,8 +136,8 @@ placing it in `Localization`, the WPF shell, or the native interop layer.
    serialization format, localization artifact, or native interop structure.
 3. Make the smallest coherent change and add focused coverage for success,
    failure, bounds, and rollback behavior.
-4. Update `Game.slnx`, the relevant `.csproj`, or `CMakeLists.txt` when adding or
-   moving compiled sources.
+4. Update `WaterMargin.slnx`, the relevant `.csproj`, or CMake declaration when
+   adding or moving compiled sources.
 5. Update README or design status when setup, supported behavior, limitations,
    or public workflows change.
 6. Review the final diff for generated files, machine paths, secrets, stale
@@ -157,7 +157,7 @@ path in the project.
 
 For WaterMargin changes:
 
-- Run `dotnet build .\Game.slnx` with the appropriate
+- Run `dotnet build .\WaterMargin.slnx` with the appropriate
   `SpriteForgeNativeDir` property when native runtime copying is required.
 - Compile affected localization CMake or .NET targets when their sources or
   build declarations change.
