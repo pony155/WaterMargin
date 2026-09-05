@@ -11,8 +11,11 @@
 - [x] Compile-only deterministic simulation contracts
 - [ ] Fixed-tick host that separates committed simulation snapshots from input
 - [ ] Data-authored sector, ship, resource, and encounter definitions
-- [ ] Data-authored ancestry, lineage, culture, and character definitions
-- [ ] Classless crew attributes, skills, needs, injuries, and inspectable duties
+- [ ] Data-authored race, heritage, and character definitions
+- [ ] Classless crew attributes, core skills, needs, injuries, positions, and inspectable duties
+- [ ] Magic, psionics, melee, archery, alchemy, and crafting content definitions
+- [ ] Language and Literacy skill, race-associated scripts, and ancient-lore
+  discovery
 - [ ] Tactical boarding or ship-to-ship encounter
 - [ ] Versioned save/load with validation and atomic publication
 - [ ] Runtime localization bootstrap for all prototype UI text
@@ -47,6 +50,7 @@ vertical slice.
   WPF, renderer handles, native pointers, wall-clock time, or localized strings.
 - The host translates player intent into typed commands and presents committed
   snapshots rather than directly mutating state.
+- Race and Heritage definitions grant validated racial Talent IDs.
 - Generated results are pure functions of versioned definitions, seed, and
   command history.
 - Commands have stable, inspectable rejection reasons and never partially

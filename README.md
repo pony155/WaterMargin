@@ -55,8 +55,11 @@ Implemented foundations include:
 These are product goals, not claims that every system is implemented. See
 [`Docs/Product/Vision.md`](Docs/Product/Vision.md) and
 [`Docs/Product/VerticalSlice.md`](Docs/Product/VerticalSlice.md). The planned
-crew ancestries, lineages, physiology, and character-generation boundaries are
-defined in [`Docs/Product/Characters.md`](Docs/Product/Characters.md).
+crew races, heritages, physiology, and character-generation boundaries are
+defined in [`Docs/Product/Races.md`](Docs/Product/Races.md). The
+classless capability model is split into
+[`Docs/Product/Attributes.md`](Docs/Product/Attributes.md) and
+[`Docs/Product/Skills.md`](Docs/Product/Skills.md).
 
 ## Repository layout
 
