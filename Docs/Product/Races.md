@@ -45,7 +45,7 @@ A persistent character is composed from independent, stable layers:
 | Identity | character ID, name seed, pronouns, portrait seed | Persistence and presentation lookup |
 | Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire | Body plan and baseline physiological rules |
 | Heritage | voidborn, deepforge, free-anchorage | Subrace, formative tradition, languages, customs, and starting knowledge |
-| Attributes | might, finesse, vigor, reason | Broad capability shared by many actions |
+| Attributes | Strength, Agility, Willpower, Intelligence, Luck, Charisma, Toughness | Broad capability shared by many actions |
 | Skills | piloting, engineering, language and literacy | Learned competence that improves independently |
 | Background | academy graduate, dockhand, caravan guard | Starting skill package and history, never a class |
 | Position | doctor, chef, navigator, engineer | Ongoing responsibility, authority, pay, and expected duties |

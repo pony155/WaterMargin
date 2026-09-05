@@ -167,10 +167,10 @@ Reading an unfamiliar discovery proceeds through explicit stages:
 
 Language and Literacy drives identification, transliteration, translation,
 speaking, reading, and writing. Ancient Lore drives context and authentication.
-Awareness can notice damaged or hidden marks, Reason can reconstruct missing
-patterns, and Resonance can read magical structure. A single check may combine
-several characters, tools, or ship facilities while preserving who contributed
-each result.
+Intelligence can notice patterns in damaged or hidden marks and reconstruct
+missing text, while Willpower can read magical or psychic impressions. A single
+check may combine several characters, tools, or ship facilities while
+preserving who contributed each result.
 
 Failure creates uncertainty, partial readings, wasted time, or a dangerous
 interpretation; it does not silently replace the original inscription. The UI
