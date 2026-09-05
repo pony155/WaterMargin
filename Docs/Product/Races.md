@@ -46,7 +46,7 @@ A persistent character is composed from independent, stable layers:
 | Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire | Body plan and baseline physiological rules |
 | Heritage | voidborn, deepforge, free-anchorage | Subrace, formative tradition, languages, customs, and starting knowledge |
 | Attributes | Strength, Agility, Willpower, Intelligence, Luck, Charisma, Toughness | Broad capability shared by many actions |
-| Skills | piloting, engineering, language and literacy | Learned competence that improves independently |
+| Skills | piloting, engineering, merchant, negotiation, language and literacy | Learned competence that improves independently |
 | Background | academy graduate, dockhand, caravan guard | Starting skill package and history, never a class |
 | Position | doctor, chef, navigator, engineer | Ongoing responsibility, authority, pay, and expected duties |
 | Talents | Versatility, Aether Sense, Braced Stance | Racial feats granted by Race and Heritage |

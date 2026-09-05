@@ -11,9 +11,12 @@
 - [x] Compile-only deterministic simulation contracts
 - [ ] Fixed-tick host that separates committed simulation snapshots from input
 - [ ] Data-authored sector, ship, resource, and encounter definitions
+- [ ] Arcane and diesel-tier Industrial ship energy packages with distinct
+  resource and failure rules
 - [ ] Data-authored race, heritage, and character definitions
 - [ ] Classless crew attributes, core skills, needs, injuries, positions, and inspectable duties
-- [ ] Magic, psionics, melee, archery, alchemy, and crafting content definitions
+- [ ] Magic, psionics, enchantment, melee, archery, alchemy, and crafting
+  content definitions
 - [ ] Language and Literacy skill, race-associated scripts, and ancient-lore
   discovery
 - [ ] Tactical boarding or ship-to-ship encounter

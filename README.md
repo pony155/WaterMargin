@@ -59,7 +59,9 @@ crew races, heritages, physiology, and character-generation boundaries are
 defined in [`Docs/Product/Races.md`](Docs/Product/Races.md). The
 classless capability model is split into
 [`Docs/Product/Attributes.md`](Docs/Product/Attributes.md) and
-[`Docs/Product/Skills.md`](Docs/Product/Skills.md).
+[`Docs/Product/Skills.md`](Docs/Product/Skills.md). Planned ship frames,
+modules, networks, damage, and refits are defined in
+[`Docs/Product/Ships.md`](Docs/Product/Ships.md).
 
 ## Repository layout
 

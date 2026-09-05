@@ -43,10 +43,13 @@ attribute that matches its method and circumstances:
 - Agility plus Melee can place a precise strike.
 - Agility plus Archery can make a difficult shot.
 - Willpower plus Magic can guide an enchanted arrow.
+- Intelligence plus Enchantment can inscribe a stable magical binding.
 - Intelligence plus Psionics can interpret an unfamiliar psychic signal.
 - Willpower plus Psionics can maintain a shield against psychic intrusion.
 - Charisma plus Psionics can send a clear emotion through a mindlink.
 - Luck plus Salvage can expose a rare find on a chance-driven sweep.
+- Intelligence plus Merchant can recognize manipulated market records.
+- Charisma plus Negotiation can bargain for safer contract terms.
 - Charisma plus Ancient Lore can explain a discovery to a suspicious faction.
 
 The interface must identify the chosen attribute and explain why it applies.

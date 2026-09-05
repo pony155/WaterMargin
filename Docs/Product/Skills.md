@@ -32,9 +32,9 @@ have no 0–100 rating, and do not improve through practice. See
 | Voyage | piloting, astrogation, sensors, rigging |
 | Ship work | engineering, salvage, crafting |
 | Combat | melee, archery, gunnery, defense |
-| Mystic | magic, psionics |
+| Mystic | magic, psionics, enchantment |
 | Care and knowledge | medicine, alchemy, cooking, xenology, ancient lore, language and literacy |
-| Social | command, insight, persuasion, deception, trade |
+| Social | command, insight, deception, merchant, negotiation |
 
 The following skills form the core of personal combat, item creation, crew
 care, and discovery:
@@ -43,18 +43,36 @@ care, and discovery:
 | --- | --- | --- |
 | Magic | `skill.magic` | Casts, controls, identifies, and counters learned spells. Individual spells are techniques or discoveries, not separate classes. |
 | Psionics | `skill.psionics` | Detects, projects, shields, and shapes thought through learned psychic techniques. Every effect defines its target, range, consent or resistance rule, and strain cost. |
+| Enchantment | `skill.enchantment` | Designs, binds, identifies, maintains, and removes persistent magical effects on equipment, ship fittings, and locations. |
 | Melee | `skill.melee` | Covers unarmed combat and hand-held weapons. Weapon tags and learned techniques create differences without separate weapon classes. |
 | Archery | `skill.archery` | Covers bows, crossbows, unusual string weapons, ammunition choice, and aimed physical projectiles. Ship guns and personal firearms use Gunnery. |
 | Alchemy | `skill.alchemy` | Identifies reagents and produces medicines, stimulants, toxins, blood substitutes, volatile mixtures, and magical compounds. |
 | Crafting | `skill.crafting` | Fabricates and improves personal equipment, ammunition, tools, fittings, and replacement parts from known designs. |
+| Engineering | `skill.engineering` | Diagnoses, operates, maintains, and repairs ship modules, machinery, power systems, and habitat infrastructure. |
+| Merchant | `skill.merchant` | Appraises goods, reads markets, manages cargo contracts, recognizes commercial customs, and detects pricing fraud. |
+| Negotiation | `skill.negotiation` | Bargains, mediates disputes, proposes terms, and secures concessions without overriding another character's agency. |
 | Cooking | `skill.cooking` | Plans meals, preserves provisions, safely handles unusual diets, and turns limited ingredients into nutrition and morale. |
 | Ancient Lore | `skill.ancient-lore` | Recognizes lost civilizations, obsolete customs, relic functions, old routes, and the historical context of discoveries. |
 | Language and Literacy | `skill.language-literacy` | Governs speaking, understanding, reading, writing, translation, and script decipherment for learned languages and scripts. |
 
 Engineering diagnoses, operates, and repairs ship systems; Crafting manufactures
-their components. Salvage extracts usable material; Alchemy transforms suitable
-reagents. These skills can cooperate in one job without collapsing into a
-single universally optimal skill.
+their physical components. Enchantment binds persistent magical effects to a
+prepared item, fitting, or location, while Magic performs active spells.
+Salvage extracts usable material; Alchemy transforms suitable reagents. These
+skills can cooperate in one job without collapsing into a single universally
+optimal skill.
+
+An enchantment requires a known design, a compatible prepared target, explicit
+reagents or stored power, and enough time. Failure can waste bounded resources,
+produce an unstable effect, or leave a detectable flaw; it cannot silently
+replace a valid existing enchantment. Removing or replacing an enchantment is
+validated before the old effect is retired.
+
+Merchant determines what cargo is worth, where demand exists, and which risks
+or obligations hide in a deal. Negotiation determines whether the parties can
+reach acceptable terms. Merchant is a learned skill rather than a class or crew
+position; a Doctor, Chef, Captain, or deckhand may study it. Negotiation cannot
+force consent, erase faction policy, or make an impossible agreement valid.
 
 Magic is available to every character who learns a spell and can meet its
 requirements. Casting may consume stamina, focus, reagents, stored charge, or a
@@ -220,10 +238,11 @@ loading cannot partially alter known facts or skill progress.
 ## First playable scope
 
 The first crew slice initially exercises Piloting, Astrogation, Engineering,
-Salvage, Medicine, Cooking, Command, and Language and Literacy. The first
-encounter milestone adds Magic, Psionics, Melee, Archery, Alchemy, and Crafting
-with at least one usable spell, psychic technique, melee technique, ranged
-technique, alchemical recipe, and crafted item.
+Salvage, Medicine, Cooking, Command, Merchant, Negotiation, and Language and
+Literacy. The first encounter milestone adds Magic, Psionics, Enchantment,
+Melee, Archery, Alchemy, and Crafting with at least one usable spell, psychic
+technique, enchantment design, melee technique, ranged technique, alchemical
+recipe, and enchanted crafted item.
 
 That milestone also includes one ancient ruin inscription. At least two crew
 members with different script or lore knowledge must be able to collaborate on
