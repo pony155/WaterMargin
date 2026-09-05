@@ -59,9 +59,19 @@ crew races, heritages, physiology, and character-generation boundaries are
 defined in [`Docs/Product/Races.md`](Docs/Product/Races.md). The
 classless capability model is split into
 [`Docs/Product/Attributes.md`](Docs/Product/Attributes.md) and
-[`Docs/Product/Skills.md`](Docs/Product/Skills.md). Planned ship frames,
-modules, networks, damage, and refits are defined in
-[`Docs/Product/Ships.md`](Docs/Product/Ships.md).
+[`Docs/Product/Skills.md`](Docs/Product/Skills.md). Planned spellcasting rules,
+the authored spell catalog, and psychic systems are defined in
+[`Docs/Product/Spells.md`](Docs/Product/Spells.md), and
+[`Docs/Product/PsychicAbilities.md`](Docs/Product/PsychicAbilities.md).
+Planned ship frames, modules, networks, damage, and refits are defined in
+[`Docs/Product/Ships.md`](Docs/Product/Ships.md). The versioned procedural
+galaxy graph, Starways, system generation, and discovery model are defined in
+[`Docs/Product/GalaxyMap.md`](Docs/Product/GalaxyMap.md). Planned faction
+membership, standing, diplomacy, territory, laws, markets, and conflict are
+defined in [`Docs/Product/Factions.md`](Docs/Product/Factions.md). Optional
+late-campaign threats, escalation, alternative resolutions, and aftermath are
+defined in
+[`Docs/Product/Endgame_Crisis.md`](Docs/Product/Endgame_Crisis.md).
 
 ## Repository layout
 

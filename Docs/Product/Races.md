@@ -95,8 +95,10 @@ medical support.
 Elves are long-lived beings whose nervous systems sense patterns in light and
 the void's aetheric currents. Their Race Talent, **Aether Sense**, can reveal
 weak anomalies or unstable routes before ordinary instruments, but intense
-interference causes sensory strain. Elves enter a short trance instead of
-normal sleep; they still need safe downtime.
+interference causes sensory strain. Aether Sense grants innate `access.magic`,
+allowing an Elf to learn and cast spells without the Spellcasting Training
+Feat; it provides no free Magic ranks or spells. Elves enter a short trance
+instead of normal sleep; they still need safe downtime.
 
 | Heritage | Stable ID | Heritage Talent | Cost |
 | --- | --- | --- | --- |
@@ -185,10 +187,13 @@ crude; behavior comes from the individual and their society.
 Somnari are a psychic race whose nervous systems resonate with nearby thought.
 Their Race Talent, **Mindwake**, lets them sense active psychic effects and
 initiate a consensual short-range mindlink without a spell or device. Mindwake
-provides access, not mastery: the Psionics skill governs control, clarity,
-range, and learned techniques. Psychic storms, crowded minds, and repeated use
-cause strain, and Mindwake never reveals private thoughts without an explicit
-effect and a consent or resistance check.
+grants innate `access.psionics`, not mastery: the Psionics skill governs
+control, clarity, range, and learned techniques. Psychic storms, crowded minds,
+and repeated use cause strain, and Mindwake never reveals private thoughts
+without an explicit effect and a consent or resistance check.
+
+See [`PsychicAbilities.md`](PsychicAbilities.md) for contact, consent,
+resistance, strain, and information rules.
 
 Somnari breathe, eat, and rest normally, but their sleep includes a vivid dream
 phase needed to recover psychic strain. They are not inherently wiser, calmer,
@@ -230,22 +235,27 @@ compatible Heritage. It represents inherited physiology, supernatural nature,
 or a heritage-specific adaptation. It does not represent personality, beliefs,
 professional training, or general learned competence.
 
+A Talent may explicitly grant an innate supernatural access ID. Innate access
+substitutes for the corresponding learned access Feat, but never grants skill
+ranks or unnamed abilities. Learned Feats come from training and are defined in
+[`Skills.md`](Skills.md); they are not Talents and are not inherited.
+
 Every character begins with two Talents:
 
 1. one Race Talent granted by their `raceId`; and
 2. one Heritage Talent granted by their `heritageId`.
 
-| Race | Race Talent | Stable Talent ID |
-| --- | --- | --- |
-| Human | Versatility | `talent.race.human.versatility` |
-| Elf | Aether Sense | `talent.race.elf.aether-sense` |
-| Half-elf | Blended Physiology | `talent.race.half-elf.blended-physiology` |
-| Dwarf | Braced Stance | `talent.race.dwarf.braced-stance` |
-| Orc | Second Wind | `talent.race.orc.second-wind` |
-| Gnome | Closework | `talent.race.gnome.closework` |
-| Goblin | Tight Passage | `talent.race.goblin.tight-passage` |
-| Somnari | Mindwake | `talent.race.somnari.mindwake` |
-| Vampire | Unliving Physiology | `talent.race.vampire.unliving-physiology` |
+| Race | Race Talent | Stable Talent ID | Innate access |
+| --- | --- | --- | --- |
+| Human | Versatility | `talent.race.human.versatility` | None |
+| Elf | Aether Sense | `talent.race.elf.aether-sense` | `access.magic` |
+| Half-elf | Blended Physiology | `talent.race.half-elf.blended-physiology` | None by default |
+| Dwarf | Braced Stance | `talent.race.dwarf.braced-stance` | None |
+| Orc | Second Wind | `talent.race.orc.second-wind` | None |
+| Gnome | Closework | `talent.race.gnome.closework` | None |
+| Goblin | Tight Passage | `talent.race.goblin.tight-passage` | None |
+| Somnari | Mindwake | `talent.race.somnari.mindwake` | `access.psionics` |
+| Vampire | Unliving Physiology | `talent.race.vampire.unliving-physiology` | None by default |
 
 Heritage Talents use IDs such as `talent.heritage.dwarf.cometdelver`. A Talent
 definition owns its explicit effects, costs, requirements, and
@@ -253,8 +263,9 @@ incompatibilities. Race and Heritage definitions grant Talent IDs rather than
 duplicating those rules.
 
 Talents do not have a 0–100 value, improve through use, or unlock because of a
-class. Learned techniques and professional expertise belong to Skills instead.
-Content validation rejects missing Talent IDs, duplicate grants, and Talents
+class. Learned techniques and professional expertise belong to Skills, while
+trained supernatural access belongs to learned Feats. Content validation
+rejects missing Talent IDs, unknown access IDs, duplicate grants, and Talents
 that are incompatible with the granting Race or Heritage.
 
 ## Classless capabilities
@@ -293,7 +304,7 @@ The planned position catalog includes:
 | Technical | Chief Engineer, Engineer, Artificer, Rigger | Drive operation, repairs, fabrication, rigging, and power allocation |
 | Exploration | Scout, Xenologist, Salvager, Alchemist | Surveys, field samples, ruins, reagents, and recovery operations |
 | Security | Master-at-Arms, Marine, Archer, Gunner | Watches, boarding defense, weapons, prisoners, and drills |
-| Mystic | Ship Mage, Warden | Magical navigation, wards, enchantments, curses, and anomalies |
+| Mystic | Ship Mage, Warden, Mindwarden | Magical navigation, wards, enchantments, psychic contact, curses, and anomalies |
 | Civil | Envoy, Trader, Chronicler, Antiquarian | Negotiation, commerce, languages, records, lore, and faction relations |
 
 Positions use stable IDs such as `position.doctor` and `position.chef`. A
@@ -337,7 +348,8 @@ must be deterministic:
 1. Select an allowed race and compatible heritage.
 2. Grant and validate the Race Talent and Heritage Talent.
 3. Generate age stage, body parameters, name seed, pronouns, and appearance.
-4. Allocate attributes, background skills, and one or more personal aptitudes.
+4. Allocate attributes, background skills, any documented pre-campaign
+   training Feats, and one or more personal aptitudes.
 5. Assign known language, script, and lore IDs from heritage and personal history.
 6. Assign an initial crew position and bounded duty schedule.
 7. Add bounded beliefs and memories.
@@ -397,12 +409,15 @@ The first crew-enabled vertical slice should use nine authored characters: one
 human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, and vampire. Each needs
 a race, heritage, background, attributes, skills, two Talents, crew position,
 and compatible quarters. The two Talents are racial feats: one granted by Race
-and one by Heritage. The initial roster must include a Doctor and Chef so
-medical care, meals, position authority, and cross-duty assignment are
-exercised. The slice needs only four shared needs—rest, nutrition or thirst,
-safety, and belonging—and five duties: navigate, salvage, repair, prepare a
-meal, and treat an injury. Attribute, skill, language, script, ancient-lore, and
-encounter scope is defined in the linked capability documents.
+and one by Heritage. The Elf must exercise innate magical access and the
+Somnari must exercise innate psychic access. At least one character without
+either access Talent must demonstrate earning an access Feat through documented
+training. The initial roster must include a Doctor and Chef so medical care,
+meals, position authority, and cross-duty assignment are exercised. The slice
+needs only four shared needs—rest, nutrition or thirst, safety, and belonging—
+and five duties: navigate, salvage, repair, prepare a meal, and treat an injury.
+Attribute, skill, language, script, ancient-lore, and encounter scope is defined
+in the linked capability documents.
 
 The slice succeeds when race and heritage change real voyage decisions, every
 crew action has an inspectable reason, and replaying the same seed and commands

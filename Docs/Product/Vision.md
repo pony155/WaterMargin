@@ -55,6 +55,11 @@ ends that run, while unlocked knowledge and scenario options may carry into a
 broader player profile. The precise metaprogression contract is planned and
 must not undermine the stakes of individual voyages.
 
+A mature galaxy may face an optional systemic threat described in
+[`Endgame_Crisis.md`](Endgame_Crisis.md). Its outcome can transform the chart
+and factions, but endgame crises remain deferred until the core voyage campaign
+is complete.
+
 ## Product principles
 
 - Build a small, complete voyage loop before adding a large universe.

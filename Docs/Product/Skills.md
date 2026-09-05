@@ -5,7 +5,10 @@
 This document defines the planned classless skill, language, script, and lore
 systems. They are not implemented yet. Broad capability is defined in
 [`Attributes.md`](Attributes.md), while race, heritage, identity, and crew
-positions are defined in [`Races.md`](Races.md).
+positions are defined in [`Races.md`](Races.md). Spellcasting rules and the
+authored spell catalog are defined in [`Spells.md`](Spells.md), and psychic
+techniques are expanded in
+[`PsychicAbilities.md`](PsychicAbilities.md).
 
 ## Classless skill system
 
@@ -20,9 +23,45 @@ player-facing range is 0–100. A character can be an excellent pilot and novice
 navigator, or a skilled doctor who later learns swordplay, without selecting or
 changing a class.
 
-Talents are not skills. They are racial feats granted by Race and Heritage,
-have no 0–100 rating, and do not improve through practice. See
-[`Races.md`](Races.md) for their rules.
+Talents and learned Feats are not skills. Talents are racial feats granted by
+Race and Heritage; learned Feats are discrete capabilities earned through
+training. Neither has a 0–100 rating or improves through repeated use. See
+[`Races.md`](Races.md) for Talent rules.
+
+## Ability access feats
+
+Magic and Psionics use explicit access gates. A skill rating measures knowledge
+and control but does not grant permission to perform supernatural actions.
+
+| Learned Feat | Stable ID | Grants |
+| --- | --- | --- |
+| Spellcasting Training | `feat.access.magic` | `access.magic`, allowing the character to cast known spells |
+| Psionic Training | `feat.access.psionics` | `access.psionics`, allowing the character to use known psychic techniques |
+
+A character earns an access Feat by completing a validated training project.
+The project declares a mentor or instructional source, minimum skills,
+facilities, time, cost, practice tasks, safety rules, and completion check. It
+awards the Feat atomically; partial training remains project progress and never
+temporarily unlocks the ability.
+
+A racial or Heritage Talent may explicitly grant the same access ID. This is
+innate access and substitutes for the corresponding learned Feat. It does not
+grant free skill ranks, unrelated techniques, or immunity to costs and failure.
+The initial examples are the Elf **Aether Sense** Talent for `access.magic` and
+the Somnari **Mindwake** Talent for `access.psionics`.
+
+Access, knowledge, and competence are separate checks:
+
+1. the character has the required access ID from a learned Feat or racial
+   Talent;
+2. the character knows the specific spell or psychic technique; and
+3. the character meets its skill, resource, target, equipment, and contextual
+   requirements.
+
+Without access, a character can study theory, identify evidence, assist an
+authorized practitioner, and make allowed knowledge checks, but cannot cast a
+spell or initiate a psychic technique. A focus item, spellbook, psychic
+implement, crew position, or high skill rating never bypasses the access gate.
 
 ## Skill catalog
 
@@ -41,8 +80,8 @@ care, and discovery:
 
 | Skill | Stable ID | Scope and boundaries |
 | --- | --- | --- |
-| Magic | `skill.magic` | Casts, controls, identifies, and counters learned spells. Individual spells are techniques or discoveries, not separate classes. |
-| Psionics | `skill.psionics` | Detects, projects, shields, and shapes thought through learned psychic techniques. Every effect defines its target, range, consent or resistance rule, and strain cost. |
+| Magic | `skill.magic` | Measures spell theory and control. Active casting requires `access.magic` plus a known spell; individual spells are techniques or discoveries, not classes. |
+| Psionics | `skill.psionics` | Measures psychic theory and control. Active techniques require `access.psionics`; every effect defines its target, range, consent or resistance rule, and strain cost. |
 | Enchantment | `skill.enchantment` | Designs, binds, identifies, maintains, and removes persistent magical effects on equipment, ship fittings, and locations. |
 | Melee | `skill.melee` | Covers unarmed combat and hand-held weapons. Weapon tags and learned techniques create differences without separate weapon classes. |
 | Archery | `skill.archery` | Covers bows, crossbows, unusual string weapons, ammunition choice, and aimed physical projectiles. Ship guns and personal firearms use Gunnery. |
@@ -74,16 +113,20 @@ reach acceptable terms. Merchant is a learned skill rather than a class or crew
 position; a Doctor, Chef, Captain, or deckhand may study it. Negotiation cannot
 force consent, erase faction policy, or make an impossible agreement valid.
 
-Magic is available to every character who learns a spell and can meet its
-requirements. Casting may consume stamina, focus, reagents, stored charge, or a
-setting-specific resource defined by the spell. Armor, race, heritage, or
-background may alter those costs but never imposes a hidden class restriction.
+Every character may pursue Spellcasting Training, but only a character with
+`access.magic` may cast a known spell. Casting may consume stamina, focus,
+reagents, stored charge, or another resource defined by the spell. Armor, Race,
+Heritage, or Background may alter those costs but never creates a hidden class
+restriction. Detailed spell definitions, casting phases, resources,
+disciplines, and counterplay are specified in [`Spells.md`](Spells.md).
 
-Psionics is likewise learnable by any character. Training, psychic implements,
-or an explicit Talent can provide access to its techniques. The Somnari
-Mindwake Talent supplies innate access to basic psychic contact, not free skill
-ranks or unrestricted mind reading. Failed or resisted psychic actions may
-create strain, distorted impressions, or detectable psychic feedback.
+Every character may pursue Psionic Training, but only a character with
+`access.psionics` may initiate a known psychic technique. The Somnari Mindwake
+Talent supplies innate access to basic psychic contact, not free skill ranks or
+unrestricted mind reading. Failed or resisted psychic actions may create
+strain, distorted impressions, or detectable psychic feedback.
+Consent, resistance, Psychic Strain, information boundaries, and technique
+definitions are specified in [`PsychicAbilities.md`](PsychicAbilities.md).
 
 ## Action resolution
 
@@ -111,8 +154,9 @@ must preserve enough information to reproduce the outcome.
   a resource and time cost.
 - High skill ranks require progressively more practice and may require a
   teacher, facility, discovery, or dangerous field experience.
-- Techniques unlock from skill thresholds, attributes, relationships,
-  equipment, discoveries, or conditions—not from class levels.
+- Techniques can require skill thresholds, attributes, equipment, discoveries,
+  or circumstances—not class levels. Casting and psychic techniques also
+  require their explicit access ID from a learned Feat or innate Talent.
 - Practice awards are deterministic, capped per committed action, and included
   in the authoritative command result.
 - Enemies and encounters do not automatically scale to a global character
@@ -225,24 +269,27 @@ language, and lore IDs rather than rendered glyphs or translated strings.
 
 ## Data and persistence
 
-Skills, languages, scripts, techniques, and lore subjects use stable canonical
-IDs and localized presentation keys. Persistent character state stores one
-Language and Literacy skill value alongside the other skill values, plus
-bounded sets of known language and script IDs. Lore progress uses records keyed
-by stable character, knowledge, and source IDs.
+Skills, learned Feats, access grants, training projects, languages, scripts,
+techniques, and lore subjects use stable canonical IDs and localized
+presentation keys. Persistent character state stores one Language and Literacy
+skill value alongside the other skill values, bounded sets of learned Feat,
+access, language, script, spell, and technique IDs, and bounded training-project
+state. Lore progress uses records keyed by stable character, knowledge, and
+source IDs.
 
 Discovery publication validates every reference and replaces the previous
 crew-knowledge snapshot atomically. Failed training, translation, or content
-loading cannot partially alter known facts or skill progress.
+loading cannot partially grant an access Feat or alter known facts and skill
+progress.
 
 ## First playable scope
 
 The first crew slice initially exercises Piloting, Astrogation, Engineering,
 Salvage, Medicine, Cooking, Command, Merchant, Negotiation, and Language and
 Literacy. The first encounter milestone adds Magic, Psionics, Enchantment,
-Melee, Archery, Alchemy, and Crafting with at least one usable spell, psychic
-technique, enchantment design, melee technique, ranged technique, alchemical
-recipe, and enchanted crafted item.
+Melee, Archery, Alchemy, and Crafting with both trained and innate access paths,
+at least one usable spell, psychic technique, enchantment design, melee
+technique, ranged technique, alchemical recipe, and enchanted crafted item.
 
 That milestone also includes one ancient ruin inscription. At least two crew
 members with different script or lore knowledge must be able to collaborate on

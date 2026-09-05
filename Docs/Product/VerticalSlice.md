@@ -11,11 +11,14 @@
 - [x] Compile-only deterministic simulation contracts
 - [ ] Fixed-tick host that separates committed simulation snapshots from input
 - [ ] Data-authored sector, ship, resource, and encounter definitions
+- [ ] Versioned procedural galaxy graph, Starways, and discovery-state contracts
+- [ ] Three-faction standing, agreement, territory, and delayed-report slice
 - [ ] Arcane and diesel-tier Industrial ship energy packages with distinct
   resource and failure rules
 - [ ] Data-authored race, heritage, and character definitions
 - [ ] Classless crew attributes, core skills, needs, injuries, positions, and inspectable duties
-- [ ] Magic, psionics, enchantment, melee, archery, alchemy, and crafting
+- [ ] Trained and innate Magic/Psionics access, authored spell and psychic
+  technique catalogs, enchantment, melee, archery, alchemy, and crafting
   content definitions
 - [ ] Language and Literacy skill, race-associated scripts, and ancient-lore
   discovery
@@ -64,6 +67,6 @@ vertical slice.
 
 ## Explicitly deferred
 
-An open-ended galaxy, multiplayer, seamless planets, large fleets, procedural
-narrative prose, broad mod support, and production-scale content are not
-required for the first playable voyage.
+An open-ended galaxy, endgame crises, multiplayer, seamless planets, large
+fleets, procedural narrative prose, broad mod support, and production-scale
+content are not required for the first playable voyage.

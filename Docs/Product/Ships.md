@@ -174,6 +174,7 @@ but cannot collect both paths' strongest benefits without paying visible costs.
 | Deck Battery | `module.weapon.deck-battery` | Mounts a tagged ship weapon and stores its ready ammunition | Gunnery; Gunner |
 | Boarding Lock | `module.contact.boarding-lock` | Controls docking, boarding, quarantine seals, and ship-to-ship access | Engineering or Defense; Master-at-Arms |
 | Signal Lantern | `module.contact.signal-lantern` | Sends identification, negotiation, warning, and distress signals | Language and Literacy or Negotiation; Envoy |
+| Psychic Resonator | `module.contact.psychic-resonator` | Amplifies permitted mindlinks and detects nearby psychic signaling | Psionics; Mindwarden or Envoy |
 
 The catalog is a design vocabulary, not a promise that every module belongs in
 the first playable voyage. New definitions should create new system
