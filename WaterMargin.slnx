@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="Source/WaterMargin.App/WaterMargin.App.csproj" />
-  <Project Path="Source/WaterMargin.Localization/WaterMargin.Localization.csproj" />
-  <Project Path="Tests/WaterMargin.Localization.Tests/WaterMargin.Localization.Tests.csproj" />
-  <Project Path="ThirdParty/AstronomyEngine/AstronomyEngine.csproj" />
-  <Project Path="Tools/WaterMargin.Localization.Compiler/WaterMargin.Localization.Compiler.csproj" />
-</Solution>

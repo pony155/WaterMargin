@@ -4,7 +4,7 @@
 | --- | --- |
 | Status | Phases 1 and 2 implemented; production content and application UI wiring remain planned |
 | Scope | Game text catalogs, locale selection, message formatting, language profiles, subtitles, and translation workflow |
-| Owner | WaterMargin with game-owned offline tooling |
+| Owner | Spelljammer with game-owned offline tooling |
 | Runtime language | C# gameplay/application layer with copy-only Engine boundaries |
 | Initial content format | Versioned UTF-8 source catalogs compiled to bounded binary artifacts |
 | Last updated | 2026-09-05 |
@@ -22,11 +22,11 @@ campaign concepts, and release languages are product content. `Engine/Text`
 shapes and draws the resulting text, `Engine/UI` lays it out and exposes
 semantics, and the generic asset system may transport compiled catalog bytes.
 None of those engine modules understands localization keys, plural rules, or
-the meaning of a regiment name.
+the meaning of a ship or crew name.
 
-`Source/WaterMargin.App/` contains a Windows-only .NET 10 WPF
-sprite-rendering prototype, not the colony-sandbox application. Phases 1 and 2
-provide a separate WaterMargin-owned .NET 10
+`Source/Spelljammer.App/` contains a Windows-only .NET 10 WPF
+sprite-rendering prototype, not the complete space-sandbox application. Phases 1 and 2
+provide a separate Spelljammer-owned .NET 10
 runtime, strict source compiler, deterministic typed catalog artifacts, SFMF
 formatting, pinned number/plural profiles, `en-US` sample content,
 pseudo-locales, and a compile-only test target. Resolved messages carry a
@@ -122,7 +122,7 @@ The first implementation will not provide:
 
 ## Ownership and module boundaries
 
-### `Source/WaterMargin.Localization`
+### `Source/Spelljammer.Localization`
 
 The planned Game runtime owns:
 
@@ -141,7 +141,7 @@ gameplay entities, or editor documents.
 
 ### Game-owned offline tooling
 
-The first compiler belongs under `Tools/WaterMargin.Localization.Compiler`
+The first compiler belongs under `Tools/Spelljammer.Localization.Compiler`
 because there is not yet a second credible product requiring a generic engine
 localization service.
 It may reuse engine UTF-8, hashing, artifact, and bounded-reader utilities, but
@@ -167,19 +167,19 @@ locale manifests, translation policy, and content remain under `Game`.
 ### Game systems
 
 Game features pass stable domain IDs and typed values into localization. For
-example, a work-status message owns colonist, job, resource, and reason IDs;
+example, a crew-status message owns crew, task, resource, and reason IDs;
 presentation resolves their display names and formats one complete message. No
 simulation component stores the resulting sentence.
 
 ## Implemented layout
 
 ```text
-WaterMargin/
+Spelljammer/
 ├── Docs/
 │   └── Architecture/
 │       └── Localization.md
 ├── Source/
-│   └── WaterMargin.Localization/
+│   └── Spelljammer.Localization/
 │       ├── Catalog/
 │       │   ├── LocalizationCatalog.cs
 │       │   ├── LocalizationIdentity.cs
@@ -191,15 +191,15 @@ WaterMargin/
 │       ├── LocaleData/
 │       │   └── PinnedLocaleData.cs
 │       ├── LocalizationService.cs
-│       └── WaterMargin.Localization.csproj
+│       └── Spelljammer.Localization.csproj
 ├── Tools/
-│   └── WaterMargin.Localization.Compiler/
+│   └── Spelljammer.Localization.Compiler/
 │       ├── MessageParser.cs
 │       ├── SourceCatalogCompiler.cs
-│       └── WaterMargin.Localization.Compiler.csproj
+│       └── Spelljammer.Localization.Compiler.csproj
 ├── Tests/
-│   └── WaterMargin.Localization.Tests/
-│       └── WaterMargin.Localization.Tests.csproj
+│   └── Spelljammer.Localization.Tests/
+│       └── Spelljammer.Localization.Tests.csproj
 └── Content/
     └── Localization/
         ├── LocaleData/
@@ -215,7 +215,7 @@ implemented with tests and documentation.
 
 ```mermaid
 flowchart LR
-    Source[Source catalog + translator metadata] --> Compiler[WaterMargin localization compiler]
+    Source[Source catalog + translator metadata] --> Compiler[Spelljammer localization compiler]
     Locale[Locale manifest + pinned plural/number data] --> Compiler
     Compiler --> Artifact[Versioned SFLOC artifact]
     Artifact --> Assets[Asset publication / locale pack]
@@ -453,7 +453,7 @@ percent. Each declares grouping, minimum/maximum fraction digits, and rounding.
 Parsing localized numbers back into gameplay data is a separate validated input
 operation and is not implied by formatting support.
 
-Campaign calendars are game data rather than Gregorian host dates. Game code
+Campaign chronology is game data rather than Gregorian host dates. Game code
 supplies a localized key/arguments or a dedicated typed campaign-date formatter.
 Real-world dates, times, currencies, units, and collation remain later features
 requiring explicit rules and fixtures.
@@ -891,7 +891,7 @@ policy; implementation changes compile targets locally without running them.
 - Decide whether localized voice is in the first playable milestone.
 - Define mod/DLC namespace and protected-key override policy before accepting
   third-party catalogs.
-- Add collation, campaign calendar, units, currencies, and rich spans only for
+- Add collation, campaign chronology, units, currencies, and rich spans only for
   concrete game/UI requirements.
 - Confirm the managed application architecture beyond the current WPF renderer
   example before fixing the final C# API and threading contract.

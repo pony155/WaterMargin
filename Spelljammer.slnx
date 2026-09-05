@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="Source/Spelljammer.App/Spelljammer.App.csproj" />
+  <Project Path="Source/Spelljammer.Localization/Spelljammer.Localization.csproj" />
+  <Project Path="Source/Spelljammer.Simulation/Spelljammer.Simulation.csproj" />
+  <Project Path="Tests/Spelljammer.Localization.Tests/Spelljammer.Localization.Tests.csproj" />
+  <Project Path="Tests/Spelljammer.Simulation.Tests/Spelljammer.Simulation.Tests.csproj" />
+  <Project Path="Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj" />
+</Solution>

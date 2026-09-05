@@ -1,7 +1,7 @@
 # Large-scale 2D RTS architecture
 
 > [!NOTE]
-> This document is archived historical exploration from before WaterMargin
+> This document is archived historical exploration from before Spelljammer
 > adopted its colony-sandbox direction. It is not a current product plan. See
 > the [product vision](../Product/Vision.md) and
 > [first playable vertical slice](../Product/VerticalSlice.md).

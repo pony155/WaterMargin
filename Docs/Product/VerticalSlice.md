@@ -1,40 +1,62 @@
-# First playable vertical slice
+# First playable voyage
 
 ## Feature status
 
 - [x] Windows application host and SpriteForge renderer prototype
 - [x] Game-owned localization runtime and catalog compiler
-- [ ] Deterministic colony simulation project and fixed-tick host integration
-- [ ] Small authored map with persistent stable identities
-- [ ] Colonist needs, capabilities, and inspectable work priorities
-- [ ] Gather, haul, store, construct, eat, and rest job loop
-- [ ] Minimal resource stockpile and construction flow
-- [ ] Save/load round trip with a versioned format
-- [ ] Localized status, inspection, and command UI
-- [ ] Headless deterministic scenario coverage
+- [x] Headless deterministic expedition state and typed command boundary
+- [x] Seeded bounded sector chart with stable sector identities
+- [x] Travel, finite salvage, hull damage, repair, supplies, and return loop
+- [x] Prototype WPF command and status surface
+- [x] Compile-only deterministic simulation contracts
+- [ ] Fixed-tick host that separates committed simulation snapshots from input
+- [ ] Data-authored sector, ship, resource, and encounter definitions
+- [ ] Data-authored ancestry, lineage, culture, and character definitions
+- [ ] Crew roles, needs, injuries, and inspectable task choices
+- [ ] Tactical boarding or ship-to-ship encounter
+- [ ] Versioned save/load with validation and atomic publication
+- [ ] Runtime localization bootstrap for all prototype UI text
+- [ ] CI execution of headless deterministic scenario coverage
 
 ## Goal
 
-The first slice should prove one complete colony loop rather than the breadth of
-the final game. A few colonists begin on a small authored map, gather and haul a
-basic resource, construct a useful object, satisfy hunger and rest needs, and
-continue correctly after save/load.
+The first complete slice should prove a voyage, not the breadth of the final
+universe. A small crew leaves an anchorage aboard a vulnerable ship, chooses a
+route through a compact generated region, acquires something valuable through
+at least one risky encounter, responds to a ship or crew problem, and either
+returns with a prize or is lost.
+
+The checked-in prototype currently proves only the navigation/resource spine:
+a 4 × 4 chart, deterministic hazards and salvage, consumable fuel and supplies,
+hull repair, and a return threshold. It is playable scaffolding, not the full
+vertical slice.
+
+## Required slice loop
+
+1. Start from an explicit seed with a known ship and crew manifest.
+2. Inspect reachable destinations and their known costs or uncertainty.
+3. Commit travel through the authoritative command boundary.
+4. Resolve a location through exploration, salvage, negotiation, or combat.
+5. Apply persistent costs and consequences to crew, ship, cargo, and factions.
+6. Change plans in response to damage or dwindling supplies.
+7. Return to the anchorage and atomically save the voyage result.
 
 ## Required boundaries
 
-- `WaterMargin.Simulation` owns authoritative state and does not depend on WPF,
-  renderer handles, or localized strings.
-- The WPF application translates player intent into typed commands and renders
-  committed simulation snapshots through SpriteForge.
-- Every work decision exposes a stable reason suitable for debugging and
-  localized presentation.
-- Random choices use owned seeded streams; replaying the same command sequence
-  from the same initial state produces the same authoritative result.
+- `Spelljammer.Simulation` owns authoritative state and has no dependency on
+  WPF, renderer handles, native pointers, wall-clock time, or localized strings.
+- The host translates player intent into typed commands and presents committed
+  snapshots rather than directly mutating state.
+- Generated results are pure functions of versioned definitions, seed, and
+  command history.
+- Commands have stable, inspectable rejection reasons and never partially
+  mutate state.
 - Save data uses versioned stable IDs and validates completely before replacing
-  the active world.
+  an active campaign.
+- Collections, searches, queues, and per-step work have explicit bounds.
 
 ## Explicitly deferred
 
-Procedural world generation, combat, factions, diplomacy, multiplayer, broad
-mod support, complex health simulation, and production-scale content are not
-required for the first playable slice.
+An open-ended galaxy, multiplayer, seamless planets, large fleets, procedural
+narrative prose, broad mod support, and production-scale content are not
+required for the first playable voyage.

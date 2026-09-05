@@ -1,191 +1,118 @@
-# WaterMargin
+# Spelljammer
 
-WaterMargin is an in-development 2D colony and sandbox simulation built with
-the [SpriteForge](https://github.com/pony155/SpriteForge) engine. Its direction is inspired by the
-systemic storytelling and settlement-management possibilities of games such as
-RimWorld, while using original rules, setting, content, code, and artwork.
+Spelljammer is an in-development 2D outer-space sandbox roguelike built with
+the [SpriteForge](https://github.com/pony155/SpriteForge) engine. The player
+commands a small voidfaring ship, explores a seeded star chart, takes risks for
+salvage, and tries to bring enough of the expedition home to finance the next
+voyage.
+
+Spelljammer is the requested working project name. The current implementation
+draws inspiration from the broad fantasy of age-of-sail adventure among the
+stars and from systemic roguelikes, while its universe, terminology,
+characters, rules, content, code, artwork, and sound remain original.
 
 > [!IMPORTANT]
-> WaterMargin is in its foundation stage. The repository currently provides a
-> Windows WPF rendering host and a substantial localization foundation; it is
-> not yet a playable sandbox game.
+> Spelljammer is at a playable-prototype stage, not a content-complete game.
+> The current shell exposes a small deterministic expedition loop and a native
+> renderer demonstration. Crew simulation, encounters, combat, trading,
+> procedural ship interiors, saves, and a full game UI remain planned.
 
-## Game direction
+## Current prototype
 
-WaterMargin aims to create stories through interacting simulation systems
-rather than a fixed sequence of scripted outcomes. The intended pillars are:
-
-- colonists with needs, skills, work priorities, relationships, and lasting
-  consequences;
-- a persistent settlement shaped by construction, production, resources,
-  environment, threats, and recovery;
-- understandable systems that let players plan, automate, specialize, and
-  improvise;
-- deterministic, saveable simulation with stable identities and data-driven
-  content; and
-- a moddable foundation that keeps gameplay rules separate from reusable
-  engine services.
-
-These are product goals, not claims about implemented features.
-
-## Current status
+Each new chart creates a deterministic 4 × 4 region from an explicit seed.
+Travel consumes fuel and can damage the hull; time consumes supplies. A sector
+can be salvaged only once, recovered cargo can patch the hull, and a successful
+run requires returning to the free anchorage with at least eight cargo.
 
 Implemented foundations include:
 
-- a .NET 10, C# 14, Windows x64 WPF application shell;
-- a child Win32 viewport that renders through the native SpriteForge D3D12
-  sprite renderer;
-- a narrow managed/native renderer interop layer;
-- a deterministic astronomical Chinese calendar for years 960 through 1644,
-  including lunar/civil conversion, leap months, solar terms, and sexagenary
-  year identities;
-- versioned Game-owned localization catalogs, typed message formatting,
-  explicit locale fallback, pinned plural/number profiles, pseudo-locales, and
-  offline catalog tooling; and
-- compile-time localization test coverage and deterministic catalog fixtures.
+- a headless `Spelljammer.Simulation` project with immutable expedition state,
+  typed commands, stable sector identities, explicit rejection reasons, bounded
+  maps, and seed-derived hazards and rewards;
+- a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
+- a child Win32 viewport rendered through SpriteForge's native D3D12 sprite
+  renderer and a narrow managed/native interop layer;
+- versioned game-owned localization catalogs, typed message formatting,
+  explicit fallback, pinned plural/number profiles, pseudo-locales, and offline
+  catalog tooling; and
+- compile-only simulation and localization contract targets for CI execution.
 
-Colony simulation, world generation, colonist behavior, jobs, construction,
-saves, and a complete game UI remain future work.
+## Product direction
 
-## Technology
+- **A ship is a home:** its hull, cargo space, modules, crew, and damage persist
+  through a voyage and force meaningful tradeoffs.
+- **The chart is a gamble:** routes reveal hazards, opportunities, factions,
+  strange environments, and shortcuts one decision at a time.
+- **Systems tell the story:** crew needs, ship failures, weather, pursuit,
+  resources, and encounters combine without a prescribed plot.
+- **Retreat is a decision:** a modest return keeps a campaign alive; greed can
+  strand a run in the void.
+- **Runs are reproducible:** explicit seeds and command streams make simulation
+  outcomes testable and debuggable.
 
-- .NET 10 and C# 14
-- WPF for the current Windows application host
-- SpriteForge native engine and D3D12 renderer
-- MIT-licensed Astronomy Engine, pinned and vendored for offline calendar builds
-- CMake integration for localization tooling
-- UTF-8 source catalogs compiled into bounded deterministic artifacts
-
-SpriteForge is maintained in a separate repository. The expected sibling
-checkout layout is:
-
-```text
-development/
-├── SpriteForge/    Native engine and framework
-└── WaterMargin/    Game, content, and game-owned tooling
-```
-
-Do not commit an absolute local engine path; provide it as a build property or
-environment variable.
+These are product goals, not claims that every system is implemented. See
+[`Docs/Product/Vision.md`](Docs/Product/Vision.md) and
+[`Docs/Product/VerticalSlice.md`](Docs/Product/VerticalSlice.md). The planned
+crew ancestries, lineages, physiology, and character-generation boundaries are
+defined in [`Docs/Product/Characters.md`](Docs/Product/Characters.md).
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
-| `Source/WaterMargin.App/` | Current WPF application, SpriteForge interop, and renderer presentation. |
-| `Source/WaterMargin.Calendar/` | Ancient Chinese calendar rules and stable calendar-domain types. |
-| `Source/WaterMargin.Localization/` | Game-owned localization runtime and message formatter. |
-| `Tools/WaterMargin.Localization.Compiler/` | Source-catalog compiler and validation tools. |
+| `Source/Spelljammer.App/` | WPF host, expedition presentation, SpriteForge interop, and renderer viewport. |
+| `Source/Spelljammer.Simulation/` | Headless authoritative space-expedition state and commands. |
+| `Source/Spelljammer.Localization/` | Game-owned localization runtime and message formatter. |
+| `Tools/Spelljammer.Localization.Compiler/` | Source-catalog compiler and validation tools. |
 | `Content/Localization/` | Authored catalogs and pinned locale-data notices. |
-| `Tests/WaterMargin.Localization.Tests/` | Localization contract test project. |
-| `Tests/WaterMargin.Calendar.Tests/` | Calendar invariant and conversion test project. |
-| `ThirdParty/AstronomyEngine/` | Pinned MIT astronomy implementation used by the calendar. |
-| `Docs/Product/` | Product vision and first playable vertical slice. |
-| `Docs/Architecture/` | Current subsystem designs. |
-| `Docs/Archive/` | Historical design explorations. |
+| `Tests/Spelljammer.Simulation.Tests/` | Compile-only deterministic simulation contracts. |
+| `Tests/Spelljammer.Localization.Tests/` | Compile-only localization contracts. |
+| `Docs/Product/` | Current vision and playable-slice scope. |
+| `Docs/Architecture/` | Implemented and planned subsystem boundaries. |
+| `Docs/Archive/` | Historical explorations; not current product authority. |
 | `Build/` | Focused CMake declarations included by the root project. |
-
-## Prerequisites
-
-For the current Windows host, install:
-
-- the .NET 10 SDK;
-- Visual Studio Build Tools with Desktop development with C++ and a Windows SDK;
-- CMake 3.21 or newer, Ninja, and Python 3 for SpriteForge generation; and
-- the dependencies required by the sibling SpriteForge checkout.
-
-Follow SpriteForge's own README for its complete dependency and platform setup.
 
 ## Build and run
 
-From `WaterMargin`, define the sibling engine root and build SpriteForge first:
+Install the .NET 10 SDK and build the managed solution:
+
+```powershell
+dotnet build .\Spelljammer.slnx
+```
+
+The WPF host also needs a built sibling SpriteForge checkout. Supply its native
+output without committing a developer-specific path:
 
 ```powershell
 $env:SPRITEFORGE_ROOT = (Resolve-Path ..\SpriteForge)
-
-Push-Location $env:SPRITEFORGE_ROOT
-.\build\generate_projects.bat `
-    --preset buildtools\presets\windows-msvc.xml `
-    --generator Ninja `
-    --build-type debug
-cmake --build .\build\windows-msvc-debug --target install --parallel
-Pop-Location
-```
-
-Build and run WaterMargin while pointing MSBuild at the installed native
-engine binaries:
-
-```powershell
 $nativeDir = Join-Path $env:SPRITEFORGE_ROOT 'build\windows-msvc-debug\release\bin'
-dotnet build .\WaterMargin.slnx -p:SpriteForgeNativeDir="$nativeDir"
-dotnet run --project .\Source\WaterMargin.App\WaterMargin.App.csproj `
+
+dotnet build .\Spelljammer.slnx -p:SpriteForgeNativeDir="$nativeDir"
+dotnet run --project .\Source\Spelljammer.App\Spelljammer.App.csproj `
     -p:SpriteForgeNativeDir="$nativeDir"
 ```
 
-The native DLLs are copied beside the managed output. The current host is
-Windows-only even though reusable SpriteForge engine components target other
-platforms.
+Follow SpriteForge's README to configure and install the native engine. The
+current host is Windows-only even though reusable SpriteForge components may
+target other platforms.
 
 ## Localization
 
-`en-US` is the current source locale. Development pseudo-locales help expose
-hard-coded text, clipping, and expansion issues. Compile a source catalog with:
+`en-US` is the current source locale. Compile a source catalog with:
 
 ```powershell
-dotnet run --project .\Tools\WaterMargin.Localization.Compiler\WaterMargin.Localization.Compiler.csproj -- `
+dotnet run --project .\Tools\Spelljammer.Localization.Compiler\Spelljammer.Localization.Compiler.csproj -- `
     compile `
     .\Content\Localization\en-US\core.sfloc.json `
     .\out\Localization\en-US\core.sfloc
 ```
 
-See
-[`Source/WaterMargin.Localization/README.md`](Source/WaterMargin.Localization/README.md)
-for catalog syntax, runtime limits, formatting behavior, and tooling commands.
-
-## Ancient Chinese calendar
-
-`WaterMargin.Calendar` provides an astronomical Chinese lunisolar calendar for
-Chinese years 960 through 1644. It uses a fixed UTC+08:00 day boundary and does
-not inspect the host timezone or culture. Calendar values are stable enums and
-numbers; Chinese or translated display names belong in localization catalogs.
-
-```csharp
-using WaterMargin.Calendar;
-
-AncientChineseCalendar calendar = new();
-ChineseCalendarYear year = calendar.GetYear(1120);
-HistoricalDate civilDate = calendar.ToCivilDate(new ChineseDate(1120, 1, 1));
-ChineseDate lunarDate = calendar.FromCivilDate(civilDate);
-IReadOnlyList<SolarTermOccurrence> terms = calendar.GetSolarTerms(1120);
-```
-
-The implementation projects astronomical Chinese-calendar rules backward; it
-is suitable as deterministic game chronology, not as a claim that every date
-matches a particular Northern Song official almanac. Its comparison civil date
-uses the Julian calendar through 1582-10-04 and the Gregorian calendar from
-1582-10-15 to remain compatible with the reference project's date convention.
-See [`Docs/Architecture/AncientChineseCalendar.md`](Docs/Architecture/AncientChineseCalendar.md).
-
-## Documentation
-
-- [`Docs/Product/Vision.md`](Docs/Product/Vision.md) defines the current
-  colony-sandbox direction.
-- [`Docs/Product/VerticalSlice.md`](Docs/Product/VerticalSlice.md) scopes the
-  first complete playable simulation loop.
-- [`Docs/Architecture/Localization.md`](Docs/Architecture/Localization.md) describes the
-  implemented localization phases and planned production workflow.
-- [`Docs/Architecture/AncientChineseCalendar.md`](Docs/Architecture/AncientChineseCalendar.md)
-  defines the implemented calendar rules, public API, and historical limits.
-- [`Docs/Archive/LargeScaleRtsConcept.md`](Docs/Archive/LargeScaleRtsConcept.md) is an earlier RTS design
-  exploration. It has not yet been revised for WaterMargin's colony-sandbox
-  direction and should not be treated as the current gameplay specification.
-- [`AGENTS.md`](AGENTS.md) defines repository ownership, architecture, and
-  verification rules for contributors and coding agents.
+See [`Source/Spelljammer.Localization/README.md`](Source/Spelljammer.Localization/README.md)
+for catalog syntax and runtime behavior.
 
 ## Contributing
 
-Keep game rules and content in WaterMargin and reusable engine behavior in
-SpriteForge. Changes that cross the managed/native boundary should document the
-required interop version and remain independently buildable in both
-repositories. Do not claim roadmap features as implemented until source,
-integration, and appropriate verification exist.
+Keep game rules and content in Spelljammer and reusable engine behavior in
+SpriteForge. Authoritative state must remain independent of WPF, renderer
+handles, localized strings, frame rate, and wall-clock timing. Describe roadmap
+work as planned until source and verification exist.

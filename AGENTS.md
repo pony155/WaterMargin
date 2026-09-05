@@ -1,22 +1,24 @@
 # AGENTS.md
 
 This file defines repository-wide guidance for contributors and coding agents
-working on WaterMargin. If a more specific `AGENTS.md` is added under a
+working on Spelljammer. If a more specific `AGENTS.md` is added under a
 subdirectory, the closest file takes precedence for that subtree.
 
 ## Mission and current state
 
-WaterMargin is an original colony and sandbox simulation inspired by the
-systemic storytelling, settlement management, and player-driven problem
-solving of games such as RimWorld. It must develop its own setting, names,
-visual identity, rules, content, and assets; do not copy proprietary game data,
-text, artwork, audio, code, or branding.
+Spelljammer is the requested working name for an original outer-space sandbox
+roguelike inspired by the broad fantasy of age-of-sail adventure among the
+stars and by systemic games. It must develop its own setting, names, cosmology,
+visual identity, rules, content, and assets. Do not assume the working name
+licenses proprietary game data, lore, characters, creatures, text, artwork,
+audio, code, trade dress, or branding.
 
-The repository is at an early foundation stage. It currently contains a
-Windows x64 .NET 10 WPF host, a narrow native rendering bridge to SpriteForge,
-and Game-owned localization runtime/tooling. It does not yet contain a playable
-colony simulation. Describe features according to their implemented state and
-label future-facing design as planned.
+The repository is at an early prototype stage. It currently contains a Windows
+x64 .NET 10 WPF host, a narrow native rendering bridge to SpriteForge,
+Game-owned localization runtime/tooling, and a small deterministic
+space-expedition loop. It does not yet contain the planned crew, encounter,
+ship-interior, campaign, or save systems. Describe features according to their
+implemented state and label future-facing design as planned.
 
 `Docs/Archive/LargeScaleRtsConcept.md` predates the current sandbox direction.
 Treat it as historical exploration; it is not the authority for new gameplay
@@ -24,8 +26,9 @@ work. Current product direction lives under `Docs/Product`.
 
 ## Repository and engine boundary
 
-- WaterMargin owns all game-specific simulation, rules, content, UI flows,
-  saves, scenarios, localization keys, and presentation decisions.
+- Spelljammer owns all game-specific voyage and crew simulation, rules,
+  content, UI flows, saves, scenarios, localization keys, and presentation
+  decisions.
 - SpriteForge is a separate reusable engine repository. In the standard local
   layout it is the sibling directory `../SpriteForge`.
 - Do not copy SpriteForge source into this repository or depend on private
@@ -37,21 +40,21 @@ work. Current product direction lives under `Docs/Product`.
   interop version.
 - Reusable rendering, platform, input, audio, text shaping, world/ECS, asset,
   and framework capabilities belong in SpriteForge. A mechanic belongs in
-  WaterMargin until a concrete reusable engine requirement is demonstrated.
+  Spelljammer until a concrete reusable engine requirement is demonstrated.
 - Never commit a developer-specific absolute SpriteForge path. Accept it
   through an environment variable, MSBuild property, or local untracked
   configuration.
 
 ## Product pillars
 
-- Systemic colony simulation in which simple rules combine into unexpected
-  situations and stories.
-- Colonists with understandable needs, capabilities, relationships, work, and
-  consequences rather than opaque scripted outcomes.
-- A persistent settlement where construction, resources, production, danger,
-  recovery, and environmental pressure interact.
-- Player freedom to prioritize, automate, specialize, and recover from failure
-  without one mandatory solution.
+- Systemic voyage simulation in which ship, crew, environment, resources, and
+  factions combine into unexpected situations and stories.
+- Crew members with understandable needs, capabilities, relationships, tasks,
+  and consequences rather than opaque scripted outcomes.
+- A persistent ship whose modules, cargo, damage, and history interact with a
+  dangerous seeded star chart and a recurring home anchorage.
+- Player freedom to choose routes, configure the ship, assign priorities,
+  bargain, fight, retreat, and recover without one mandatory solution.
 - Data-driven definitions and stable identities that support balancing,
   content growth, save migration, and eventual modding without hard-coding
   presentation text into simulation state.
@@ -83,7 +86,7 @@ smallest playable vertical slice before broadening the simulation surface.
 
 ## Managed/native boundary
 
-- `Source/WaterMargin.App/Interop/SpriteForgeNative.cs` owns the low-level
+- `Source/Spelljammer.App/Interop/SpriteForgeNative.cs` owns the low-level
   SpriteForge imports. Keep the ABI narrow, versioned, blittable, and explicit
   about ownership, thread affinity, units, ranges, and error status.
 - Do not allow managed exceptions to escape callbacks into native code, or C++
@@ -115,14 +118,13 @@ smallest playable vertical slice before broadening the simulation surface.
 
 | Path | Responsibility |
 | --- | --- |
-| `Source/WaterMargin.App/` | Current WPF shell, native interop, and presentation host. |
-| `Source/WaterMargin.Calendar/` | Deterministic game-owned ancient Chinese calendar and stable calendar-domain types. |
-| `Source/WaterMargin.Localization/` | Game-owned catalog runtime, formatting, identity, and limits. |
-| `Tools/WaterMargin.Localization.Compiler/` | Offline source-catalog parser and compiler. |
+| `Source/Spelljammer.App/` | Current WPF shell, native interop, and expedition presentation host. |
+| `Source/Spelljammer.Simulation/` | Headless authoritative voyage state, seeded sector generation, and typed commands. |
+| `Source/Spelljammer.Localization/` | Game-owned catalog runtime, formatting, identity, and limits. |
+| `Tools/Spelljammer.Localization.Compiler/` | Offline source-catalog parser and compiler. |
 | `Content/Localization/` | Authored locale catalogs and pinned locale-data notices. |
-| `Tests/WaterMargin.Localization.Tests/` | Headless localization contracts and corruption/formatting coverage. |
-| `Tests/WaterMargin.Calendar.Tests/` | Compile-only calendar invariants, conversion, and historical-boundary coverage. |
-| `ThirdParty/AstronomyEngine/` | Pinned MIT-licensed astronomy calculations used behind the Game calendar boundary. |
+| `Tests/Spelljammer.Localization.Tests/` | Headless localization contracts and corruption/formatting coverage. |
+| `Tests/Spelljammer.Simulation.Tests/` | Compile-only determinism, rejection, bounds, and resource-loop contracts. |
 | `Docs/Product/` | Current product direction and playable-slice scope. |
 | `Docs/Architecture/` | Implemented and planned subsystem architecture. |
 | `Docs/Archive/` | Historical design material that is not current product authority. |
@@ -139,12 +141,12 @@ placing it in `Localization`, the WPF shell, or the native interop layer.
    serialization format, localization artifact, or native interop structure.
 3. Make the smallest coherent change and add focused coverage for success,
    failure, bounds, and rollback behavior.
-4. Update `WaterMargin.slnx`, the relevant `.csproj`, or CMake declaration when
+4. Update `Spelljammer.slnx`, the relevant `.csproj`, or CMake declaration when
    adding or moving compiled sources.
 5. Update README or design status when setup, supported behavior, limitations,
    or public workflows change.
 6. Review the final diff for generated files, machine paths, secrets, stale
-   claims, and accidental changes outside WaterMargin.
+   claims, and accidental changes outside Spelljammer.
 
 ## Build and verification
 
@@ -158,9 +160,9 @@ Build and install SpriteForge before launching the WPF host, then pass its
 native output directory through `SpriteForgeNativeDir`. Do not hard-code that
 path in the project.
 
-For WaterMargin changes:
+For Spelljammer changes:
 
-- Run `dotnet build .\WaterMargin.slnx` with the appropriate
+- Run `dotnet build .\Spelljammer.slnx` with the appropriate
   `SpriteForgeNativeDir` property when native runtime copying is required.
 - Compile affected localization CMake or .NET targets when their sources or
   build declarations change.
