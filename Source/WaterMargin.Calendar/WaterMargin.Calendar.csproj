@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\ThirdParty\AstronomyEngine\AstronomyEngine.csproj" />
-  </ItemGroup>
-
-</Project>
