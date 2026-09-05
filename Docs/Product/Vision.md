@@ -36,6 +36,9 @@ of each voyage. The ship gradually becomes a record of those choices.
   strategic commitment.
 - **Systemic voyage stories:** crew, ship, environment, factions, resources,
   and encounters interact to create outcomes rather than follow a fixed plot.
+- **Classless characters:** attributes describe capability and independently
+  trained skills determine what a character can do; duties never lock future
+  progression.
 - **Risk has an exit:** returning early with a small prize is a valid result.
   Staying out longer can transform a campaign or end it.
 - **Readable causality:** the interface explains costs, blockers, hazards, and

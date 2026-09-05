@@ -12,9 +12,11 @@ only ship-level expedition resources.
 - Make every crew member mechanically understandable and narratively distinct.
 - Support humans, elves, half-elves, dwarves, orcs, vampires, and future
   ancestries without hard-coding content into simulation code.
+- Use classless progression: attributes describe capability, skills improve
+  through use and training, and no class limits what a character may learn.
 - Give each ancestry recognizable strengths, needs, and complications without
   prescribing personality, morality, intelligence, profession, or faction.
-- Separate inherited physiology from culture, upbringing, vocation, belief,
+- Separate inherited physiology from culture, upbringing, training, belief,
   and personal traits.
 - Let ancestry matter aboard a ship: atmosphere, gravity, food, sleep, medical
   care, room design, travel hazards, and relationships should all interact.
@@ -48,7 +50,9 @@ A persistent character is composed from independent, stable layers:
 | Lineage | voidborn human, deepforge dwarf | One focused adaptation and one meaningful cost |
 | Culture | free anchorage, convoy clan, court exile | Languages, customs, starting relationships, learned knowledge |
 | Upbringing | dockhand, monastery ward, officer's child | Starting memories, contacts, and aptitudes |
-| Vocation | pilot, navigator, gunner, surgeon, artificer | Trained skills, not an immutable character class |
+| Attributes | might, finesse, vigor, reason | Broad capability shared by many actions |
+| Skills | piloting, engineering, medicine, command | Learned competence that improves independently |
+| Background | pilot, navigator, gunner, surgeon, artificer | Starting skill package and history, never a class |
 | Traits | patient, reckless, curious, claustrophobic | Individual behavior and preferences |
 | Conditions | injured, irradiated, vampiric, exhausted | Mutable health and supernatural state |
 | Relationships | trust, fear, affection, debt, rivalry | Character-specific social state |
@@ -170,10 +174,91 @@ Ship policy must record who may donate blood, when stores may be consumed, and
 how emergencies are handled. Consent, trust, faction law, and scarcity create
 the conflict; vampirism does not assign morality.
 
-## Skills and shipboard roles
+## Classless character system
 
-Ancestry never locks a role. Any character can train any vocation when their
-body can use the required equipment. The first role set is planned as:
+Characters have no class, global character level, class skill, or class-locked
+ability. A starting background answers “what has this person done before?” but
+does not decide what they can become. Every character may improve every skill,
+equip any compatible item, perform any ship duty, and learn any technique whose
+explicit requirements they meet.
+
+### Attributes
+
+Attributes express broad capability. Their normal player-facing range is 1–10;
+injuries, needs, equipment, supernatural conditions, and the environment apply
+temporary modifiers without rewriting the permanent value.
+
+| Attribute | Stable ID | Governs |
+| --- | --- | --- |
+| Might | `attribute.might` | Force, lifting, heavy weapons, and resisting forced movement |
+| Finesse | `attribute.finesse` | Coordination, balance, delicate manipulation, and reaction |
+| Vigor | `attribute.vigor` | Stamina, exertion, physical recovery, and environmental endurance |
+| Reason | `attribute.reason` | Analysis, memory, diagnosis, planning, and technical learning |
+| Awareness | `attribute.awareness` | Perception, attention, aim, danger detection, and spatial judgment |
+| Resolve | `attribute.resolve` | Concentration, fear resistance, pain tolerance, and self-control |
+| Presence | `attribute.presence` | Leadership, empathy, intimidation, performance, and negotiation |
+| Resonance | `attribute.resonance` | Aetheric sensitivity, magical control, and supernatural resistance |
+
+Ancestry may change physiological rules or make an attribute cheaper to use in
+a particular environment, but it does not set intelligence, morality, or a hard
+attribute ceiling. Permanent attributes change rarely through major training,
+lasting injuries, transformations, or campaign milestones.
+
+### Skills
+
+Skills express learned competence and advance independently. Their planned
+player-facing range is 0–100. A character can be an excellent pilot and novice
+navigator, or a skilled surgeon who later learns swordplay, without selecting
+or changing a class.
+
+| Area | Initial skills |
+| --- | --- |
+| Movement | athletics, acrobatics, EVA, stealth |
+| Voyage | piloting, astrogation, sensors, rigging |
+| Ship work | engineering, salvage, crafting, gunnery |
+| Combat | close combat, blades, marksmanship, defense |
+| Knowledge | medicine, aethercraft, xenology, lore |
+| Social | command, insight, persuasion, deception, trade |
+
+Skills do not have one permanently governing attribute. Each action selects the
+attribute appropriate to its method and context. For example, forcing a warped
+drive housing may use Might plus Engineering, diagnosing the same housing uses
+Reason plus Engineering, and repairing it during a storm may use Resolve plus
+Engineering. The UI must show the selected attribute, skill, equipment, help,
+conditions, and difficulty before or after resolution as appropriate.
+
+An action's capability is derived from:
+
+```text
+relevant attribute + relevant skill + equipment + assistance
+    + situational modifiers + deterministic random result
+```
+
+The exact formula is deferred until implementation and balancing. Random
+results must come from an explicitly owned seeded stream, and the action record
+must preserve enough information to reproduce the outcome.
+
+### Advancement
+
+- Using a skill against a meaningful challenge grants bounded practice for that
+  skill; trivial repeated actions do not provide unlimited advancement.
+- Instruction, manuals, simulators, and downtime projects can grant practice at
+  a resource and time cost.
+- High skill ranks require progressively more practice and may require a
+  teacher, facility, discovery, or dangerous field experience.
+- Techniques unlock from skill thresholds, attributes, relationships,
+  equipment, discoveries, or conditions—not from class levels.
+- Practice awards are deterministic, capped per committed action, and included
+  in the authoritative command result.
+- Enemies and encounters do not automatically scale to a global character
+  level. Location, faction, world state, and authored threat determine danger.
+
+## Shipboard duties
+
+Ancestry, background, and prior duty never lock a role. Shipboard roles are
+current assignments chosen by the player or schedule system. Their performance
+emerges from attributes, skills, equipment, health, needs, and cooperation. The
+first duty set is planned as:
 
 - captain: command, negotiation, morale, and voyage policy;
 - pilot: maneuvering, docking, and evasive travel;
@@ -184,8 +269,9 @@ body can use the required equipment. The first role set is planned as:
 - gunner: ship weapons, point defense, and boarding support; and
 - envoy: trade, language, customs, intelligence, and faction relations.
 
-Roles describe current duty. Skills improve through practice and instruction;
-injury, fatigue, equipment, relationships, and environment affect performance.
+A character may hold different duties on different watches or act outside an
+assignment during an emergency. The interface should recommend qualified crew
+without preventing unconventional assignments.
 
 ## Character generation
 
@@ -195,7 +281,7 @@ must be deterministic:
 1. Select an allowed ancestry and compatible lineage.
 2. Select culture and upbringing independently where scenario rules permit.
 3. Generate age stage, body parameters, name seed, pronouns, and appearance.
-4. Allocate vocation skills and one or more personal aptitudes.
+4. Allocate attributes, background skills, and one or more personal aptitudes.
 5. Add bounded traits, beliefs, relationships, memories, and conditions.
 6. Validate equipment, atmosphere, quarters, diet, and medical compatibility.
 7. Publish the character only after the complete definition passes validation.
@@ -247,9 +333,12 @@ unbounded generation tables before publication.
 
 The first crew-enabled vertical slice should use six authored characters: one
 human, elf, half-elf, dwarf, orc, and vampire. Each needs an ancestry, lineage
-or bloodline, culture, vocation, two traits, one relationship, and compatible
-quarters. The slice needs only four shared needs—rest, nutrition or thirst,
-safety, and belonging—and three duties: navigate, salvage, and repair.
+or bloodline, culture, background, attributes, skills, two traits, one
+relationship, and compatible quarters. The slice needs only four shared
+needs—rest, nutrition or thirst, safety, and belonging—and three duties:
+navigate, salvage, and repair. It should initially exercise piloting,
+astrogation, engineering, salvage, medicine, and command before broadening the
+skill catalog.
 
 The slice succeeds when ancestry changes real voyage decisions, every crew
 action has an inspectable reason, and replaying the same seed and commands

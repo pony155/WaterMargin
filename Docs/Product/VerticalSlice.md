@@ -12,7 +12,7 @@
 - [ ] Fixed-tick host that separates committed simulation snapshots from input
 - [ ] Data-authored sector, ship, resource, and encounter definitions
 - [ ] Data-authored ancestry, lineage, culture, and character definitions
-- [ ] Crew roles, needs, injuries, and inspectable task choices
+- [ ] Classless crew attributes, skills, needs, injuries, and inspectable duties
 - [ ] Tactical boarding or ship-to-ship encounter
 - [ ] Versioned save/load with validation and atomic publication
 - [ ] Runtime localization bootstrap for all prototype UI text

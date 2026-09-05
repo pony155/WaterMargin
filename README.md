@@ -45,6 +45,8 @@ Implemented foundations include:
   strange environments, and shortcuts one decision at a time.
 - **Systems tell the story:** crew needs, ship failures, weather, pursuit,
   resources, and encounters combine without a prescribed plot.
+- **Characters remain classless:** attributes shape broad capability while
+  skills improve independently through use, instruction, and experience.
 - **Retreat is a decision:** a modest return keeps a campaign alive; greed can
   strand a run in the void.
 - **Runs are reproducible:** explicit seeds and command streams make simulation
