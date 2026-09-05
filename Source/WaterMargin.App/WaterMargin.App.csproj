@@ -9,7 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WaterMargin.Calendar\WaterMargin.Calendar.csproj" />
     <ProjectReference Include="..\WaterMargin.Localization\WaterMargin.Localization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\ThirdParty\AstronomyEngine\LICENSE"
+          Link="ThirdPartyNotices\AstronomyEngine-LICENSE.txt"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

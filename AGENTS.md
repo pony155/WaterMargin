@@ -116,10 +116,13 @@ smallest playable vertical slice before broadening the simulation surface.
 | Path | Responsibility |
 | --- | --- |
 | `Source/WaterMargin.App/` | Current WPF shell, native interop, and presentation host. |
+| `Source/WaterMargin.Calendar/` | Deterministic game-owned ancient Chinese calendar and stable calendar-domain types. |
 | `Source/WaterMargin.Localization/` | Game-owned catalog runtime, formatting, identity, and limits. |
 | `Tools/WaterMargin.Localization.Compiler/` | Offline source-catalog parser and compiler. |
 | `Content/Localization/` | Authored locale catalogs and pinned locale-data notices. |
 | `Tests/WaterMargin.Localization.Tests/` | Headless localization contracts and corruption/formatting coverage. |
+| `Tests/WaterMargin.Calendar.Tests/` | Compile-only calendar invariants, conversion, and historical-boundary coverage. |
+| `ThirdParty/AstronomyEngine/` | Pinned MIT-licensed astronomy calculations used behind the Game calendar boundary. |
 | `Docs/Product/` | Current product direction and playable-slice scope. |
 | `Docs/Architecture/` | Implemented and planned subsystem architecture. |
 | `Docs/Archive/` | Historical design material that is not current product authority. |
