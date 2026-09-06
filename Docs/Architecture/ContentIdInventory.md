@@ -17,9 +17,10 @@ definition families. Candidate strings were deduplicated and then reviewed to
 separate gameplay IDs from localization keys and adjacent definition kinds.
 
 Included categories are Attributes, Skills, learned Feats, racial or Heritage
-Talents, Access gates, Spells, psychic techniques, combat contexts, ship
-modules, factions, and crises. Crisis phase and resolution IDs are retained in
-separate tables because they are explicit crisis content references.
+Talents, Access gates, Spells, psychic techniques, combat contexts, travel
+events and their explicit choices, ship modules, factions, and crises. Event
+choice, crisis phase, and crisis resolution IDs are retained in separate tables
+because they are explicit content references.
 
 Excluded strings include localized keys ending in `.name` or `.description`,
 formula and effect IDs, psychic discipline IDs, psychic information-scope IDs,
@@ -33,17 +34,19 @@ inventoried when their definition schemas enter roadmap scope.
 | Attributes | 7 | [`Attributes.md`](../DesignConcept/Attributes.md) |
 | Skills | 29 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Learned Feats | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
-| Talents | 10 | [`Races.md`](../DesignConcept/Races.md) |
+| Talents | 12 | [`Races.md`](../DesignConcept/Races.md) |
 | Access gates | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Spells | 32 | [`Spells.md`](../DesignConcept/Spells.md) |
 | Psychic techniques | 4 | [`PsychicAbilities.md`](../DesignConcept/PsychicAbilities.md) |
 | Combat contexts | 6 | [`Battle.md`](../DesignConcept/Battle.md) |
-| Ship modules | 34 | [`Ships.md`](../DesignConcept/Ships.md) |
+| Travel events | 8 | [`Events.md`](../DesignConcept/Events.md) |
+| Travel-event choices | 3 | [`Events.md`](../DesignConcept/Events.md) |
+| Ship modules | 35 | [`Ships.md`](../DesignConcept/Ships.md) |
 | Factions | 6 | [`Factions.md`](../DesignConcept/Factions.md) |
 | Crisis families | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis phases | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis resolutions | 3 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
-| **Total** | **149** | |
+| **Total** | **163** | |
 
 ## Attributes
 
@@ -104,6 +107,7 @@ inventoried when their definition schemas enter roadmap scope.
 | --- | --- |
 | Cometdelver Heritage Talent | `talent.heritage.dwarf.cometdelver` |
 | Braced Stance | `talent.race.dwarf.braced-stance` |
+| Soul Anchor | `talent.race.eidolon.soul-anchor` |
 | Aether Sense | `talent.race.elf.aether-sense` |
 | Closework | `talent.race.gnome.closework` |
 | Tight Passage | `talent.race.goblin.tight-passage` |
@@ -112,6 +116,7 @@ inventoried when their definition schemas enter roadmap scope.
 | Second Wind | `talent.race.orc.second-wind` |
 | Mindwake | `talent.race.somnari.mindwake` |
 | Unliving Physiology | `talent.race.vampire.unliving-physiology` |
+| Trail Sense | `talent.race.kharuun.trail-sense` |
 
 Heritage tables describe additional Heritage Talents without spelling out a
 Stable Talent ID for each row. Only the explicit Cometdelver example is listed
@@ -222,6 +227,27 @@ definition kinds and are not counted as psychic technique IDs.
 | Ship engagement | `combat.context.ship` |
 | Surface expedition | `combat.context.surface` |
 
+## Travel events
+
+| Display label | Stable ID |
+| --- | --- |
+| Aether Squall | `event.travel.aether-squall` |
+| Coolant Leak | `event.travel.coolant-leak` |
+| Crew Dispute | `event.travel.crew-dispute` |
+| Derelict Signal | `event.travel.derelict-signal` |
+| Distress Call | `event.travel.distress-call` |
+| Pirate Shadow | `event.travel.pirate-shadow` |
+| Starway Echo | `event.travel.starway-echo` |
+| Stowaway | `event.travel.stowaway` |
+
+### Explicit travel-event choices
+
+| Display label | Stable ID |
+| --- | --- |
+| Isolate the loop | `event.travel.coolant-leak.choice.isolate` |
+| Reduce power | `event.travel.coolant-leak.choice.reduce-power` |
+| Repair the leak | `event.travel.coolant-leak.choice.repair` |
+
 ## Ship modules
 
 | Display label | Stable ID |
@@ -231,6 +257,7 @@ definition kinds and are not counted as psychic technique IDs.
 | Boarding Lock | `module.contact.boarding-lock` |
 | Psychic Resonator | `module.contact.psychic-resonator` |
 | Signal Lantern | `module.contact.signal-lantern` |
+| Energy Shield | `module.defense.energy-shield` |
 | Reinforced Plating | `module.defense.reinforced-plating` |
 | Ward Projector | `module.defense.ward-projector` |
 | Atmosphere Recycler | `module.habitat.atmosphere-recycler` |
@@ -312,7 +339,7 @@ by this inventory.
 
 ## Review result
 
-The requested categories contain 149 unique explicit gameplay IDs. No duplicate
+The requested categories contain 163 unique explicit gameplay IDs. No duplicate
 ID is assigned to two different labels within these tables. Repeated references
 to the same ID across design documents were consolidated under one entry.
 

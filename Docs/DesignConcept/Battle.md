@@ -285,6 +285,8 @@ The tactical state tracks:
 - available firing arcs, weapon damage, rate of fire, effective and maximum
   range, reload state, damage type and area, armor penetration, ammunition,
   heat, and charge;
+- Energy Shield maximum and current Shield Value, Recharge Rate, Energy
+  Consumption Rate, and raised or lowered state;
 - power and aether allocation across propulsion, defense, weapons, sensors, and
   damaged networks;
 - exposed or protected modules and compartments;
@@ -301,9 +303,9 @@ need any declared operator, preparation, resources, and recovery time.
 Positions grant responsibility and authority, not automatic skill ranks.
 
 Typical ship actions include scan, identify, set course, apply thrust, turn,
-brake, intercept, match velocity, hold formation, evade, fire, ram, brace, vent
-heat, reroute power, repair, jam, signal, negotiate, launch boarding, repel
-boarding, rescue, disengage, and surrender.
+brake, intercept, match velocity, hold formation, evade, fire, ram, raise or
+lower shields, brace, vent heat, reroute power, repair, jam, signal, negotiate,
+launch boarding, repel boarding, rescue, disengage, and surrender.
 
 Weapons target a ship, visible module, exposed compartment, projectile, or
 declared area according to their tags. Precision targeting requires sufficient
@@ -317,6 +319,24 @@ charge. Rate of fire schedules shots; reload time controls when the cannon can
 fire again. Damage, damage type, damage area, and armor penetration resolve
 against the target's protection. Cannon resolution does not add a recoil stat
 or wait for an assigned Gunner.
+
+Ship attack damage crosses three explicit defensive layers:
+
+1. If the whole-ship Energy Shield is raised and powered for the tick, subtract
+   damage from its current Shield Value. Excess damage continues.
+2. Apply remaining damage to the struck armor section. Armor protection and the
+   weapon's armor penetration determine how much passes through and how much
+   armor integrity is lost.
+3. Commit penetrating damage to hull structure, compartments, modules, cargo,
+   networks, or exposed crew according to the hit location and damage area.
+
+Current Shield Value is a finite state value, not bonus armor. While the shield
+is raised and receives its full Energy Consumption Rate, each fixed tick adds
+its Recharge Rate up to the maximum Shield Value. Those are its only combat
+statistics. Lowering a shield stops both consumption and replenishment and
+never repairs armor. Ward Projectors resolve only their declared magical,
+psychic, or environmental
+effects and do not silently substitute for an Energy Shield.
 
 A ram requires a compatible installed prow module, a legal collision course,
 and sufficient relative velocity. Impact resolves damage and impulse for both
@@ -482,10 +502,10 @@ under explicit rules. Death-causing effects, bleed-out deadlines, stabilization,
 and coup-de-grace actions are visible and do not arise from hidden narrative
 fiat.
 
-Ships resolve harm through defenses, armor, hull structure, compartments,
-modules, networks, fires, breaches, and crew exposure as defined in
-[`Ships.md`](Ships.md). Character and ship damage commit together when one
-attack affects both.
+Ships resolve harm through finite current Shield Value, sectional armor, hull
+structure, compartments, modules, networks, fires, breaches, and crew exposure
+as defined in [`Ships.md`](Ships.md). Character and ship damage commit together
+when one attack affects both.
 
 ## Morale, surrender, and prisoners
 
@@ -565,11 +585,12 @@ An authored encounter definition resembles:
 
 Persistent battle state stores definition revisions, encounter seed and random
 streams, tick, participants, teams, knowledge, continuous ship positions,
-headings and velocities, personal zone and cell state, objectives, Turn Meters,
-current AP and reserved reaction AP, Ready-queue state, queued ship orders,
-reserved resources, scheduled actions, reactions, projectiles, active effects,
-hazards, injuries, ship damage, reinforcement state, retreat paths, and
-committed event history.
+headings and velocities, current Energy Shield value and raised state,
+sectional armor, personal zone and cell state, objectives, Turn Meters, current
+AP and reserved reaction AP, Ready-queue state, queued ship
+orders, reserved resources, scheduled actions, reactions, projectiles, active
+effects, hazards, injuries, ship damage, reinforcement state, retreat paths,
+and committed event history.
 
 Saving is allowed only at documented commit boundaries. Loading restores the
 same next authoritative tick and never rerolls an attack, AI choice,
@@ -580,11 +601,12 @@ cannot advance before the player receives the restored snapshot.
 ## Bounds and validation
 
 Runtime limits include ships, continuous-map extent, local space objects,
-spatial-query candidates, actors, personal-board dimensions, hex cells, zones,
-links, AP per activation, Ready actors, queued ship orders, planned personal
-actions, carried items, active effects, scheduled actions, reactions per
-trigger, projectiles, reinforcements, path expansions, visibility checks, AI
-candidates, event history, and maximum encounter duration.
+spatial-query candidates, armor sections per ship, actors,
+personal-board dimensions, hex cells, zones, links, AP per activation, Ready
+actors, queued ship orders, planned personal actions, carried items, active
+effects, scheduled actions, reactions per trigger, projectiles, reinforcements,
+path expansions, visibility checks, AI candidates, event history, and maximum
+encounter duration.
 
 Content loading rejects:
 
@@ -594,6 +616,9 @@ Content loading rejects:
   or a board, cell set, or zone graph beyond capacity;
 - attacks without skill, range, target, delivery, protection, harm, evidence,
   ammunition or charge, and miss behavior;
+- ship weapons or defenses without bounded Shield Value, Recharge Rate, Energy
+  Consumption Rate, armor, penetration, overflow, and hit-location behavior
+  where applicable;
 - supernatural actions without access, learned-content, cost, targeting, and
   resistance requirements;
 - reinforcements without source, limit, route, warning, and arrival condition;
@@ -612,9 +637,10 @@ failed reload leaves the previous definitions available.
 The first battle milestone should contain two connected encounters:
 
 1. a small real-time-with-pause engagement on a continuous 2D ship map with
-   scanning, course and thrust control, one weapon, module damage, damage
-   control, signaling, disengagement, queued station orders, and an optional
-   boarding route;
+   scanning, course and thrust control, one weapon, Energy Shield depletion and
+   replenishment, armor penetration, module damage, damage control,
+   signaling, disengagement, queued station orders, and an optional boarding
+   route;
 2. a bounded hex-board derelict or ruin expedition with six tactical zones,
    four active crew, individual Turn Meters and AP, limited visibility, one
    environmental hazard, one hostile group, one ancient defense, one

@@ -38,7 +38,7 @@ A ship consists of distinct persistent layers:
 | --- | --- |
 | Frame | Exterior shape, structural limits, mount zones, baseline hull, and maximum mass |
 | Compartments | Interior spaces, access paths, atmosphere zones, hazards, and room capacity |
-| Modules | Installed capabilities such as propulsion, life support, workshops, weapons, and wards |
+| Modules | Installed capabilities such as propulsion, life support, workshops, weapons, armor, energy shields, and wards |
 | Networks | Explicit power, atmosphere, heat, fuel, aether, control, and logistics connections |
 | Cargo | Bounded stored goods that are not permanently installed |
 | Crew stations | Places where assigned duties operate or assist modules |
@@ -70,6 +70,11 @@ responses. Ship cannon modules declare hardpoint size, firing arc, damage,
 rate of fire, effective and maximum range, reload time, damage type, damage
 area, armor penetration, and ammunition or supply paths. Cannons do not declare
 recoil or require a Gunner, crew station, or Gunnery Skill check.
+Energy-shield modules declare exactly three combat statistics: maximum Shield
+Value, Recharge Rate per fixed tick, and Energy Consumption Rate per fixed
+tick. An Energy Shield is distinct from a Ward Projector: shields intercept
+ordinary ship attacks, while wards counter declared magical, psychic, and
+environmental effects.
 Propulsion and power modules declare startup, shutdown, thrust, storage, fuel,
 cooling, and backbone requirements. Prow modules declare collision clearance,
 structural load, and whether they obstruct another prow fitting.
@@ -147,6 +152,7 @@ installed upgrade; it never permits arbitrary editing of combat statistics.
 | System | Mount and choices | Important consequences |
 | --- | --- | --- |
 | Armor | Install plating on compatible frame sections and choose protected arcs, material, thickness, and enchantments | Mass, maneuverability, coverage gaps, repair material, heat, and protection by damage type |
+| Energy shield | Install one shield module and connect a compatible energy feed | Shield Value, Recharge Rate, and Energy Consumption Rate |
 | Power | Choose an Arcane or Industrial core, storage, distribution, cooling, and optional converters | Available energy media, peak and sustained output, failure modes, signature, fuel, and maintenance |
 | Propulsion | Fit path-compatible main drives and maneuvering systems | Acceleration, turning, braking, propellant or aether use, heat, noise, and escape capability |
 | Prow | Install a ram, figurehead, sensor fitting, boarding device, or leave the mount clear | Collision capability, forward mass, clearance, identity, morale, enchantment capacity, and docking restrictions |
@@ -220,6 +226,7 @@ ship remains unchanged.
 | Module | Stable ID | Function | Typical skill or position |
 | --- | --- | --- | --- |
 | Reinforced Plating | `module.defense.reinforced-plating` | Adds localized protection at the cost of mass and maneuverability | Engineering |
+| Energy Shield | `module.defense.energy-shield` | Uses power or aether to provide a whole-ship Shield Value that absorbs damage and replenishes at its Recharge Rate | No dedicated Skill or crew position requirement |
 | Ward Projector | `module.defense.ward-projector` | Sustains a bounded defense against magical, psychic, or environmental threats | Magic, Psionics, or Enchantment; Warden |
 | Prow Ram | `module.prow.ram` | Reinforces a compatible prow for deliberate collision attacks while transmitting impact risk into the frame | Piloting or Engineering; Pilot |
 | Ship Figurehead | `module.prow.figurehead` | Provides a customizable prow fitting that can host declared enchantments, wards, sensors, or command effects | Crafting or Enchantment; Artificer |
@@ -257,6 +264,15 @@ tick. The authoritative simulation resolves supply in a stable order, records
 every unmet request, and exposes which producer, connection, capacity, policy,
 or priority blocked a module. Allocation and module updates occur on the fixed
 simulation tick and never depend on UI or rendering cadence.
+
+When raised, an Energy Shield requests its fixed Energy Consumption Rate every
+simulation tick. A fully supplied shield protects the entire ship and restores
+current Shield Value by its Recharge Rate, up to its maximum. Replenishment
+starts on the next fully powered tick after damage. If the request is not fully
+supplied, the shield provides no protection or recharge for that tick. Lowering
+it stops consumption but also stops protection and recharge. An Arcane variant
+accepts Aether, an Industrial variant accepts Power, and a hybrid installation
+needs an explicit compatible converter.
 
 ## Operation and crew
 
@@ -302,10 +318,10 @@ before the repair command is committed.
 
 Installation, removal, and replacement are transactional. The simulation
 validates frame capacity, footprint, mass, access, network compatibility,
-cargo displacement, armor coverage, firing arcs, cannon hardpoint size,
-collision loads, prow and docking clearance, module-specific crew access, and
-unique limits before changing the working configuration. Failed validation
-leaves the previous ship intact.
+cargo displacement, armor coverage, shield energy demand, firing arcs, cannon
+hardpoint size, collision loads, prow and docking clearance,
+module-specific crew access, and unique limits before changing the working
+configuration. Failed validation leaves the previous ship intact.
 Major refits normally require an anchorage or shipyard; explicitly tagged field
 modules may be swapped during a voyage.
 
@@ -331,17 +347,31 @@ An authored module definition resembles:
 }
 ```
 
+Energy Shield definitions add only these combat fields:
+
+| Field | Meaning |
+| --- | --- |
+| `shieldValue` | Positive maximum Shield Value for the installed module |
+| `rechargeRate` | Shield Value restored per fully powered fixed tick, capped at the maximum |
+| `energyConsumptionRate` | Power or Aether consumed per fixed tick while the shield is raised |
+
+All three values use bounded integer units. Current Shield Value and raised or
+lowered state belong to the installed module instance; the three authored
+statistics remain on its definition.
+
 Persistent ship state stores its primary path ID and backbone revision.
 
 Persistent module state stores instance ID, definition ID and revision,
 location, orientation, integrity, requested mode, faults, contents, installed
-upgrades, enchantments, and bounded history references. Saves never store a
-localized path or module name as identity.
+upgrades, enchantments, current Shield Value where applicable, and bounded
+history references. Saves never store a localized path or module name as
+identity.
 
 Definition loading rejects duplicate or missing IDs, unknown path references,
 invalid footprints, negative or excessive capacities, incompatible ports,
-impossible dependency cycles, unknown skills or tags, and unbounded fault
-propagation before publishing a replacement catalog.
+invalid Shield Value, Recharge Rate, or Energy Consumption Rate, impossible
+dependency cycles, unknown skills or tags, and unbounded fault propagation
+before publishing a replacement catalog.
 
 ## First playable ship scope
 
@@ -357,20 +387,23 @@ modules, and a choice between two fixed energy packages:
 | Cargo Hold and Salvage Rig | Bounded recovery and cargo capacity |
 | Workshop | Engineering repair and replacement parts |
 | Signal Lantern | Contact, negotiation, warnings, and distress calls |
+| Reinforced Plating and Energy Shield | Passive armor behind a powered, depleting, and recharging defense layer |
 | Deck Battery | One configurable cannon mount and its ammunition flow |
 | Prow Ram or Ship Figurehead | One visible loadout choice with a mechanical or customizable identity tradeoff |
 
 | Energy package | Starting modules | Slice tradeoff |
 | --- | --- | --- |
 | Arcane | Flux Sail, Aether Dynamo, Crystal Accumulator, and Ward Projector | Lower mass and supernatural defense against scarce reagents and aether instability |
-| Industrial | Propellant Drive, Diesel Generator, Flywheel Bank, and Reinforced Plating | Durable repairable dieselpunk output against greater mass, fuel, coolant, heat, and noise |
+| Industrial | Propellant Drive, Diesel Generator, and Flywheel Bank | Durable repairable dieselpunk output against greater mass, fuel, coolant, heat, and noise |
 
-The player selects one energy package, one armor arrangement, one prow fitting,
-and one weapon configuration before departure. The slice needs only one
-energy-allocation decision, one path-specific module fault, one crew-operated
-repair, and one choice where cargo, protection, firepower, or maneuverability
-competes for limited capacity. The fault must expose the affected module,
-network, and repair path. Full hybrid construction, changing paths during a
-voyage, atompunk Industrial upgrades, multiple frames, structural frame
-editing, large equipment catalogs, module manufacturing, and unrestricted
-shipyards remain deferred until that loop is deterministic and readable.
+The player selects one energy package, one armor arrangement, one Energy Shield
+module, one prow fitting, and one weapon configuration before departure. The
+slice needs shield depletion and replenishment, damage overflowing into armor,
+one energy-allocation decision, one path-specific module fault, one
+crew-operated repair, and one choice where cargo, protection, firepower, or
+maneuverability competes for limited capacity. The fault must expose the
+affected module, network, and repair path. Full hybrid construction, changing
+paths during a voyage, atompunk Industrial upgrades, multiple frames,
+structural frame editing, large equipment catalogs, module manufacturing, and
+unrestricted shipyards remain deferred until that loop is deterministic and
+readable.

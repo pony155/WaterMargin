@@ -10,7 +10,8 @@ only ship-level expedition resources.
 
 - Make every crew member mechanically understandable and narratively distinct.
 - Support humans, elves, half-elves, dwarves, orcs, gnomes, goblins, Somnari,
-  vampires, and future races without hard-coding content into simulation code.
+  vampires, Eidolons, Kharuun, and future races without hard-coding content
+  into simulation code.
 - Use classless progression: attributes describe capability, skills improve
   through use and training, and no class limits what a character may learn.
 - Give each race recognizable strengths, needs, and complications without
@@ -43,7 +44,7 @@ A persistent character is composed from independent, stable layers:
 | Layer | Examples | Simulation responsibility |
 | --- | --- | --- |
 | Identity | character ID, name seed, pronouns, portrait seed | Persistence and presentation lookup |
-| Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire | Body plan and baseline physiological rules |
+| Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire, Eidolon, Kharuun | Body plan and baseline physiological rules |
 | Heritage | voidborn, deepforge, free-anchorage | Subrace, formative tradition, languages, customs, and starting knowledge |
 | Attributes | Strength, Agility, Willpower, Intelligence, Luck, Charisma, Toughness | Broad capability shared by many actions |
 | Skills | piloting, engineering, merchant, negotiation, language and literacy | Learned competence that improves independently |
@@ -228,6 +229,60 @@ Ship policy must record how blood stores are acquired and consumed and how
 shortages are handled. Vampirism creates a resource constraint; it does not
 assign morality.
 
+### Eidolons
+
+Eidolons are an undead spirit race whose identity persists through a crafted
+Soul Anchor and an embodied vessel. Character creation stores `race.eidolon`
+and one compatible Heritage. They are distinct from vampires: a vampire
+maintains an undead body with vital essence, while an Eidolon's spirit operates
+a replaceable or reconstructable form from an external anchor.
+
+Their Race Talent, **Soul Anchor**, removes the need to breathe, eat ordinary
+food, or sleep and provides resistance to vacuum and common disease. Activity
+and recovery instead consume resonance held by the anchor, and serious bodily
+disruption requires a safe anchor, suitable material, and time to rebuild a
+usable vessel. This does not prevent injury, incapacitation, or removal from an
+encounter. Loss, capture, or depletion of the anchor prevents recovery.
+Conventional Medicine can treat a compatible organic vessel but not the spirit
+itself; Eidolon care usually combines Enchantment, Crafting, and purpose-built
+ship facilities.
+
+Soul Anchor is supernatural physiology, not spellcasting or psionics. It does
+not grant `access.magic`, `access.psionics`, a Skill rank, or a technique.
+Eidolons may learn either access Feat through the same training available to
+other characters. They are not inherently ancient, emotionless, truthful, or
+knowledgeable; memories and personality belong to the individual.
+
+| Heritage | Stable ID | Heritage Talent | Cost |
+| --- | --- | --- | --- |
+| Reliquary-Bound | `heritage.eidolon.reliquary-bound` | Reconstitutes more efficiently beside a portable, prepared reliquary | Concentrating anchor and reserve in one object makes its capture or damage especially dangerous |
+| Huskbound | `heritage.eidolon.huskbound` | A preserved organic vessel fits ordinary armor, tools, and some medical procedures | Decay control consumes preservative supplies and contaminated environments can damage the vessel |
+| Starwisp | `heritage.eidolon.starwisp` | A light semi-material vessel moves precisely in low gravity and through narrow openings | It carries little unaided mass and magical or electrical interference disrupts coordination |
+
+### Kharuun
+
+Kharuun are a spacefaring jackal-like race with long directional ears, keen
+chemical senses in atmosphere, and strong spatial memory. Character creation
+stores `race.kharuun` and one compatible Heritage. Their Race Talent,
+**Trail Sense**, reduces uncertainty when following an already observed
+physical, chemical, thermal, acoustic, or signal trail. It improves how
+Sensors, Xenology, Ancient Lore, and relevant field work use available
+evidence; it never reveals unobserved information and cannot smell through a
+vacuum without a collected sample or instrument.
+
+Kharuun breathe, eat, and sleep normally. Their hearing and scent can be
+overloaded by machinery, fumes, weapons, or unfamiliar atmospheres, so fitted
+helmets and sensory filters matter. Suits, seats, beds, and armor must also
+accommodate muzzle, ears, digitigrade legs, and tail. Kharuun are not
+inherently loyal, predatory, nomadic, or suited to a particular profession;
+those qualities come from the character and their communities.
+
+| Heritage | Stable ID | Heritage Talent | Cost |
+| --- | --- | --- | --- |
+| Sunwake | `heritage.kharuun.sunwake` | Tolerates heat, dry air, and long periods of measured water rationing | Cold exposure and sudden temperature drops accumulate fatigue faster |
+| Hull-Listener | `heritage.kharuun.hull-listener` | Reads faint vibration and movement through direct contact with a hull or deck | Heavy machinery, impacts, and sustained alarm noise cause sensory strain |
+| Startrail | `heritage.kharuun.startrail` | Retains bearings and correlates weak route traces after partial sensor loss | Featureless space and contradictory interference require more time and can produce false leads |
+
 ## Racial talents
 
 A **Talent** is a racial feat: a discrete rule granted by a character's Race or
@@ -256,6 +311,8 @@ Every character begins with two Talents:
 | Goblin | Tight Passage | `talent.race.goblin.tight-passage` | None |
 | Somnari | Mindwake | `talent.race.somnari.mindwake` | `access.psionics` |
 | Vampire | Unliving Physiology | `talent.race.vampire.unliving-physiology` | None by default |
+| Eidolon | Soul Anchor | `talent.race.eidolon.soul-anchor` | None by default |
+| Kharuun | Trail Sense | `talent.race.kharuun.trail-sense` | None |
 
 Heritage Talents use IDs such as `talent.heritage.dwarf.cometdelver`. A Talent
 definition owns its explicit effects, costs, requirements, and
@@ -405,17 +462,20 @@ validation.
 
 ## First playable character scope
 
-The first crew-enabled vertical slice should use nine authored characters: one
-human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, and vampire. Each needs
-a race, heritage, background, attributes, skills, two Talents, crew position,
-and compatible quarters. The two Talents are racial feats: one granted by Race
-and one by Heritage. The Elf must exercise innate magical access and the
-Somnari must exercise innate psychic access. At least one character without
+The first crew-enabled vertical slice should use eleven authored characters:
+one human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire, Eidolon,
+and Kharuun. Each needs a race, heritage, background, attributes, skills, two
+Talents, crew position, and compatible quarters. The two Talents are racial
+feats: one granted by Race and one by Heritage. The Elf must exercise innate
+magical access and the Somnari must exercise innate psychic access. The
+Eidolon's anchor logistics and the Kharuun's evidence-bounded tracking must
+each change at least one voyage decision. At least one character without
 either access Talent must demonstrate earning an access Feat through documented
 training. The initial roster must include a Doctor and Chef so medical care,
 meals, position authority, and cross-duty assignment are exercised. The slice
-needs only four shared needs—rest, nutrition or thirst, safety, and belonging—
-and five duties: navigate, salvage, repair, prepare a meal, and treat an injury.
+needs only four shared needs—rest, nutrition or equivalent reserve, safety,
+and belonging—and five duties: navigate, salvage, repair, prepare a meal, and
+treat an injury.
 Attribute, skill, language, script, ancient-lore, and encounter scope is defined
 in the linked capability documents. See [`Battle.md`](Battle.md) for combat,
 injury, surrender, and tactical-position rules.

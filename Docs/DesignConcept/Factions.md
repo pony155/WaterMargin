@@ -30,8 +30,9 @@ Faction behavior during optional late-campaign threats is defined in
 
 A faction is an organization, polity, movement, guild, fleet, faith, company,
 or alliance. It is not a race. Humans, elves, half-elves, dwarves, orcs,
-gnomes, goblins, Somnari, vampires, and future races may belong to the same
-faction. Members of one race may support rival factions or none at all.
+gnomes, goblins, Somnari, vampires, Eidolons, Kharuun, and future races may
+belong to the same faction. Members of one race may support rival factions or
+none at all.
 
 Heritage supplies formative tradition and starting language or script
 knowledge; it does not assign loyalty. A faction may use official languages,

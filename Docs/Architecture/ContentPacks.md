@@ -78,6 +78,7 @@ Content/
         Items/
         Ships/
         Encounters/
+        Events/
         Factions/
         Crises/
       Localization/

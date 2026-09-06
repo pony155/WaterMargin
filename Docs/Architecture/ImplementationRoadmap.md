@@ -72,6 +72,7 @@ Source/
     Training/
     Ships/
     Encounters/
+    Events/
     Persistence/
   Spelljammer.Content/
     Manifests/
@@ -101,8 +102,9 @@ added explicitly to `Spelljammer.slnx`.
 ### Phase M0.1: inventory existing identities
 
 - [x] **M0.1.1** Extract every current Attribute, Skill, Feat, Talent, Access,
-  Spell, psychic-technique, combat-context, ship-module, faction, and crisis ID
-  from `Docs/DesignConcept` into the reviewed
+  Spell, psychic-technique, combat-context, ship-module, faction, crisis,
+  authored travel-event, and event-choice ID from `Docs/DesignConcept` into the
+  reviewed
   [`ContentIdInventory.md`](ContentIdInventory.md).
 - [x] **M0.1.2** Mark each ID as base-owned, example-only, deferred, or already
   serialized by the prototype.
@@ -367,6 +369,21 @@ iteration, diagnostics, and UI projection see it without a source change.
 - [ ] **M3.6.4** Render localized values and disabled-action reasons without
   direct mutation or fixed-property binding.
 
+### Phase M3.7: author and prove the base race roster
+
+- [ ] **M3.7.1** Author all eleven base Race definitions and their Race Talent
+  grants, including Eidolon Soul Anchor and Kharuun Trail Sense.
+- [ ] **M3.7.2** Author one compatible first-slice Heritage and Heritage Talent
+  for each Race; defer additional Heritage rows until their Talent IDs are
+  explicitly inventoried.
+- [ ] **M3.7.3** Author one deterministic first-slice character per Race with
+  attributes, skills, background, position, language, script, and equipment.
+- [ ] **M3.7.4** Validate mixed-race quarters, equipment, care, nutrition or
+  reserve, rest, and environmental compatibility before roster publication.
+- [ ] **M3.7.5** Prove Soul Anchor recovery requires its anchor and resources,
+  and prove Trail Sense consumes only observed evidence without revealing
+  hidden state.
+
 Deliverables:
 
 - character, Race, Heritage, Background, Attribute, Skill, Feat, Talent,
@@ -375,16 +392,19 @@ Deliverables:
 - data-authored Race, Heritage, Background, Talent, and training definitions;
 - deterministic creation with validated grants;
 - generic capability lookup and action eligibility;
-- bounded Skill practice and training projects; and
-- stable events explaining grants and advancement.
+- bounded Skill practice and training projects;
+- stable events explaining grants and advancement; and
+- an eleven-character base roster with one representative of every planned
+  Race and one first-slice Heritage per Race.
 
 WPF may initially show an inspection-only roster. It enumerates registry data
 and resolves localization separately instead of binding fixed Strength or
 Engineering properties.
 
-Exit criteria: the same seed and fingerprint create the same character, an
-invalid grant prevents publication, and a new Skill needs no state-schema
-change.
+Exit criteria: the same seed and fingerprint create the same eleven-character
+roster, an invalid grant prevents publication, new Skills need no state-schema
+change, Soul Anchor recovery cannot bypass its costs, and Trail Sense cannot
+reveal unobserved information.
 
 ## Milestone 4: supernatural access slice
 
@@ -502,16 +522,18 @@ individual Turn Meters, and Action Points without global rounds.
 - [ ] **M5.4.1** Add stable Ship, Frame, Compartment, Module, Network, Station,
   and Resource IDs.
 - [ ] **M5.4.2** Compile one minimal Arcane and one minimal Industrial energy
-  package plus common armor, prow, and configurable cannon definitions; ship
-  cannons have no Gunner position or Gunnery Skill requirement.
+  package plus common sectional armor, Energy Shield, prow, and configurable
+  cannon definitions; ship cannons have no Gunner position or Gunnery Skill
+  requirement.
 - [ ] **M5.4.3** Implement bounded power or aether allocation and crew-station
-  ownership.
-- [ ] **M5.4.4** Commit armor, hull, breach, module, network, and exposed-crew
-  damage together.
+  ownership, including the shield's fixed Energy Consumption Rate while raised.
+- [ ] **M5.4.4** Resolve finite current Shield Value, damage overflow, armor
+  protection and penetration, hull, breach, module, network, and exposed-crew
+  damage in one atomic commit.
 - [ ] **M5.4.5** Validate and transactionally commit one pre-voyage loadout with
-  armor-section, power, propulsion, ram or figurehead, weapon orientation,
-  ammunition, mass, structure, network, clearance, and module-specific access
-  choices.
+  armor-section, Energy Shield energy feed, power, propulsion, ram or
+  figurehead, weapon orientation, ammunition, mass, structure, network,
+  clearance, and module-specific access choices.
 
 ### Phase M5.5: implement a ship engagement
 
@@ -519,11 +541,13 @@ individual Turn Meters, and Action Points without global rounds.
   fixed-point 2D coordinates, heading, velocity, collision shapes, derived
   range labels, contact knowledge, firing solutions, cannon damage, rate of
   fire, effective and maximum range, reload time, damage type and area, armor
-  penetration, ammunition or charge, weapon readiness, and disengagement state.
+  penetration, ammunition or charge, weapon readiness, maximum and current
+  Shield Value, Recharge Rate, Energy Consumption Rate, raised state, and
+  disengagement state.
 - [ ] **M5.5.2** Implement bounded queued scan, course, thrust, turn, brake,
-  intercept, fire, ram, defend, damage-control, signal, and retreat orders with
-  explicit cancellation rules; fire orders use ship targeting state without an
-  assigned Gunner.
+  intercept, fire, ram, raise or lower shield, defend, damage-control, signal,
+  and retreat orders with explicit cancellation rules;
+  fire orders use ship targeting state without an assigned Gunner.
 - [ ] **M5.5.3** Add one opponent plan with bounded candidates and a documented
   safe fallback.
 - [ ] **M5.5.4** Persist module damage, spent resources, knowledge, witnesses,
@@ -559,8 +583,8 @@ Deliverables:
 - explicit ticks, deterministic command ordering, Turn Meters, and AP budgets;
 - real-time-with-pause ship commands and non-round-based personal activations;
 - continuous ship positions and movement with no ship-combat grid;
-- a transactional player loadout covering armor, energy, propulsion, prow
-  fitting, cannon configuration, and supporting modules;
+- a transactional player loadout covering armor, Energy Shield, power,
+  propulsion, prow fitting, cannon configuration, and supporting modules;
 - one ship engagement and connected boarding or ruin encounter from
   [`../DesignConcept/Battle.md`](../DesignConcept/Battle.md);
 - persistent equipment, injuries, module damage, resources, knowledge, and
@@ -720,14 +744,16 @@ Base-definition patching is separate and cannot use last-file-wins semantics.
 Replace the prototype grid only after smaller character and encounter contracts
 are stable. Deliverables follow
 [`../DesignConcept/GalaxyMap.md`](../DesignConcept/GalaxyMap.md) and
-[`../DesignConcept/Factions.md`](../DesignConcept/Factions.md): seeded graph generation,
-knowledge separation, faction instances, reports, agreements, territory,
-markets, and a complete return voyage.
+[`../DesignConcept/Factions.md`](../DesignConcept/Factions.md), with travel-event
+behavior from [`../DesignConcept/Events.md`](../DesignConcept/Events.md): seeded
+graph generation, knowledge separation, bounded voyage events, faction
+instances, reports, agreements, territory, markets, and a complete return
+voyage.
 
 ### Phase M8.1: define galaxy content and settings
 
 - [ ] **M8.1.1** Add versioned Galaxy Settings, Shape, Region, System Archetype,
-  Site, Starway, Hazard, and Landmark definitions.
+  Site, Starway, Hazard, Landmark, Travel Event, and Event Choice definitions.
 - [ ] **M8.1.2** Validate placement constraints, counts, compatibility, route
   costs, and required services.
 - [ ] **M8.1.3** Add the base 16-system slice settings and authored site tables.
@@ -736,7 +762,7 @@ markets, and a complete return voyage.
 ### Phase M8.2: generate the immutable graph
 
 - [ ] **M8.2.1** Split named random streams for topology, systems, sites,
-  factions, hazards, and names.
+  factions, hazards, travel-event selection and outcomes, and names.
 - [ ] **M8.2.2** Place systems, guarantee connectivity, then add bounded optional
   edges in a deterministic order.
 - [ ] **M8.2.3** Validate starting routes, chokepoint alternatives, required
@@ -753,6 +779,14 @@ markets, and a complete return voyage.
   known danger.
 - [ ] **M8.3.4** Preserve changed sites and routes rather than regenerating on
   revisit.
+- [ ] **M8.3.5** Create bounded event opportunities from committed travel-leg
+  progress rather than render frames or wall-clock time.
+- [ ] **M8.3.6** Filter and ordinally weight eligible events by route, ship,
+  crew, knowledge, faction, history, cooldown, and remaining event budget.
+- [ ] **M8.3.7** Implement Scheduled, Revealed, AwaitingDecision, Resolving,
+  ActiveEncounter, Resolved, and Expired event-instance states.
+- [ ] **M8.3.8** Persist event seeds, choices, recurrence, cooldowns, follow-ups,
+  and a no-event outcome without rerolling after load.
 
 ### Phase M8.4: define and place factions
 
@@ -787,15 +821,16 @@ markets, and a complete return voyage.
 ### Phase M8.7: replace the navigation shell
 
 - [ ] **M8.7.1** Present the generated graph and limited knowledge in WPF.
-- [ ] **M8.7.2** Complete departure, route choice, travel, site encounter,
-  consequence, and return through the new world.
+- [ ] **M8.7.2** Complete departure, route choice, seeded travel event, site
+  encounter, consequence, and return through the new world.
 - [ ] **M8.7.3** Migrate or retire prototype-only UI without deleting the
   independently buildable expedition code prematurely.
 - [ ] **M8.7.4** Declare replacement only after deterministic save/load and
   replay criteria pass.
 
-Exit criterion: the same seed, fingerprint, and commands reproduce galaxy and
-politics, and failed content or save migration cannot partially replace them.
+Exit criterion: the same seed, fingerprint, and commands reproduce galaxy,
+travel events, and politics, and failed content or save migration cannot
+partially replace them.
 
 ## Milestone 9: endgame crises
 

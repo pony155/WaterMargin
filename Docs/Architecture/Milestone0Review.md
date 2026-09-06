@@ -11,7 +11,7 @@ implements these reviewed contracts.
 
 | Concern | Authoritative artifact | Frozen result |
 | --- | --- | --- |
-| Existing gameplay identities | [`ContentIdInventory.md`](ContentIdInventory.md) | 149 unique explicit IDs |
+| Existing gameplay identities | [`ContentIdInventory.md`](ContentIdInventory.md) | 163 unique explicit IDs |
 | Ownership, delivery, spelling, collisions | [`ContentIdReview.md`](ContentIdReview.md) | Base, example, deferred, and prototype status assigned |
 | Stable IDs and namespaces | [`ContentContractsV1.md`](ContentContractsV1.md) | ASCII grammar, 127-byte maximum, base and mod ownership |
 | Source documents and ordering | [`ContentContractsV1.md`](ContentContractsV1.md) | Strict UTF-8 JSON, exact manifest, directories, deterministic pack order |

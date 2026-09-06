@@ -69,7 +69,9 @@ tactical resolution are defined in
 modules, networks, damage, and refits are defined in
 [`Docs/DesignConcept/Ships.md`](Docs/DesignConcept/Ships.md). The versioned procedural galaxy
 graph, Starways, system generation, and discovery model are defined in
-[`Docs/DesignConcept/GalaxyMap.md`](Docs/DesignConcept/GalaxyMap.md). Planned faction
+[`Docs/DesignConcept/GalaxyMap.md`](Docs/DesignConcept/GalaxyMap.md). Seeded random
+events during interstellar travel are defined in
+[`Docs/DesignConcept/Events.md`](Docs/DesignConcept/Events.md). Planned faction
 membership, standing, diplomacy, territory, laws, markets, and conflict are
 defined in [`Docs/DesignConcept/Factions.md`](Docs/DesignConcept/Factions.md). Optional
 late-campaign threats, escalation, alternative resolutions, and aftermath are

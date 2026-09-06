@@ -12,6 +12,8 @@
 - [ ] Fixed-tick host that separates committed simulation snapshots from input
 - [ ] Data-authored sector, ship, resource, and encounter definitions
 - [ ] Versioned procedural galaxy graph, Starways, and discovery-state contracts
+- [ ] Seeded bounded travel events with choices, recurrence rules, and
+  persistent consequences
 - [ ] Three-faction standing, agreement, territory, and delayed-report slice
 - [ ] Arcane and diesel-tier Industrial ship energy packages with distinct
   resource and failure rules
@@ -45,10 +47,11 @@ vertical slice.
 1. Start from an explicit seed with a known ship and crew manifest.
 2. Inspect reachable destinations and their known costs or uncertainty.
 3. Commit travel through the authoritative command boundary.
-4. Resolve a location through exploration, salvage, negotiation, or combat.
-5. Apply persistent costs and consequences to crew, ship, cargo, and factions.
-6. Change plans in response to damage or dwindling supplies.
-7. Return to the anchorage and atomically save the voyage result.
+4. Resolve any seeded travel event through a player choice or safe continuation.
+5. Resolve a location through exploration, salvage, negotiation, or combat.
+6. Apply persistent costs and consequences to crew, ship, cargo, and factions.
+7. Change plans in response to damage or dwindling supplies.
+8. Return to the anchorage and atomically save the voyage result.
 
 ## Required boundaries
 

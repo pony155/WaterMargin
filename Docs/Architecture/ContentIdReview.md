@@ -3,7 +3,7 @@
 ## Status
 
 This document completes roadmap tasks `M0.1.2` and `M0.1.3`. It classifies the
-149 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
+163 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
 the spelling and collision review performed before version 1 loader work.
 
 No gameplay content loader or public save format exists yet. Classification is
@@ -28,19 +28,21 @@ precedence over base ownership until content authoring promotes it explicitly.
 
 Every ID in an inventory section inherits the classification below unless an
 exception is listed. This grouping marks every inventoried ID without copying a
-second 149-row table that could drift from the canonical inventory.
+second 163-row table that could drift from the canonical inventory.
 
 | Inventory group | Count | Ownership | Earliest registry | Delivery note |
 | --- | ---: | --- | --- | --- |
 | Attributes | 7 | Base-owned | M2 | All seven are required base definitions |
 | Skills | 29 | Base-owned | M2 | All 29 are required base definitions |
-| Talents | 10 | Base-owned | M3/M4 | Registry begins in M3; supernatural grants become executable in M4 |
+| Talents | 12 | Base-owned | M3/M4 | Registry begins in M3; supernatural grants become executable in M4 |
 | Learned Feats | 2 | Base-owned | M4 | Both are required access paths |
 | Access gates | 2 | Base-owned | M4 | Both are required access definitions |
 | Spells | 32 | Base-owned | M4 | Four are first-slice; 28 are deferred catalog content |
 | Psychic techniques | 4 | Base-owned | M4 | All four are first-slice content |
 | Combat contexts | 6 | Base-owned | M5 | Three initial contexts and three deferred contexts |
-| Ship modules | 34 | Base-owned | M5 | Registry begins in M5; individual catalog delivery is phased |
+| Travel events | 8 | Base-owned | M8 | Four first-voyage events and four deferred events |
+| Travel-event choices | 3 | Base-owned | M8 | All three belong to the first Coolant Leak event |
+| Ship modules | 35 | Base-owned | M5 | Registry begins in M5; individual catalog delivery is phased |
 | Factions | 6 | Base-owned | M8 | Initial voyage selects three; remaining roster is deferred |
 | Crisis families | 7 | Base-owned | M9 | All endgame content is deferred beyond the first voyage |
 | Crisis phases | 7 | Base-owned | M9 | Shared M9 phase vocabulary |
@@ -79,12 +81,24 @@ combat.context.settlement
 combat.context.surface
 ```
 
-The initial M5 ship slice requires these 22 module definitions:
+The first M8 travel-event slice is:
+
+```text
+event.travel.aether-squall
+event.travel.coolant-leak
+event.travel.derelict-signal
+event.travel.distress-call
+```
+
+The other four Event IDs remain base-owned deferred catalog content.
+
+The initial M5 ship slice requires these 23 module definitions:
 
 ```text
 module.cargo.hold
 module.command.helm
 module.contact.signal-lantern
+module.defense.energy-shield
 module.defense.reinforced-plating
 module.defense.ward-projector
 module.habitat.atmosphere-recycler
@@ -107,8 +121,9 @@ module.workshop.fabricator
 ```
 
 The other 12 inventoried ship modules remain base-owned deferred catalog
-content. This first set supports energy-package, armor, prow, weapon, habitat,
-care, cargo, and utility customization without requiring the full catalog.
+content. This first set supports energy-package, armor, Energy Shield, prow,
+weapon, habitat, care, cargo, and utility customization without requiring the
+full catalog.
 
 The initial M8 faction candidate set is the Free Anchorage Compact, Horizon
 Salvagers' Union, Meridian Foundry League, and Lumenwake Covenant; a campaign
@@ -150,7 +165,7 @@ is complete.
 
 ## Collision review
 
-The 149 inventoried IDs are unique. No one ID maps to two different display
+The 163 inventoried IDs are unique. No one ID maps to two different display
 labels, and ordinal comparison produces no case-only collision.
 
 The following similar forms are intentional:
@@ -173,7 +188,7 @@ Illustrative third-party IDs previously used a pack ID that looked more
 specific than their shared namespace. Version 1 resolves this by using a pack
 ID of the form `mod.<namespace>`, for example `mod.starwrights`, with definitions
 such as `skill.mod.starwrights.gravimetry`. These examples are not base IDs and
-are excluded from the 149 count.
+are excluded from the 163 count.
 
 ## Review conclusion
 

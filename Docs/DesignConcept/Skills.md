@@ -219,10 +219,12 @@ may adopt, adapt, or reject the script associated with their race.
 | Patchsign | `script.patchsign` | Goblin flotillas, markets, and maintenance crews | Modular marks remain legible when stenciled, rearranged, or repaired on reused material |
 | Dreamtrace | `script.dreamtrace` | Somnari sanctuaries, navigators, and memory circles | Layered curves annotate ordinary language with emotion, certainty, and the source of a remembered impression |
 | Sable Cipher | `script.sable-cipher` | Vampire courts, refuges, and blood archives | Layered notation separating public text from heritage, debt, and feeding records |
+| Echo Rings | `script.echo-rings` | Eidolon reliquaries, memorial houses, and vessel workshops | Concentric breaks record sequence, speaker identity, and revision when etched, embossed, or projected |
+| Waynotch | `script.waynotch` | Kharuun stations, route guilds, and traveling communities | Directional notches encode bearings, pressure warnings, and concise messages readable by sight or touch |
 
-Sable Cipher is associated with vampire communities but is not automatic race
-knowledge. Half-elves likewise do not automatically know Bridgehand or the
-scripts used by either parent's community.
+Sable Cipher, Echo Rings, and Waynotch are associated with particular
+communities but are not automatic race knowledge. Half-elves likewise do not
+automatically know Bridgehand or the scripts used by either parent's community.
 
 Living scripts may have regional hands and historical forms. These are
 definition variants under one stable script identity unless they require a

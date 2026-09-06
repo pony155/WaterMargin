@@ -19,7 +19,8 @@ The first mod release supports local declarative packs that add validated:
 - Skills after every consumer supports a dynamic Skill registry;
 - spells, psychic abilities, combat techniques, recipes, and enchantments;
 - items, weapons, armor, ship frames, and ship modules;
-- encounters, ruin rooms, galaxy sites, factions, and crises; and
+- travel events, encounters, ruin rooms, galaxy sites, factions, and crises;
+  and
 - localization entries and presentation assets within declared limits.
 
 Adding or removing Attributes, patching base definitions, executable behavior,

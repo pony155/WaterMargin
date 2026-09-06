@@ -9,6 +9,8 @@ that grid proves the voyage command and resource loop but is not the final
 galaxy representation.
 Optional late-campaign threats that can transform this graph are defined in
 [`Endgame_Crisis.md`](Endgame_Crisis.md).
+Seeded situations that occur while crossing its routes are defined in
+[`Events.md`](Events.md).
 
 ## Design goals
 
@@ -170,6 +172,11 @@ time, fuel, known danger, tolls, secrecy, or a weighted custom policy. Unknown
 values appear as uncertainty rather than being passed secretly to the planner.
 Equal-cost choices use stable system IDs as deterministic tie-breakers.
 
+Travel through a selected route creates bounded event opportunities at
+committed progress points. Eligibility, seeded selection, player choices, and
+persistent consequences follow [`Events.md`](Events.md). Opening the galaxy map
+or waiting in a paused decision screen never rolls an event.
+
 ## Discovery and map knowledge
 
 The authoritative galaxy exists independently from what a crew knows. Each
@@ -268,6 +275,8 @@ needs:
 - at least four system archetypes and six site types;
 - three factions, one settlement, one neutral market, and one contested location;
 - one ruin, one salvage site, one aether hazard, and one industrial hazard;
+- four authored travel-event definitions, including a no-event result and no
+  more than two events on one leg;
 - Unknown, Detected, Surveyed, and Charted knowledge states;
 - deterministic route planning by time, fuel, and known danger; and
 - save/load preservation of topology, discoveries, and changed sites.
