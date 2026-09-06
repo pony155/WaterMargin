@@ -33,7 +33,7 @@ industry coexist in ports, fleets, markets, and law. Factions differ in how
 they regulate, finance, and deploy these tools—not in whether advanced
 technology or magic exists at all. Aether resonators, charge accumulators,
 reactor material, fuel, enchantments, spare parts, and skilled labor are all normal political and
-economic concerns. The setting baseline is in [`Setting.md`](Setting.md).
+economic concerns. The setting baseline is in [`History.md`](History.md).
 
 ## Race, culture, and faction
 

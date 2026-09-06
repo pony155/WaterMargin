@@ -21,7 +21,7 @@ reservation, preparation, refund, contamination, or detailed ritual systems.
 
 Magic belongs to the advanced Arcane-Industrial setting. Wards and spells can
 exist beside engines, reactors, sensors, armor, and energy weapons without
-requiring a second layer of simulation. See [`Setting.md`](Setting.md).
+requiring a second layer of simulation. See [`History.md`](History.md).
 
 ## Access and learning
 

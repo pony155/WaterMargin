@@ -27,7 +27,7 @@ mature dieselpunk and atompunk space technology. Shipyards, reactors, engines,
 wards, enchantments, sensors, armor, and interstellar markets are ordinary
 parts of civilization. The player chooses how much of either tradition their
 ship uses; neither is a universal upgrade path or a moral identity. See
-[`Setting.md`](Setting.md) for the shared setting baseline.
+[`History.md`](History.md) for the shared setting baseline.
 
 ## Player fantasy
 

@@ -11,7 +11,7 @@ catalog remain planned.
 Ship engagements, boarding transitions, and shipboard combat are defined in
 [`Battle.md`](Battle.md).
 The wider Arcane-Industrial setting baseline is defined in
-[`Setting.md`](Setting.md).
+[`History.md`](History.md).
 
 Arcane ships exist because their drives couple to the Aether discovered in open
 space. Elven resonance vessels were the first documented magical spacecraft;

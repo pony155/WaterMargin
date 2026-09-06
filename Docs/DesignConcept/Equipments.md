@@ -18,7 +18,7 @@ economy, crafting, and the broader catalog in this document remain planned.
 - Keep stable IDs and data-authored definitions for saves, balancing, and
   eventual modding.
 
-The setting baseline is in [`Setting.md`](Setting.md), combat contexts are in
+The setting baseline is in [`History.md`](History.md), combat contexts are in
 [`Battle.md`](Battle.md), and Skills and supernatural access are in
 [`Skills.md`](Skills.md).
 

@@ -98,7 +98,7 @@ Player preferences, accessibility, campaign rules, and their persistence
 boundaries are defined in
 [`Docs/DesignConcept/GameSettings.md`](Docs/DesignConcept/GameSettings.md). The planned
 Arcane-Industrial setting, including dieselpunk and atompunk technology, is
-defined in [`Docs/DesignConcept/Setting.md`](Docs/DesignConcept/Setting.md). The planned
+defined in [`Docs/DesignConcept/History.md`](Docs/DesignConcept/History.md). The planned
 crew races, heritages, physiology, and character-generation boundaries are
 defined in [`Docs/DesignConcept/Races.md`](Docs/DesignConcept/Races.md). The
 classless capability model is split into
