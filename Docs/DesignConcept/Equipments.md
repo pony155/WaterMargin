@@ -2,8 +2,10 @@
 
 ## Status
 
-This document defines planned personal-equipment rules. Equipment, inventories,
-and item definitions are not implemented in the current voyage prototype.
+Milestone 5 implements bounded personal loadouts with Main hand, Off hand,
+Body, Utility, and Relic slots plus Ready, Depleted, and Damaged states. Five
+first-encounter item definitions are data-authored. General inventories,
+economy, crafting, and the broader catalog in this document remain planned.
 
 ## Design goals
 

@@ -16,8 +16,9 @@ characters, rules, content, code, artwork, and sound remain original.
 > The current shell exposes a small deterministic expedition loop and a native
 > renderer demonstration. A headless eleven-character capability roster now
 > exists with trained and innate supernatural access, Magic Missile, and
-> consensual Mindlink execution, but crew schedules and relationships,
-> encounters, combat, trading,
+> consensual Mindlink execution. Milestone 5 adds a headless modular ship
+> engagement and six-zone personal encounter slice, but these are not yet
+> connected to the WPF shell. Crew schedules and relationships, trading,
 > procedural ship interiors, saves, and a full game UI remain planned.
 
 ## Current prototype
@@ -41,6 +42,12 @@ Implemented foundations include:
   capability/grant storage, action eligibility and resolution, Skill practice,
   Feat training, mixed-crew support validation, and localization-ready roster
   inspection;
+- a headless 20 Hz `VoyageWorld` with tactical pause, bounded ordered commands,
+  immutable snapshots and replay logs, continuous ship combat, modular damage,
+  personal Turn Meters and Action Points, reactions, injuries, objectives, and
+  encounter cleanup;
+- authored equipment, a six-zone Glass Observatory ruin, a Wayfarer ship frame,
+  Arcane and Industrial module packages, and two cannon configurations;
 - a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
 - a child Win32 viewport rendered through SpriteForge's native D3D12 sprite
   renderer and a narrow managed/native interop layer;
@@ -75,7 +82,7 @@ classless capability model is split into
 [`Docs/DesignConcept/Attributes.md`](Docs/DesignConcept/Attributes.md) and
 [`Docs/DesignConcept/Skills.md`](Docs/DesignConcept/Skills.md); Perk and Racial
 Perk rules are defined in [`Docs/DesignConcept/Perks.md`](Docs/DesignConcept/Perks.md).
-Planned personal weapons, armor, tools, and relics are defined in
+Implemented first-slice and planned personal weapons, armor, tools, and relics are defined in
 [`Docs/DesignConcept/Equipments.md`](Docs/DesignConcept/Equipments.md).
 Planned spellcasting rules,
 the authored spell catalog, and psychic systems are defined in
@@ -83,7 +90,7 @@ the authored spell catalog, and psychic systems are defined in
 [`Docs/DesignConcept/PsychicAbilities.md`](Docs/DesignConcept/PsychicAbilities.md).
 Ship engagements, boarding, ruin expeditions, EVA fighting, injuries, and
 tactical resolution are defined in
-[`Docs/DesignConcept/Battle.md`](Docs/DesignConcept/Battle.md). Planned ship frames,
+[`Docs/DesignConcept/Battle.md`](Docs/DesignConcept/Battle.md). First-slice and planned ship frames,
 modules, networks, damage, and refits are defined in
 [`Docs/DesignConcept/Ships.md`](Docs/DesignConcept/Ships.md). The versioned procedural galaxy
 graph, Starways, system generation, and discovery model are defined in

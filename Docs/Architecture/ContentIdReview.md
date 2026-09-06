@@ -3,11 +3,11 @@
 ## Status
 
 This document completes roadmap tasks `M0.1.2` and `M0.1.3` and includes the
-Milestone 4 character and supernatural ID extensions. It classifies the explicit IDs in
+Milestone 5 character, supernatural, encounter, and ship ID extensions. It classifies the explicit IDs in
 [`ContentIdInventory.md`](ContentIdInventory.md) and records
 the spelling and collision review performed before version 1 loader work.
 
-The gameplay loader and M4 base character and supernatural definitions now exist. No public save
+The gameplay loader and M5 base definitions now exist. No public save
 format exists yet; classifications for later milestones remain design
 commitments rather than implementation claims.
 
@@ -51,15 +51,15 @@ second 152-row table that could drift from the canonical inventory.
 | Character resources | 5 | Base-owned | M3/M4 | Bounded stores including Focus and Psychic Strain |
 | Scenarios | 1 | Base-owned | M3 | `scenario.first-voyage` |
 | Character action primitives | 5 | Base-owned | M3 | Standard check, Soul Anchor action/context, and bounded Race effects |
-| Equipment | 11 | Base-owned | M5 | Initial weapons, powered armor, tools, medical gear, and Arcane focus |
+| Equipment | 11 | Base-owned | M5 | Five encounter items are implemented; six catalog candidates remain deferred |
 | Learned Feats | 2 | Base-owned | M4 | Both are required access paths |
 | Access gates | 2 | Base-owned | M4 | Both are required access definitions |
 | Spells | 7 | Base-owned | M4 | Magic Missile is implemented; six remain catalog candidates |
 | Psychic techniques | 4 | Base-owned | M4 | Mindlink is implemented; three remain catalog candidates |
-| Combat contexts | 6 | Base-owned | M5 | Three initial contexts and three deferred contexts |
+| Combat contexts | 6 | Base-owned | M5 | Ruin is implemented; boarding, ship, and three later contexts remain primitive IDs |
 | Travel events | 8 | Base-owned | M8 | Four first-voyage events and four deferred events |
 | Travel-event choices | 3 | Base-owned | M8 | All three belong to the first Coolant Leak event |
-| Ship modules | 35 | Base-owned | M5 | Registry begins in M5; individual catalog delivery is phased |
+| Ship modules | 35 | Base-owned | M5 | Eleven first-slice definitions are implemented; individual catalog delivery remains phased |
 | Ship weapon configurations | 3 | Base-owned | M5 | Aether and Diesel are first-slice; Atomic is deferred atompunk content |
 | Factions | 6 | Base-owned | M8 | Initial voyage selects three; remaining roster is deferred |
 | Crisis families | 7 | Base-owned | M9 | All endgame content is deferred beyond the first voyage |
@@ -111,38 +111,25 @@ event.travel.distress-call
 
 The other four Event IDs remain base-owned deferred catalog content.
 
-The initial M5 ship slice requires these 23 module definitions:
+The implemented M5 ship slice contains these eleven module definitions:
 
 ```text
 module.cargo.hold
-module.command.helm
-module.contact.signal-lantern
-module.defense.energy-shield
+module.defense.arcane-energy-shield
+module.defense.industrial-energy-shield
 module.defense.reinforced-plating
-module.defense.ward-projector
-module.habitat.atmosphere-recycler
-module.habitat.crew-quarters
-module.habitat.galley
-module.habitat.provision-locker
-module.habitat.sickbay
-module.navigation.star-compass
 module.power.aether-dynamo
-module.power.crystal-accumulator
 module.power.diesel-generator
-module.power.flywheel-bank
 module.propulsion.flux-sail
 module.propulsion.propellant-drive
-module.prow.figurehead
 module.prow.ram
-module.utility.salvage-rig
-module.weapon.deck-battery
-module.workshop.fabricator
+module.weapon.arcane-deck-battery
+module.weapon.industrial-deck-battery
 ```
 
-The other 12 inventoried ship modules remain base-owned deferred catalog
-content. This first set supports energy-package, armor, Energy Shield, prow,
-weapon, habitat, care, cargo, and utility customization without requiring the
-full catalog.
+The remaining inventoried modules remain base-owned deferred catalog content.
+The first set supports energy packages, armor, Energy Shield, prow, weapon, and
+cargo choices without requiring the full catalog.
 
 The first M5 weapon slice includes `ship.weapon.arcane.aether-cannon` and
 `ship.weapon.industrial.diesel-shell-cannon`. The Atomic Shell Cannon remains

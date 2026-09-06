@@ -138,8 +138,77 @@ public sealed class CharacterCapabilities
             [.. Perks.Order()],
             [.. Access.Order()],
             [.. Techniques.Order()],
-            [.. GrantSources.OrderBy(value => value.CapabilityId).ThenBy(value => value.SourceId)]);
+            [.. GrantSources.OrderBy(value => value.CapabilityId).ThenBy(value => value.SourceId)],
+            [.. practiceKeys.Order()]);
     }
+
+    public static CharacterCapabilities Restore(CharacterCapabilitySnapshot snapshot, ICharacterContentCatalog catalog)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        ArgumentNullException.ThrowIfNull(catalog);
+        if (snapshot.Fingerprint != catalog.Fingerprint || snapshot.Attributes.Length != catalog.Attributes.Length ||
+            snapshot.Skills.Length != catalog.Skills.Length || snapshot.Feats.Length > MaximumSetEntries ||
+            snapshot.Perks.Length > MaximumSetEntries || snapshot.Techniques.Length > MaximumSetEntries ||
+            snapshot.GrantSources.Length > MaximumSetEntries || snapshot.PracticeKeys.Length > MaximumPracticeKeys ||
+            snapshot.Attributes.Select(value => value.Id).Distinct().Count() != snapshot.Attributes.Length ||
+            snapshot.Skills.Select(value => value.Id).Distinct().Count() != snapshot.Skills.Length ||
+            snapshot.PracticeKeys.Distinct().Count() != snapshot.PracticeKeys.Length)
+        {
+            throw new InvalidOperationException("Character capability snapshot is incompatible or exceeds capacity.");
+        }
+
+        ImmutableArray<short>.Builder attributes = ImmutableArray.CreateBuilder<short>(catalog.Attributes.Length);
+        foreach (AttributeDefinition definition in catalog.Attributes)
+        {
+            AttributeValueSnapshot? value = snapshot.Attributes.SingleOrDefault(candidate => candidate.Id == definition.AttributeId);
+            if (value is null || value.Value < definition.Minimum || value.Value > definition.Maximum)
+            {
+                throw new InvalidOperationException("Character Attribute state is invalid.");
+            }
+
+            attributes.Add(value.Value);
+        }
+
+        ImmutableArray<byte>.Builder skills = ImmutableArray.CreateBuilder<byte>(catalog.Skills.Length);
+        ImmutableArray<ushort>.Builder practice = ImmutableArray.CreateBuilder<ushort>(catalog.Skills.Length);
+        foreach (SkillDefinition definition in catalog.Skills)
+        {
+            SkillValueSnapshot? value = snapshot.Skills.SingleOrDefault(candidate => candidate.Id == definition.SkillId);
+            if (value is null || value.Value < definition.Minimum || value.Value > definition.Maximum)
+            {
+                throw new InvalidOperationException("Character Skill state is invalid.");
+            }
+
+            skills.Add(value.Value);
+            practice.Add(value.Practice);
+        }
+
+        if (snapshot.Feats.Any(id => !catalog.TryGetFeat(id, out _)) ||
+            snapshot.Perks.Any(id => !catalog.TryGetPerk(id, out _)) ||
+            snapshot.Techniques.Any(id => !TechniqueExists(id, catalog)) ||
+            snapshot.GrantSources.Any(value => !value.CapabilityId.IsValid || !value.SourceId.IsValid))
+        {
+            throw new InvalidOperationException("Character capability references are missing.");
+        }
+
+        return new CharacterCapabilities(
+            snapshot.Fingerprint,
+            attributes.MoveToImmutable(),
+            skills.MoveToImmutable(),
+            practice.MoveToImmutable(),
+            snapshot.Feats.ToImmutableHashSet(),
+            snapshot.Perks.ToImmutableHashSet(),
+            snapshot.Techniques.ToImmutableHashSet(),
+            snapshot.GrantSources,
+            snapshot.PracticeKeys.ToImmutableHashSet());
+    }
+
+    private static bool TechniqueExists(TechniqueId id, ICharacterContentCatalog catalog) =>
+        id.Value.ToString().StartsWith("spell.", StringComparison.Ordinal)
+            ? catalog.TryGetSpell(new SpellId(id.Value), out _)
+            : id.Value.ToString().StartsWith("psychic.", StringComparison.Ordinal)
+                ? catalog.TryGetPsychicTechnique(new PsychicTechniqueId(id.Value), out _)
+                : catalog.TryGetTechnique(id, out _);
 
     internal CharacterCapabilities AwardPractice(
         ICharacterContentCatalog catalog,

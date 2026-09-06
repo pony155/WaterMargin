@@ -3,8 +3,9 @@
 ## Status
 
 This document began as the reviewed inventory produced by roadmap task
-`M0.1.1`. Milestone 3 extends it with the reviewed IDs assigned while authoring
-the base character pack; those entries now have runtime definitions.
+`M0.1.1`. Milestones 3 through 5 extend it with IDs assigned while authoring
+the base character, encounter, equipment, and ship packs; those first-slice
+entries now have runtime definitions.
 
 The inventory is a documentation snapshot, not yet a machine-readable content
 manifest. Ownership and lifecycle classifications, plus collision and spelling

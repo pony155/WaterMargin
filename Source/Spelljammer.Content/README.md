@@ -19,6 +19,10 @@ Milestone 4 adds strict Spell and psychic-technique definitions, expanded
 training-project contracts, fingerprint-scoped registries, and validation for
 supernatural access, knowledge, targets, resources, consent, resistance, and
 bounded effects.
+Milestone 5 adds Equipment, Board Cell, Zone Link, Personal Board, Encounter,
+Ship Frame, Ship Module, and Ship Weapon Configuration schemas. Their linked,
+fingerprint-scoped registries feed the headless encounter runtime without
+adding filesystem access to Simulation.
 
 Public namespaces are:
 

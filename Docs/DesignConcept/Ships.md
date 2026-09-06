@@ -2,10 +2,12 @@
 
 ## Status
 
-This document defines the planned ship-frame, compartment, module, network,
-damage, and refit systems. They are not implemented yet. The current voyage
-prototype stores only aggregate Hull, Fuel, Supplies, and Cargo values; those
-values must not be described as a finished modular-ship simulation.
+Milestone 5 implements the first headless modular-ship slice: a Wayfarer frame,
+Arcane and Industrial energy packages, common fittings, configurable cannons,
+bounded power priority, shields, armor, Hull, module damage, and transactional
+loadout validation. The WPF expedition shell still uses its aggregate voyage
+values; compartments, refit UI, save serialization, and the broader module
+catalog remain planned.
 Ship engagements, boarding transitions, and shipboard combat are defined in
 [`Battle.md`](Battle.md).
 The wider Arcane-Industrial setting baseline is defined in

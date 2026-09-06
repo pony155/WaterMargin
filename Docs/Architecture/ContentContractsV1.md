@@ -3,9 +3,9 @@
 ## Status
 
 This document freezes the decisions required by roadmap phase M0.2 and the
-version 1 fixtures. The Milestone 1 loader implements the foundation and
-Milestones 3 and 4 add the strict character and supernatural definition
-profiles recorded below. Changes
+version 1 fixtures. The Milestone 1 loader implements the foundation;
+Milestones 3 through 5 add strict character, supernatural, encounter,
+equipment, ship, module, and weapon-configuration profiles. Changes
 to these decisions require updating the implementation, fixtures, and expected
 fingerprints together; changes after a public save contract also require the
 compatibility rules below.
@@ -153,6 +153,14 @@ Initial semantic fields are:
 | Psychic Technique | `requiredAccessId`, `skillId`, `resistanceSkillId`, `strainResourceId`, `strainCost`, `sustainCostPerTick`, `contactModeId`, `rangeId`, `informationScopeId`, `disciplineIds`, `targetTags`, `effectIds` |
 | Technique | `requiredAccessIds`, `grantedPerkIds` |
 | Training Project | `requiredSkillIds`, `workUnits`, `progressCap`, `facilityId`, `resourceId`, `resourceCost`, `safetyId`, `grantedFeatIds`, `grantedTechniqueIds` |
+| Equipment | `slotId`, `initialStateId`, `resourceId`, `resourceCapacity`, `actionIds`, `effectIds` |
+| Board Cell | `zoneId`, `q`, `r`, `capacity`, `cover`, `visibility`, `atmosphereId`, `gravityId`, `hazardTags` |
+| Zone Link | `fromCellId`, `toCellId`, `accessId`, `oneWay`, `allowsRetreat` |
+| Personal Board | `maximumOccupants`, `cellIds`, `linkIds`, `requiredObjectiveIds`, `retreatCellIds` |
+| Encounter | `personalBoardId`, `contextId`, `hostileTeamId`, `ancientDefenseId`, `nonCombatObjectiveId`, `extractionObjectiveId` |
+| Ship Frame | `maximumHull`, `baseArmor`, `maximumSlots`, `cargoCapacity`, `mountIds` |
+| Ship Module | `slotCost`, `cargoDisplacement`, `maximumIntegrity`, `networkId`, `energyGeneration`, `energyConsumption`, `mountId`, `primaryEffectId`, `armorValue`, `shieldValue`, `shieldRechargeRate`, `shieldEnergyConsumptionRate`, `compatiblePathIds` |
+| Ship Weapon Configuration | `networkId`, `resourceId`, `resourceCost`, `damage`, `rateOfFireTicks`, `effectiveRange`, `maximumRange`, `reloadTicks`, `damageTypeId`, `areaId`, `armorPenetration` |
 
 Version 1 recognizes these exact first-level directories under a definition
 root:
@@ -172,6 +180,14 @@ root:
 | `PsychicTechniques` | `PsychicTechnique` | `psychic.` |
 | `Techniques` | `Technique` | `technique.` |
 | `TrainingProjects` | `TrainingProject` | `training.` |
+| `Equipment` | `Equipment` | `equipment.` |
+| `BoardCells` | `BoardCell` | `cell.` |
+| `ZoneLinks` | `ZoneLink` | `link.` |
+| `PersonalBoards` | `PersonalBoard` | `board.` |
+| `Encounters` | `Encounter` | `encounter.` |
+| `ShipFrames` | `ShipFrame` | `frame.` |
+| `ShipModules` | `ShipModule` | `module.` |
+| `ShipWeaponConfigurations` | `ShipWeaponConfiguration` | `ship.weapon.` |
 
 An unregistered directory, a file directly in a definition root, or a prefix
 that disagrees with its directory produces `CONTENT_KIND_MISMATCH`. Any kind
@@ -256,8 +272,10 @@ canonical byte contract is named `spelljammer-semantic-v1`:
 - no insignificant whitespace;
 - object properties sorted by bytewise ordinal property name;
 - definition kinds use the canonical order Access, Attribute, Background,
-  Character, Feat, Heritage, Race, Skill, Perk, Technique, and Training
-  Project, with definitions sorted by Stable ID within each kind. This
+  Character, Feat, Heritage, Race, Skill, Perk, Technique, Training Project,
+  Equipment, Board Cell, Zone Link, Personal Board, Encounter, Ship Frame,
+  Ship Module, and Ship Weapon Configuration, with definitions sorted by
+  Stable ID within each kind. This
   preserves the relative order and bytes of the reviewed M0 kinds;
 - packs retained in resolved load order;
 - set-like arrays deduplicated during validation and sorted ordinally;

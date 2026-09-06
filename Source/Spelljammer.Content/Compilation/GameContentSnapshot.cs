@@ -29,6 +29,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
         ImmutableArray<PsychicTechniqueDefinition> psychicTechniques,
         ImmutableArray<TechniqueDefinition> techniques,
         ImmutableArray<TrainingProjectDefinition> trainingProjects,
+        ImmutableArray<EquipmentDefinition> equipment,
+        ImmutableArray<BoardCellDefinition> boardCells,
+        ImmutableArray<ZoneLinkDefinition> zoneLinks,
+        ImmutableArray<PersonalBoardDefinition> personalBoards,
+        ImmutableArray<EncounterDefinition> encounters,
+        ImmutableArray<ShipFrameDefinition> shipFrames,
+        ImmutableArray<ShipModuleDefinition> shipModules,
+        ImmutableArray<ShipWeaponConfigurationDefinition> shipWeaponConfigurations,
         ImmutableArray<byte> canonicalSemanticContent,
         IReadOnlyDictionary<ContentId, ContentId> provenance)
     {
@@ -47,6 +55,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
         PsychicTechniques = psychicTechniques;
         Techniques = techniques;
         TrainingProjects = trainingProjects;
+        Equipment = equipment;
+        BoardCells = boardCells;
+        ZoneLinks = zoneLinks;
+        PersonalBoards = personalBoards;
+        Encounters = encounters;
+        ShipFrames = shipFrames;
+        ShipModules = shipModules;
+        ShipWeaponConfigurations = shipWeaponConfigurations;
         CanonicalSemanticContent = canonicalSemanticContent;
         AttributeRegistry = new TypedDefinitionRegistry<AttributeId, AttributeDefinition>(
             fingerprint, attributes, definition => definition.AttributeId);
@@ -63,6 +79,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
         PsychicTechniqueRegistry = new TypedDefinitionRegistry<PsychicTechniqueId, PsychicTechniqueDefinition>(fingerprint, psychicTechniques, definition => definition.PsychicTechniqueId);
         TechniqueRegistry = new TypedDefinitionRegistry<TechniqueId, TechniqueDefinition>(fingerprint, techniques, definition => definition.TechniqueId);
         TrainingProjectRegistry = new TypedDefinitionRegistry<TrainingProjectId, TrainingProjectDefinition>(fingerprint, trainingProjects, definition => definition.TrainingProjectId);
+        EquipmentRegistry = new TypedDefinitionRegistry<EquipmentId, EquipmentDefinition>(fingerprint, equipment, definition => definition.EquipmentId);
+        BoardCellRegistry = new TypedDefinitionRegistry<CellId, BoardCellDefinition>(fingerprint, boardCells, definition => definition.CellId);
+        ZoneLinkRegistry = new TypedDefinitionRegistry<LinkId, ZoneLinkDefinition>(fingerprint, zoneLinks, definition => definition.LinkId);
+        PersonalBoardRegistry = new TypedDefinitionRegistry<PersonalBoardId, PersonalBoardDefinition>(fingerprint, personalBoards, definition => definition.PersonalBoardId);
+        EncounterRegistry = new TypedDefinitionRegistry<EncounterId, EncounterDefinition>(fingerprint, encounters, definition => definition.EncounterId);
+        ShipFrameRegistry = new TypedDefinitionRegistry<ShipFrameId, ShipFrameDefinition>(fingerprint, shipFrames, definition => definition.ShipFrameId);
+        ShipModuleRegistry = new TypedDefinitionRegistry<ModuleId, ShipModuleDefinition>(fingerprint, shipModules, definition => definition.ModuleId);
+        ShipWeaponConfigurationRegistry = new TypedDefinitionRegistry<ShipWeaponConfigurationId, ShipWeaponConfigurationDefinition>(fingerprint, shipWeaponConfigurations, definition => definition.ShipWeaponConfigurationId);
 
         definitionsById = attributes.Cast<ContentDefinition>()
             .Concat(skills)
@@ -77,6 +101,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
             .Concat(psychicTechniques)
             .Concat(techniques)
             .Concat(trainingProjects)
+            .Concat(equipment)
+            .Concat(boardCells)
+            .Concat(zoneLinks)
+            .Concat(personalBoards)
+            .Concat(encounters)
+            .Concat(shipFrames)
+            .Concat(shipModules)
+            .Concat(shipWeaponConfigurations)
             .ToFrozenDictionary(definition => definition.Id);
         provenanceById = provenance.ToFrozenDictionary();
     }
@@ -96,6 +128,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
     public ImmutableArray<PsychicTechniqueDefinition> PsychicTechniques { get; }
     public ImmutableArray<TechniqueDefinition> Techniques { get; }
     public ImmutableArray<TrainingProjectDefinition> TrainingProjects { get; }
+    public ImmutableArray<EquipmentDefinition> Equipment { get; }
+    public ImmutableArray<BoardCellDefinition> BoardCells { get; }
+    public ImmutableArray<ZoneLinkDefinition> ZoneLinks { get; }
+    public ImmutableArray<PersonalBoardDefinition> PersonalBoards { get; }
+    public ImmutableArray<EncounterDefinition> Encounters { get; }
+    public ImmutableArray<ShipFrameDefinition> ShipFrames { get; }
+    public ImmutableArray<ShipModuleDefinition> ShipModules { get; }
+    public ImmutableArray<ShipWeaponConfigurationDefinition> ShipWeaponConfigurations { get; }
     public ImmutableArray<byte> CanonicalSemanticContent { get; }
     public TypedDefinitionRegistry<AttributeId, AttributeDefinition> AttributeRegistry { get; }
     public TypedDefinitionRegistry<SkillId, SkillDefinition> SkillRegistry { get; }
@@ -110,6 +150,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
     public TypedDefinitionRegistry<PsychicTechniqueId, PsychicTechniqueDefinition> PsychicTechniqueRegistry { get; }
     public TypedDefinitionRegistry<TechniqueId, TechniqueDefinition> TechniqueRegistry { get; }
     public TypedDefinitionRegistry<TrainingProjectId, TrainingProjectDefinition> TrainingProjectRegistry { get; }
+    public TypedDefinitionRegistry<EquipmentId, EquipmentDefinition> EquipmentRegistry { get; }
+    public TypedDefinitionRegistry<CellId, BoardCellDefinition> BoardCellRegistry { get; }
+    public TypedDefinitionRegistry<LinkId, ZoneLinkDefinition> ZoneLinkRegistry { get; }
+    public TypedDefinitionRegistry<PersonalBoardId, PersonalBoardDefinition> PersonalBoardRegistry { get; }
+    public TypedDefinitionRegistry<EncounterId, EncounterDefinition> EncounterRegistry { get; }
+    public TypedDefinitionRegistry<ShipFrameId, ShipFrameDefinition> ShipFrameRegistry { get; }
+    public TypedDefinitionRegistry<ModuleId, ShipModuleDefinition> ShipModuleRegistry { get; }
+    public TypedDefinitionRegistry<ShipWeaponConfigurationId, ShipWeaponConfigurationDefinition> ShipWeaponConfigurationRegistry { get; }
 
     public bool TryGetAttribute(AttributeId id, out AttributeDefinition? definition, out int index) =>
         TryGetIndexed(AttributeRegistry, id, out definition, out index);
@@ -129,6 +177,15 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
         PsychicTechniqueRegistry.TryGet(id, out definition);
     public bool TryGetTechnique(TechniqueId id, out TechniqueDefinition? definition) => TechniqueRegistry.TryGet(id, out definition);
     public bool TryGetTrainingProject(TrainingProjectId id, out TrainingProjectDefinition? definition) => TrainingProjectRegistry.TryGet(id, out definition);
+    public bool TryGetEquipment(EquipmentId id, out EquipmentDefinition? definition) => EquipmentRegistry.TryGet(id, out definition);
+    public bool TryGetBoardCell(CellId id, out BoardCellDefinition? definition) => BoardCellRegistry.TryGet(id, out definition);
+    public bool TryGetZoneLink(LinkId id, out ZoneLinkDefinition? definition) => ZoneLinkRegistry.TryGet(id, out definition);
+    public bool TryGetPersonalBoard(PersonalBoardId id, out PersonalBoardDefinition? definition) => PersonalBoardRegistry.TryGet(id, out definition);
+    public bool TryGetEncounter(EncounterId id, out EncounterDefinition? definition) => EncounterRegistry.TryGet(id, out definition);
+    public bool TryGetShipFrame(ShipFrameId id, out ShipFrameDefinition? definition) => ShipFrameRegistry.TryGet(id, out definition);
+    public bool TryGetShipModule(ModuleId id, out ShipModuleDefinition? definition) => ShipModuleRegistry.TryGet(id, out definition);
+    public bool TryGetShipWeaponConfiguration(ShipWeaponConfigurationId id, out ShipWeaponConfigurationDefinition? definition) =>
+        ShipWeaponConfigurationRegistry.TryGet(id, out definition);
 
     public bool TryGetDefinition(ContentId id, out ContentDefinition? definition) =>
         definitionsById.TryGetValue(id, out definition);
@@ -149,6 +206,14 @@ public sealed class GameContentSnapshot : ICharacterContentCatalog
         AddEntries(entries, "PsychicTechnique", PsychicTechniques, definition => definition.Id);
         AddEntries(entries, "Technique", Techniques, definition => definition.Id);
         AddEntries(entries, "TrainingProject", TrainingProjects, definition => definition.Id);
+        AddEntries(entries, "Equipment", Equipment, definition => definition.Id);
+        AddEntries(entries, "BoardCell", BoardCells, definition => definition.Id);
+        AddEntries(entries, "ZoneLink", ZoneLinks, definition => definition.Id);
+        AddEntries(entries, "PersonalBoard", PersonalBoards, definition => definition.Id);
+        AddEntries(entries, "Encounter", Encounters, definition => definition.Id);
+        AddEntries(entries, "ShipFrame", ShipFrames, definition => definition.Id);
+        AddEntries(entries, "ShipModule", ShipModules, definition => definition.Id);
+        AddEntries(entries, "ShipWeaponConfiguration", ShipWeaponConfigurations, definition => definition.Id);
         return new RegistryInspectionSnapshot(
             Fingerprint,
             Packs.Length,

@@ -284,6 +284,206 @@ public readonly record struct ResourceId : IComparable<ResourceId>
     public override string ToString() => Value.ToString();
 }
 
+public readonly record struct ActorId : IComparable<ActorId>
+{
+    public ActorId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "actor.");
+    public ActorId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ActorId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct TeamId : IComparable<TeamId>
+{
+    public TeamId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "team.");
+    public TeamId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(TeamId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct SpaceObjectId : IComparable<SpaceObjectId>
+{
+    public SpaceObjectId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "space-object.");
+    public SpaceObjectId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(SpaceObjectId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct PersonalBoardId : IComparable<PersonalBoardId>
+{
+    public PersonalBoardId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "board.");
+    public PersonalBoardId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(PersonalBoardId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct CellId : IComparable<CellId>
+{
+    public CellId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "cell.");
+    public CellId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(CellId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ZoneId : IComparable<ZoneId>
+{
+    public ZoneId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "zone.");
+    public ZoneId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ZoneId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct LinkId : IComparable<LinkId>
+{
+    public LinkId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "link.");
+    public LinkId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(LinkId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct EncounterId : IComparable<EncounterId>
+{
+    public EncounterId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "encounter.");
+    public EncounterId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(EncounterId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ObjectiveId : IComparable<ObjectiveId>
+{
+    public ObjectiveId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "objective.");
+    public ObjectiveId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ObjectiveId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct EquipmentId : IComparable<EquipmentId>
+{
+    public EquipmentId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "equipment.");
+    public EquipmentId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(EquipmentId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ShipId : IComparable<ShipId>
+{
+    public ShipId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "ship.");
+    public ShipId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ShipId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ShipFrameId : IComparable<ShipFrameId>
+{
+    public ShipFrameId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "frame.");
+    public ShipFrameId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ShipFrameId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ModuleId : IComparable<ModuleId>
+{
+    public ModuleId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "module.");
+    public ModuleId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ModuleId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ShipWeaponConfigurationId : IComparable<ShipWeaponConfigurationId>
+{
+    public ShipWeaponConfigurationId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "ship.weapon.");
+    public ShipWeaponConfigurationId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ShipWeaponConfigurationId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct NetworkId : IComparable<NetworkId>
+{
+    public NetworkId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "network.");
+    public NetworkId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(NetworkId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct StationId : IComparable<StationId>
+{
+    public StationId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "station.");
+    public StationId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(StationId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct CompartmentId : IComparable<CompartmentId>
+{
+    public CompartmentId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "compartment.");
+    public CompartmentId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(CompartmentId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ModuleInstanceId : IComparable<ModuleInstanceId>
+{
+    public ModuleInstanceId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "module-instance.");
+    public ModuleInstanceId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ModuleInstanceId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct EventId : IComparable<EventId>
+{
+    public EventId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "event.");
+    public EventId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(EventId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct EffectId : IComparable<EffectId>
+{
+    public EffectId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "effect.");
+    public EffectId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(EffectId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
 public readonly record struct ContentFingerprint
 {
     public ContentFingerprint(string hexadecimal)

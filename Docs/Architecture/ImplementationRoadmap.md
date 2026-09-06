@@ -485,6 +485,10 @@ deterministically.
 
 ## Milestone 5: dual-tempo fixed-tick encounter slice
 
+**Status: Complete (headless vertical slice).** The WPF expedition shell is
+unchanged; immutable snapshots and command logs provide its future integration
+boundary.
+
 Introduce `VoyageWorld` and a bounded command queue while keeping the expedition
 layer as a navigation shell. Ship engagements are real-time with tactical
 pause on a continuous 2D coordinate map; personal encounters use a hex board,
@@ -492,100 +496,100 @@ individual Turn Meters, and Action Points without global rounds.
 
 ### Phase M5.1: establish world time and ownership
 
-- [ ] **M5.1.1** Define fixed tick units, maximum catch-up work, ship tactical
+- [x] **M5.1.1** Define fixed tick units, maximum catch-up work, ship tactical
   pause, personal Ready pauses, and allowed command-submission boundaries.
-- [ ] **M5.1.2** Create `VoyageWorld` with seed, content fingerprint, tick, and
+- [x] **M5.1.2** Create `VoyageWorld` with seed, content fingerprint, tick, and
   explicitly owned random streams.
-- [ ] **M5.1.3** Add a bounded typed command queue with stable ordering and
+- [x] **M5.1.3** Add a bounded typed command queue with stable ordering and
   rejection for overflow or stale targets.
-- [ ] **M5.1.4** Publish read-only snapshots only after a complete tick commit.
+- [x] **M5.1.4** Publish read-only snapshots only after a complete tick commit.
 
 ### Phase M5.2: add actors, zones, and placement
 
-- [ ] **M5.2.1** Add stable Actor, Team, Space Object, Personal Board, Cell,
+- [x] **M5.2.1** Add stable Actor, Team, Space Object, Personal Board, Cell,
   Zone, Link, Encounter, and Objective IDs.
-- [ ] **M5.2.2** Compile bounded personal-combat hex boards and zone graphs with
+- [x] **M5.2.2** Compile bounded personal-combat hex boards and zone graphs with
   capacity, occupancy, access, visibility, cover, atmosphere, gravity, and
   hazard tags.
-- [ ] **M5.2.3** Validate legal initial placement, connected required
+- [x] **M5.2.3** Validate legal initial placement, connected required
   objectives, and retreat or one-way rules.
-- [ ] **M5.2.4** Add deterministic movement and bounded path search.
-- [ ] **M5.2.5** Add data-authored Equipment definitions and bounded personal
+- [x] **M5.2.4** Add deterministic movement and bounded path search.
+- [x] **M5.2.5** Add data-authored Equipment definitions and bounded personal
   loadouts: Main hand, Off hand, Body, Utility, and Relic slots; each item uses
   the Ready, Depleted, or Damaged state model from
   [`../DesignConcept/Equipments.md`](../DesignConcept/Equipments.md).
 
 ### Phase M5.3: add scheduled actions and effects
 
-- [ ] **M5.3.1** Implement declare, validate, reserve, prepare, commit, and
+- [x] **M5.3.1** Implement declare, validate, reserve, prepare, commit, and
   recover timing in ticks.
-- [ ] **M5.3.2** Add bounded Turn Meters, Ready queues, AP budgets, action
+- [x] **M5.3.2** Add bounded Turn Meters, Ready queues, AP budgets, action
   schedules, active effects, reactions, and stable equal-tick priority rules.
-- [ ] **M5.3.3** Implement allowlisted movement, resource, damage, condition,
+- [x] **M5.3.3** Implement allowlisted movement, resource, damage, condition,
   detection, and objective primitives.
-- [ ] **M5.3.4** Prove interruption and failure cannot partially publish or
+- [x] **M5.3.4** Prove interruption and failure cannot partially publish or
   duplicate resources.
 
 ### Phase M5.4: add ship and module state
 
-- [ ] **M5.4.1** Add stable Ship, Frame, Compartment, Module, Ship Weapon
+- [x] **M5.4.1** Add stable Ship, Frame, Compartment, Module, Ship Weapon
   Configuration, Network, Station, and Resource IDs; revise the content schema
   contract before loading the new weapon-configuration kind. Freeze the small
   stat budget: Hull, Armor, Shield, energy, cargo, slots, and each module's
   single primary effect.
-- [ ] **M5.4.2** Compile one minimal Arcane and one minimal Industrial energy
+- [x] **M5.4.2** Compile one minimal Arcane and one minimal Industrial energy
   package plus common armor, Energy Shield, prow, and configurable
   cannon definitions. Author an Aether Energy Cannon and Diesel Shell Cannon
   for the first slice, then defer the Atomic Shell Cannon; ship cannons have no
   Gunner position or Gunnery Skill requirement.
-- [ ] **M5.4.3** Implement a bounded priority order for Power or Aether,
+- [x] **M5.4.3** Implement a bounded priority order for Power or Aether,
   including the shield's fixed Energy Consumption Rate while raised.
-- [ ] **M5.4.4** Resolve finite current Shield Value, Armor Value mitigation,
+- [x] **M5.4.4** Resolve finite current Shield Value, Armor Value mitigation,
   damage overflow, Hull damage, and selected-module condition in one atomic
   commit.
-- [ ] **M5.4.5** Validate and transactionally commit one pre-voyage loadout with
+- [x] **M5.4.5** Validate and transactionally commit one pre-voyage loadout with
   available slots, Armor Value, Energy Shield energy feed, power, propulsion,
   prow effect, cannon resource type, and cargo displacement.
 
 ### Phase M5.5: implement a ship engagement
 
-- [ ] **M5.5.1** Add real-time-with-pause ship timing, bounded deterministic
+- [x] **M5.5.1** Add real-time-with-pause ship timing, bounded deterministic
   fixed-point 2D coordinates, heading, velocity, collision shapes, derived
   range labels, contact knowledge, firing solutions, cannon damage, rate of
   fire, effective and maximum range, reload time, damage type and area, armor
   penetration, Aether charge or physical ammunition, weapon readiness, maximum
   and current Shield Value, Recharge Rate, Energy Consumption Rate, raised
   state, and disengagement state.
-- [ ] **M5.5.2** Implement bounded queued scan, course, thrust, turn, brake,
+- [x] **M5.5.2** Implement bounded queued scan, course, thrust, turn, brake,
   intercept, fire, ram, raise or lower shield, defend, damage-control, signal,
   and retreat orders with explicit cancellation rules;
   fire orders use ship targeting state without an assigned Gunner.
-- [ ] **M5.5.3** Add one opponent plan with bounded candidates and a documented
+- [x] **M5.5.3** Add one opponent plan with bounded candidates and a documented
   safe fallback.
-- [ ] **M5.5.4** Persist module damage, spent resources, knowledge, witnesses,
+- [x] **M5.5.4** Persist module damage, spent resources, knowledge, witnesses,
   and escape results into the voyage state.
 
 ### Phase M5.6: implement boarding or ruin combat
 
-- [ ] **M5.6.1** Author a six-zone derelict or ruin with one hazard, hostile
+- [x] **M5.6.1** Author a six-zone derelict or ruin with one hazard, hostile
   group, ancient defense, non-combat solution, and extraction objective.
-- [ ] **M5.6.2** Add a bounded hex board and four active crew with individual
+- [x] **M5.6.2** Add a bounded hex board and four active crew with individual
   Turn Meters, AP budgets, movement, melee, ranged, defense, Spell or psychic,
   Engineering, and Medicine actions.
-- [ ] **M5.6.3** Add injury, incapacitation, stabilization, surrender, prisoner,
+- [x] **M5.6.3** Add injury, incapacitation, stabilization, surrender, prisoner,
   retreat, and cleanup rules.
-- [ ] **M5.6.4** Preserve exploration changes and desired objects damaged during
+- [x] **M5.6.4** Preserve exploration changes and desired objects damaged during
   combat.
 
 ### Phase M5.7: connect presentation and replay
 
-- [ ] **M5.7.1** Project safe world, action, objective, and explanation data to
+- [x] **M5.7.1** Project safe world, action, objective, and explanation data to
   immutable UI snapshots.
-- [ ] **M5.7.2** Add tactical-pause ship ordering and Ready-actor personal
+- [x] **M5.7.2** Add tactical-pause ship ordering and Ready-actor personal
   planning without placing WPF objects or wall-clock time in simulation state.
-- [ ] **M5.7.3** Record a bounded command/event stream sufficient to reproduce
+- [x] **M5.7.3** Record a bounded command/event stream sufficient to reproduce
   the slice.
-- [ ] **M5.7.4** Compare results across different rendering cadence, UI timing,
+- [x] **M5.7.4** Compare results across different rendering cadence, UI timing,
   and worker completion schedules.
 
 Deliverables:
@@ -955,6 +959,6 @@ Report engine, game, content-tool, and CI-owned test status separately.
 | Loader failure publishes partial state | Candidate registry and validate-before-publish transaction |
 | Scope delays the playable voyage | Move one content family at a time and retain the prototype |
 
-The near-term target is Milestone 5, not complete public mod support. Milestone
-4 proves trained and innate supernatural access, bounded knowledge, and atomic
-Spell and Mindlink execution on the deterministic character foundation.
+The near-term target is Milestone 6, not complete public mod support. Milestone
+5 supplies the headless dual-tempo encounter boundary, deterministic ship and
+personal action state, and authored first-slice encounter content.

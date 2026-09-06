@@ -172,3 +172,127 @@ public sealed record CharacterDefinition(
     ImmutableArray<SkillId> FocusSkillIds,
     ImmutableArray<ResourceId> ResourceIds)
     : ContentDefinition(CharacterId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record EquipmentDefinition(
+    EquipmentId EquipmentId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    ContentId SlotId,
+    ContentId InitialStateId,
+    ResourceId ResourceId,
+    int ResourceCapacity,
+    ImmutableArray<ContentId> ActionIds,
+    ImmutableArray<ContentId> EffectIds)
+    : ContentDefinition(EquipmentId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record BoardCellDefinition(
+    CellId CellId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    ZoneId ZoneId,
+    int Q,
+    int R,
+    int Capacity,
+    int Cover,
+    int Visibility,
+    ContentId AtmosphereId,
+    ContentId GravityId,
+    ImmutableArray<string> HazardTags)
+    : ContentDefinition(CellId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record ZoneLinkDefinition(
+    LinkId LinkId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    CellId FromCellId,
+    CellId ToCellId,
+    ContentId AccessId,
+    int OneWay,
+    int AllowsRetreat)
+    : ContentDefinition(LinkId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record PersonalBoardDefinition(
+    PersonalBoardId PersonalBoardId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    int MaximumOccupants,
+    ImmutableArray<CellId> CellIds,
+    ImmutableArray<LinkId> LinkIds,
+    ImmutableArray<ObjectiveId> RequiredObjectiveIds,
+    ImmutableArray<CellId> RetreatCellIds)
+    : ContentDefinition(PersonalBoardId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record EncounterDefinition(
+    EncounterId EncounterId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    PersonalBoardId PersonalBoardId,
+    ContentId ContextId,
+    TeamId HostileTeamId,
+    ContentId AncientDefenseId,
+    ObjectiveId NonCombatObjectiveId,
+    ObjectiveId ExtractionObjectiveId)
+    : ContentDefinition(EncounterId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record ShipFrameDefinition(
+    ShipFrameId ShipFrameId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    int MaximumHull,
+    int BaseArmor,
+    int MaximumSlots,
+    int CargoCapacity,
+    ImmutableArray<ContentId> MountIds)
+    : ContentDefinition(ShipFrameId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record ShipModuleDefinition(
+    ModuleId ModuleId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    int SlotCost,
+    int CargoDisplacement,
+    int MaximumIntegrity,
+    NetworkId NetworkId,
+    int EnergyGeneration,
+    int EnergyConsumption,
+    ContentId MountId,
+    ContentId PrimaryEffectId,
+    int ArmorValue,
+    int ShieldValue,
+    int ShieldRechargeRate,
+    int ShieldEnergyConsumptionRate,
+    ImmutableArray<ContentId> CompatiblePathIds)
+    : ContentDefinition(ModuleId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record ShipWeaponConfigurationDefinition(
+    ShipWeaponConfigurationId ShipWeaponConfigurationId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    NetworkId NetworkId,
+    ResourceId ResourceId,
+    int ResourceCost,
+    int Damage,
+    int RateOfFireTicks,
+    int EffectiveRange,
+    int MaximumRange,
+    int ReloadTicks,
+    ContentId DamageTypeId,
+    ContentId AreaId,
+    int ArmorPenetration)
+    : ContentDefinition(ShipWeaponConfigurationId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);

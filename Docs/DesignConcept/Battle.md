@@ -2,12 +2,12 @@
 
 ## Status
 
-This document defines the planned combat framework for ship engagements,
-boarding actions, shipboard melee, space-ruin expeditions, EVA fighting,
-settlement conflicts, and related tactical encounters. It is not implemented
-yet. The current voyage prototype has aggregate Hull damage but no weapons,
-combatants, tactical spaces, injuries, Turn Meters, Action Points, hostile AI,
-or battle saves.
+Milestone 5 implements the first headless combat framework: fixed-tick ship
+orders with tactical pause, continuous fixed-point movement, modular damage,
+and a bounded personal hex encounter with Turn Meters, Action Points, injuries,
+objectives, surrender, and retreat. The WPF host still presents the expedition
+prototype; boarding transitions, EVA, settlements, save serialization, and the
+broader catalog in this document remain planned.
 
 Battle is one possible way to resolve an encounter, not a separate campaign
 genre. Exploration, negotiation, stealth, rescue, sabotage, surrender, and

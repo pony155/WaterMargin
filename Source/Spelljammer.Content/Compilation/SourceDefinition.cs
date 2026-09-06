@@ -17,7 +17,15 @@ internal enum DefinitionKind : byte
     Spell,
     PsychicTechnique,
     Technique,
-    TrainingProject
+    TrainingProject,
+    Equipment,
+    BoardCell,
+    ZoneLink,
+    PersonalBoard,
+    Encounter,
+    ShipFrame,
+    ShipModule,
+    ShipWeaponConfiguration
 }
 
 internal sealed record SourceDefinition(

@@ -32,6 +32,20 @@ internal static class DefinitionParser
             [DefinitionKind.Technique] = new(["requiredAccessIds", "grantedPerkIds"], []),
             [DefinitionKind.TrainingProject] = new(
                 ["requiredSkillIds", "workUnits", "progressCap", "facilityId", "resourceId", "resourceCost", "safetyId", "grantedFeatIds", "grantedTechniqueIds"], []),
+            [DefinitionKind.Equipment] = new(
+                ["slotId", "initialStateId", "resourceId", "resourceCapacity", "actionIds", "effectIds"], []),
+            [DefinitionKind.BoardCell] = new(
+                ["zoneId", "q", "r", "capacity", "cover", "visibility", "atmosphereId", "gravityId", "hazardTags"], []),
+            [DefinitionKind.ZoneLink] = new(["fromCellId", "toCellId", "accessId", "oneWay", "allowsRetreat"], []),
+            [DefinitionKind.PersonalBoard] = new(
+                ["maximumOccupants", "cellIds", "linkIds", "requiredObjectiveIds", "retreatCellIds"], []),
+            [DefinitionKind.Encounter] = new(
+                ["personalBoardId", "contextId", "hostileTeamId", "ancientDefenseId", "nonCombatObjectiveId", "extractionObjectiveId"], []),
+            [DefinitionKind.ShipFrame] = new(["maximumHull", "baseArmor", "maximumSlots", "cargoCapacity", "mountIds"], []),
+            [DefinitionKind.ShipModule] = new(
+                ["slotCost", "cargoDisplacement", "maximumIntegrity", "networkId", "energyGeneration", "energyConsumption", "mountId", "primaryEffectId", "armorValue", "shieldValue", "shieldRechargeRate", "shieldEnergyConsumptionRate", "compatiblePathIds"], []),
+            [DefinitionKind.ShipWeaponConfiguration] = new(
+                ["networkId", "resourceId", "resourceCost", "damage", "rateOfFireTicks", "effectiveRange", "maximumRange", "reloadTicks", "damageTypeId", "areaId", "armorPenetration"], []),
         };
 
     private static readonly IReadOnlyDictionary<string, DefinitionKind> Directories =
@@ -50,6 +64,14 @@ internal static class DefinitionParser
             ["PsychicTechniques"] = DefinitionKind.PsychicTechnique,
             ["Techniques"] = DefinitionKind.Technique,
             ["TrainingProjects"] = DefinitionKind.TrainingProject,
+            ["Equipment"] = DefinitionKind.Equipment,
+            ["BoardCells"] = DefinitionKind.BoardCell,
+            ["ZoneLinks"] = DefinitionKind.ZoneLink,
+            ["PersonalBoards"] = DefinitionKind.PersonalBoard,
+            ["Encounters"] = DefinitionKind.Encounter,
+            ["ShipFrames"] = DefinitionKind.ShipFrame,
+            ["ShipModules"] = DefinitionKind.ShipModule,
+            ["ShipWeaponConfigurations"] = DefinitionKind.ShipWeaponConfiguration,
         };
 
     public static bool TryGetKind(string pathUnderRoot, out DefinitionKind kind)
@@ -161,9 +183,9 @@ internal static class DefinitionParser
 
         foreach ((string field, ImmutableArray<string> values) in arrays)
         {
-            if (field is "tags" or "targetTags" or "effectIds")
+            if (field is "tags" or "targetTags" or "hazardTags" or "effectIds")
             {
-                bool invalid = field is "tags" or "targetTags"
+                bool invalid = field is "tags" or "targetTags" or "hazardTags"
                     ? values.Any(value => !SourceValidation.IsIdSegment(value))
                     : values.Any(value => !ContentId.IsCanonical(value));
                 if (invalid)

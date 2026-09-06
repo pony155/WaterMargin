@@ -29,6 +29,64 @@ public sealed class GameContentCompiler
         "psychic.scope.deliberate-message",
         "effect.spirit.magic-missile-impact",
         "effect.psychic.shared-channel",
+        "equipment-slot.main-hand",
+        "equipment-slot.off-hand",
+        "equipment-slot.body",
+        "equipment-slot.utility",
+        "equipment-slot.relic",
+        "equipment-state.ready",
+        "resource.equipment-charge",
+        "resource.ballistic-ammunition",
+        "resource.aether-charge",
+        "resource.diesel-shell",
+        "resource.spare-parts",
+        "action.personal.melee",
+        "action.personal.ranged",
+        "action.personal.defend",
+        "action.personal.engineering",
+        "action.personal.medicine",
+        "action.personal.spell",
+        "effect.equipment.attack",
+        "effect.equipment.armor",
+        "effect.equipment.repair",
+        "effect.equipment.treatment",
+        "effect.equipment.focus",
+        "zone.ruin.entry",
+        "zone.ruin.gantry",
+        "zone.ruin.archive",
+        "zone.ruin.reactor",
+        "zone.ruin.sanctum",
+        "zone.ruin.extraction",
+        "atmosphere.breathable",
+        "gravity.standard",
+        "traversal.open",
+        "objective.ruin.extract-relic",
+        "objective.ruin.disable-defense",
+        "combat.context.ruin",
+        "team.ruin.sentinels",
+        "object.ruin.ancient-defense",
+        "ship.path.arcane",
+        "ship.path.industrial",
+        "mount.power",
+        "mount.propulsion",
+        "mount.armor",
+        "mount.shield",
+        "mount.prow",
+        "mount.weapon",
+        "mount.cargo",
+        "network.aether",
+        "network.power",
+        "network.supplies",
+        "effect.ship.energy-generation",
+        "effect.ship.propulsion",
+        "effect.ship.armor",
+        "effect.ship.shield",
+        "effect.ship.ram",
+        "effect.ship.weapon-mount",
+        "effect.ship.cargo",
+        "damage.arcane",
+        "damage.kinetic",
+        "area.single-target",
     };
 
     private readonly ContentLimits limits;
@@ -589,6 +647,52 @@ public sealed class GameContentCompiler
                     CheckPrimitive(definition, definition.Strings["resourceId"], "/resourceId", diagnostics);
                     CheckPrimitive(definition, definition.Strings["safetyId"], "/safetyId", diagnostics);
                     break;
+                case DefinitionKind.Equipment:
+                    CheckPrimitive(definition, definition.Strings["slotId"], "/slotId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["initialStateId"], "/initialStateId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["resourceId"], "/resourceId", diagnostics);
+                    CheckPrimitives(definition, definition.Arrays["actionIds"], "/actionIds", diagnostics);
+                    CheckPrimitives(definition, definition.Arrays["effectIds"], "/effectIds", diagnostics);
+                    break;
+                case DefinitionKind.BoardCell:
+                    CheckPrimitive(definition, definition.Strings["zoneId"], "/zoneId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["atmosphereId"], "/atmosphereId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["gravityId"], "/gravityId", diagnostics);
+                    break;
+                case DefinitionKind.ZoneLink:
+                    CheckReference(definition, definition.Strings["fromCellId"], DefinitionKind.BoardCell, byId, "/fromCellId", diagnostics);
+                    CheckReference(definition, definition.Strings["toCellId"], DefinitionKind.BoardCell, byId, "/toCellId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["accessId"], "/accessId", diagnostics);
+                    break;
+                case DefinitionKind.PersonalBoard:
+                    CheckReferences(definition, definition.Arrays["cellIds"], DefinitionKind.BoardCell, byId, "/cellIds", diagnostics);
+                    CheckReferences(definition, definition.Arrays["linkIds"], DefinitionKind.ZoneLink, byId, "/linkIds", diagnostics);
+                    CheckPrimitives(definition, definition.Arrays["requiredObjectiveIds"], "/requiredObjectiveIds", diagnostics);
+                    CheckReferences(definition, definition.Arrays["retreatCellIds"], DefinitionKind.BoardCell, byId, "/retreatCellIds", diagnostics);
+                    break;
+                case DefinitionKind.Encounter:
+                    CheckReference(definition, definition.Strings["personalBoardId"], DefinitionKind.PersonalBoard, byId, "/personalBoardId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["contextId"], "/contextId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["hostileTeamId"], "/hostileTeamId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["ancientDefenseId"], "/ancientDefenseId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["nonCombatObjectiveId"], "/nonCombatObjectiveId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["extractionObjectiveId"], "/extractionObjectiveId", diagnostics);
+                    break;
+                case DefinitionKind.ShipFrame:
+                    CheckPrimitives(definition, definition.Arrays["mountIds"], "/mountIds", diagnostics);
+                    break;
+                case DefinitionKind.ShipModule:
+                    CheckPrimitive(definition, definition.Strings["networkId"], "/networkId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["mountId"], "/mountId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["primaryEffectId"], "/primaryEffectId", diagnostics);
+                    CheckPrimitives(definition, definition.Arrays["compatiblePathIds"], "/compatiblePathIds", diagnostics);
+                    break;
+                case DefinitionKind.ShipWeaponConfiguration:
+                    CheckPrimitive(definition, definition.Strings["networkId"], "/networkId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["resourceId"], "/resourceId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["damageTypeId"], "/damageTypeId", diagnostics);
+                    CheckPrimitive(definition, definition.Strings["areaId"], "/areaId", diagnostics);
+                    break;
             }
         }
 
@@ -635,6 +739,47 @@ public sealed class GameContentCompiler
                     definition.Integers["sustainCostPerTick"] is < 0 or > 100:
                     OutOfRange(definition, "/strainCost", diagnostics);
                     break;
+                case DefinitionKind.Equipment when definition.Integers["resourceCapacity"] is < 0 or > 1_000_000:
+                    OutOfRange(definition, "/resourceCapacity", diagnostics);
+                    break;
+                case DefinitionKind.BoardCell when definition.Integers["q"] is < -1_024 or > 1_024 ||
+                    definition.Integers["r"] is < -1_024 or > 1_024 || definition.Integers["capacity"] is < 1 or > 8 ||
+                    definition.Integers["cover"] is < 0 or > 100 || definition.Integers["visibility"] is < 0 or > 100:
+                    OutOfRange(definition, "/capacity", diagnostics);
+                    break;
+                case DefinitionKind.ZoneLink when definition.Integers["oneWay"] is < 0 or > 1 ||
+                    definition.Integers["allowsRetreat"] is < 0 or > 1:
+                    OutOfRange(definition, "/oneWay", diagnostics);
+                    break;
+                case DefinitionKind.PersonalBoard when definition.Integers["maximumOccupants"] is < 1 or > 256:
+                    OutOfRange(definition, "/maximumOccupants", diagnostics);
+                    break;
+                case DefinitionKind.ShipFrame when definition.Integers["maximumHull"] is < 1 or > 1_000_000 ||
+                    definition.Integers["baseArmor"] is < 0 or > 100_000 || definition.Integers["maximumSlots"] is < 1 or > 256 ||
+                    definition.Integers["cargoCapacity"] is < 0 or > 1_000_000:
+                    OutOfRange(definition, "/maximumHull", diagnostics);
+                    break;
+                case DefinitionKind.ShipModule when definition.Integers["slotCost"] is < 1 or > 256 ||
+                    definition.Integers["cargoDisplacement"] is < 0 or > 1_000_000 ||
+                    definition.Integers["maximumIntegrity"] is < 1 or > 1_000_000 ||
+                    definition.Integers["energyGeneration"] is < 0 or > 1_000_000 ||
+                    definition.Integers["energyConsumption"] is < 0 or > 1_000_000 ||
+                    definition.Integers["armorValue"] is < 0 or > 100_000 ||
+                    definition.Integers["shieldValue"] is < 0 or > 1_000_000 ||
+                    definition.Integers["shieldRechargeRate"] is < 0 or > 1_000_000 ||
+                    definition.Integers["shieldEnergyConsumptionRate"] is < 0 or > 1_000_000:
+                    OutOfRange(definition, "/slotCost", diagnostics);
+                    break;
+                case DefinitionKind.ShipWeaponConfiguration when definition.Integers["resourceCost"] is < 1 or > 1_000_000 ||
+                    definition.Integers["damage"] is < 1 or > 1_000_000 ||
+                    definition.Integers["rateOfFireTicks"] is < 1 or > 1_000_000 ||
+                    definition.Integers["effectiveRange"] is < 1 or > 1_000_000_000 ||
+                    definition.Integers["maximumRange"] < definition.Integers["effectiveRange"] ||
+                    definition.Integers["maximumRange"] > 1_000_000_000 ||
+                    definition.Integers["reloadTicks"] is < 1 or > 1_000_000 ||
+                    definition.Integers["armorPenetration"] is < 0 or > 100_000:
+                    OutOfRange(definition, "/damage", diagnostics);
+                    break;
             }
         }
 
@@ -650,7 +795,7 @@ public sealed class GameContentCompiler
                         definition.Id.ToString(), "/" + field);
                 }
 
-                if (field is not ("tags" or "targetTags"))
+                if (field is not ("tags" or "targetTags" or "hazardTags"))
                 {
                     totalReferences = checked(totalReferences + values.Length);
                     definitionReferences = checked(definitionReferences + values.Length);
@@ -706,6 +851,30 @@ public sealed class GameContentCompiler
                     RequireNonempty(definition, "targetTags", diagnostics);
                     RequireNonempty(definition, "effectIds", diagnostics);
                     break;
+                case DefinitionKind.Equipment:
+                    RequireNonempty(definition, "actionIds", diagnostics);
+                    RequireNonempty(definition, "effectIds", diagnostics);
+                    break;
+                case DefinitionKind.ZoneLink:
+                    if (definition.Strings["fromCellId"] == definition.Strings["toCellId"])
+                    {
+                        diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, definition.PackId, definition.RelativePath,
+                            definition.Id.ToString(), "/toCellId");
+                    }
+                    break;
+                case DefinitionKind.PersonalBoard:
+                    RequireNonempty(definition, "cellIds", diagnostics);
+                    RequireNonempty(definition, "linkIds", diagnostics);
+                    RequireNonempty(definition, "requiredObjectiveIds", diagnostics);
+                    RequireNonempty(definition, "retreatCellIds", diagnostics);
+                    ValidateBoard(definition, byId, diagnostics);
+                    break;
+                case DefinitionKind.ShipFrame:
+                    RequireNonempty(definition, "mountIds", diagnostics);
+                    break;
+                case DefinitionKind.ShipModule:
+                    RequireNonempty(definition, "compatiblePathIds", diagnostics);
+                    break;
             }
         }
 
@@ -713,7 +882,7 @@ public sealed class GameContentCompiler
         {
             foreach ((string field, ImmutableArray<string> values) in definition.Arrays)
             {
-                bool isTagField = field is "tags" or "targetTags";
+                bool isTagField = field is "tags" or "targetTags" or "hazardTags";
                 int maximum = isTagField ? limits.TagsPerDefinition : limits.ReferencesPerDefinition;
                 if (values.Length > maximum)
                 {
@@ -723,7 +892,7 @@ public sealed class GameContentCompiler
             }
 
             int definitionReferences = definition.Arrays
-                .Where(pair => pair.Key is not ("tags" or "targetTags"))
+                .Where(pair => pair.Key is not ("tags" or "targetTags" or "hazardTags"))
                 .Sum(pair => pair.Value.Length);
             definitionReferences += definition.Strings.Count;
 
@@ -764,14 +933,23 @@ public sealed class GameContentCompiler
         ImmutableArray<PsychicTechniqueDefinition> psychicTechniques = [.. sources.Where(value => value.Kind == DefinitionKind.PsychicTechnique).OrderBy(value => value.Id).Select(CompilePsychicTechnique)];
         ImmutableArray<TechniqueDefinition> techniques = [.. sources.Where(value => value.Kind == DefinitionKind.Technique).OrderBy(value => value.Id).Select(CompileTechnique)];
         ImmutableArray<TrainingProjectDefinition> training = [.. sources.Where(value => value.Kind == DefinitionKind.TrainingProject).OrderBy(value => value.Id).Select(CompileTraining)];
+        ImmutableArray<EquipmentDefinition> equipment = [.. sources.Where(value => value.Kind == DefinitionKind.Equipment).OrderBy(value => value.Id).Select(CompileEquipment)];
+        ImmutableArray<BoardCellDefinition> boardCells = [.. sources.Where(value => value.Kind == DefinitionKind.BoardCell).OrderBy(value => value.Id).Select(CompileBoardCell)];
+        ImmutableArray<ZoneLinkDefinition> zoneLinks = [.. sources.Where(value => value.Kind == DefinitionKind.ZoneLink).OrderBy(value => value.Id).Select(CompileZoneLink)];
+        ImmutableArray<PersonalBoardDefinition> personalBoards = [.. sources.Where(value => value.Kind == DefinitionKind.PersonalBoard).OrderBy(value => value.Id).Select(CompilePersonalBoard)];
+        ImmutableArray<EncounterDefinition> encounters = [.. sources.Where(value => value.Kind == DefinitionKind.Encounter).OrderBy(value => value.Id).Select(CompileEncounter)];
+        ImmutableArray<ShipFrameDefinition> shipFrames = [.. sources.Where(value => value.Kind == DefinitionKind.ShipFrame).OrderBy(value => value.Id).Select(CompileShipFrame)];
+        ImmutableArray<ShipModuleDefinition> shipModules = [.. sources.Where(value => value.Kind == DefinitionKind.ShipModule).OrderBy(value => value.Id).Select(CompileShipModule)];
+        ImmutableArray<ShipWeaponConfigurationDefinition> shipWeapons = [.. sources.Where(value => value.Kind == DefinitionKind.ShipWeaponConfiguration).OrderBy(value => value.Id).Select(CompileShipWeapon)];
         ImmutableArray<ContentPackIdentity> identities = [.. packs.Select(pack => new ContentPackIdentity(
             pack.Manifest.Id, pack.Manifest.Version, pack.Manifest.ContentRevision))];
-        ContentDefinition[] all = [.. attributes, .. skills, .. access, .. backgrounds, .. characters, .. feats, .. heritages, .. perks, .. races, .. spells, .. psychicTechniques, .. techniques, .. training];
+        ContentDefinition[] all = [.. attributes, .. skills, .. access, .. backgrounds, .. characters, .. feats, .. heritages, .. perks, .. races, .. spells, .. psychicTechniques, .. techniques, .. training, .. equipment, .. boardCells, .. zoneLinks, .. personalBoards, .. encounters, .. shipFrames, .. shipModules, .. shipWeapons];
         (byte[] canonicalBytes, ContentFingerprint fingerprint) = CanonicalSemanticWriter.Write(identities, all);
         Dictionary<ContentId, ContentId> provenance = sources.ToDictionary(
             source => source.Id,
             source => new ContentId(source.PackId));
         GameContentSnapshot snapshot = new(fingerprint, identities, attributes, skills, access, backgrounds, characters, feats, heritages, perks, races, spells, psychicTechniques, techniques, training,
+            equipment, boardCells, zoneLinks, personalBoards, encounters, shipFrames, shipModules, shipWeapons,
             [.. canonicalBytes], provenance);
         return new ContentCompilationResult(snapshot, diagnostics.ToImmutable(), null);
     }
@@ -862,6 +1040,62 @@ public sealed class GameContentCompiler
         Sort(value.Arrays["grantedFeatIds"]).Select(item => new FeatId(item)).ToImmutableArray(),
         Sort(value.Arrays["grantedTechniqueIds"]).Select(item => new TechniqueId(item)).ToImmutableArray());
 
+    private static EquipmentDefinition CompileEquipment(SourceDefinition value) => new(
+        new EquipmentId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new ContentId(value.Strings["slotId"]), new ContentId(value.Strings["initialStateId"]),
+        new ResourceId(value.Strings["resourceId"]), value.Integers["resourceCapacity"],
+        Sort(value.Arrays["actionIds"]).Select(item => new ContentId(item)).ToImmutableArray(),
+        Sort(value.Arrays["effectIds"]).Select(item => new ContentId(item)).ToImmutableArray());
+
+    private static BoardCellDefinition CompileBoardCell(SourceDefinition value) => new(
+        new CellId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new ZoneId(value.Strings["zoneId"]), value.Integers["q"], value.Integers["r"],
+        value.Integers["capacity"], value.Integers["cover"], value.Integers["visibility"],
+        new ContentId(value.Strings["atmosphereId"]), new ContentId(value.Strings["gravityId"]),
+        Sort(value.Arrays["hazardTags"]));
+
+    private static ZoneLinkDefinition CompileZoneLink(SourceDefinition value) => new(
+        new LinkId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new CellId(value.Strings["fromCellId"]), new CellId(value.Strings["toCellId"]),
+        new ContentId(value.Strings["accessId"]),
+        value.Integers["oneWay"], value.Integers["allowsRetreat"]);
+
+    private static PersonalBoardDefinition CompilePersonalBoard(SourceDefinition value) => new(
+        new PersonalBoardId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        value.Integers["maximumOccupants"],
+        Sort(value.Arrays["cellIds"]).Select(item => new CellId(item)).ToImmutableArray(),
+        Sort(value.Arrays["linkIds"]).Select(item => new LinkId(item)).ToImmutableArray(),
+        Sort(value.Arrays["requiredObjectiveIds"]).Select(item => new ObjectiveId(item)).ToImmutableArray(),
+        Sort(value.Arrays["retreatCellIds"]).Select(item => new CellId(item)).ToImmutableArray());
+
+    private static EncounterDefinition CompileEncounter(SourceDefinition value) => new(
+        new EncounterId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new PersonalBoardId(value.Strings["personalBoardId"]), new ContentId(value.Strings["contextId"]),
+        new TeamId(value.Strings["hostileTeamId"]), new ContentId(value.Strings["ancientDefenseId"]),
+        new ObjectiveId(value.Strings["nonCombatObjectiveId"]), new ObjectiveId(value.Strings["extractionObjectiveId"]));
+
+    private static ShipFrameDefinition CompileShipFrame(SourceDefinition value) => new(
+        new ShipFrameId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        value.Integers["maximumHull"], value.Integers["baseArmor"], value.Integers["maximumSlots"],
+        value.Integers["cargoCapacity"], Sort(value.Arrays["mountIds"]).Select(item => new ContentId(item)).ToImmutableArray());
+
+    private static ShipModuleDefinition CompileShipModule(SourceDefinition value) => new(
+        new ModuleId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        value.Integers["slotCost"], value.Integers["cargoDisplacement"], value.Integers["maximumIntegrity"],
+        new NetworkId(value.Strings["networkId"]), value.Integers["energyGeneration"], value.Integers["energyConsumption"],
+        new ContentId(value.Strings["mountId"]), new ContentId(value.Strings["primaryEffectId"]),
+        value.Integers["armorValue"], value.Integers["shieldValue"], value.Integers["shieldRechargeRate"],
+        value.Integers["shieldEnergyConsumptionRate"],
+        Sort(value.Arrays["compatiblePathIds"]).Select(item => new ContentId(item)).ToImmutableArray());
+
+    private static ShipWeaponConfigurationDefinition CompileShipWeapon(SourceDefinition value) => new(
+        new ShipWeaponConfigurationId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new NetworkId(value.Strings["networkId"]), new ResourceId(value.Strings["resourceId"]),
+        value.Integers["resourceCost"], value.Integers["damage"], value.Integers["rateOfFireTicks"],
+        value.Integers["effectiveRange"], value.Integers["maximumRange"], value.Integers["reloadTicks"],
+        new ContentId(value.Strings["damageTypeId"]), new ContentId(value.Strings["areaId"]),
+        value.Integers["armorPenetration"]);
+
     private static ImmutableArray<string> Sort(ImmutableArray<string> values) => [.. values.Order(StringComparer.Ordinal)];
 
     private static void ValidateAttribute(SourceDefinition definition, DiagnosticSink diagnostics)
@@ -940,6 +1174,86 @@ public sealed class GameContentCompiler
         {
             diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, character.PackId, character.RelativePath,
                 character.Id.ToString(), "/raceId");
+        }
+    }
+
+    private void ValidateBoard(
+        SourceDefinition board,
+        IReadOnlyDictionary<string, SourceDefinition> byId,
+        DiagnosticSink diagnostics)
+    {
+        HashSet<string> cells = board.Arrays["cellIds"].ToHashSet(StringComparer.Ordinal);
+        if (board.Arrays["retreatCellIds"].Any(value => !cells.Contains(value)))
+        {
+            diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, board.PackId, board.RelativePath,
+                board.Id.ToString(), "/retreatCellIds");
+            return;
+        }
+
+        Dictionary<string, List<string>> adjacent = cells.ToDictionary(value => value, _ => new List<string>(), StringComparer.Ordinal);
+        foreach (string linkId in board.Arrays["linkIds"])
+        {
+            if (!byId.TryGetValue(linkId, out SourceDefinition? link))
+            {
+                continue;
+            }
+
+            string from = link.Strings["fromCellId"];
+            string to = link.Strings["toCellId"];
+            if (!cells.Contains(from) || !cells.Contains(to))
+            {
+                diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, board.PackId, board.RelativePath,
+                    board.Id.ToString(), "/linkIds");
+                return;
+            }
+
+            adjacent[from].Add(to);
+            if (link.Integers["oneWay"] == 0)
+            {
+                adjacent[to].Add(from);
+            }
+        }
+
+        foreach (string retreatCell in board.Arrays["retreatCellIds"])
+        {
+            bool hasRetreatLink = board.Arrays["linkIds"].Any(linkId =>
+                byId.TryGetValue(linkId, out SourceDefinition? link) &&
+                link.Integers["allowsRetreat"] == 1 &&
+                (link.Strings["fromCellId"] == retreatCell || link.Strings["toCellId"] == retreatCell));
+            if (!hasRetreatLink)
+            {
+                diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, board.PackId, board.RelativePath,
+                    board.Id.ToString(), "/retreatCellIds");
+                return;
+            }
+        }
+
+        if (cells.Count == 0)
+        {
+            return;
+        }
+
+        HashSet<string> reached = [];
+        Queue<string> pending = new();
+        pending.Enqueue(cells.Order(StringComparer.Ordinal).First());
+        while (pending.Count > 0 && reached.Count <= limits.GraphNodes)
+        {
+            string current = pending.Dequeue();
+            if (!reached.Add(current))
+            {
+                continue;
+            }
+
+            foreach (string next in adjacent[current].Order(StringComparer.Ordinal))
+            {
+                pending.Enqueue(next);
+            }
+        }
+
+        if (reached.Count != cells.Count)
+        {
+            diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, board.PackId, board.RelativePath,
+                board.Id.ToString(), "/linkIds");
         }
     }
 
@@ -1078,6 +1392,14 @@ public sealed class GameContentCompiler
         DefinitionKind.PsychicTechnique => "psychic.",
         DefinitionKind.Technique => "technique.",
         DefinitionKind.TrainingProject => "training.",
+        DefinitionKind.Equipment => "equipment.",
+        DefinitionKind.BoardCell => "cell.",
+        DefinitionKind.ZoneLink => "link.",
+        DefinitionKind.PersonalBoard => "board.",
+        DefinitionKind.Encounter => "encounter.",
+        DefinitionKind.ShipFrame => "frame.",
+        DefinitionKind.ShipModule => "module.",
+        DefinitionKind.ShipWeaponConfiguration => "ship.weapon.",
         _ => throw new ArgumentOutOfRangeException(nameof(kind)),
     };
 

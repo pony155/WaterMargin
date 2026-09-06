@@ -12,7 +12,9 @@ Milestone 3 adds strict Character, Background, Heritage, and Technique kinds,
 grant-graph validation, the base race roster, and the simulation catalog
 boundary. Milestone 4 adds Spell and psychic-technique kinds, expanded training
 projects, and their fingerprint-scoped registries. The current WPF expedition
-behavior remains unchanged.
+behavior remains unchanged. Milestone 5 adds linked equipment, personal-board,
+encounter, ship-frame, ship-module, and ship-weapon-configuration kinds plus
+the authored six-zone ruin and two technology packages.
 
 The implementation moves character definitions into a built-in base pack
 without changing the expedition UI. Later systems reuse the pipeline for
@@ -86,11 +88,16 @@ Content/
         Heritages/
         Techniques/
         TrainingProjects/
-        Spells/
-        PsychicTechniques/
-        Items/
-        Ships/
+        Equipment/
+        BoardCells/
+        ZoneLinks/
+        PersonalBoards/
         Encounters/
+        ShipFrames/
+        ShipModules/
+        ShipWeaponConfigurations/
+        Items/                 # planned
+        Ships/                 # planned
         Events/
         Factions/
         Crises/

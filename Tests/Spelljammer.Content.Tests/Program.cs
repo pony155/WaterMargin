@@ -7,6 +7,7 @@ using Spelljammer.Content.Manifests;
 using Spelljammer.Content.Sources;
 using Spelljammer.Simulation.Characters;
 using Spelljammer.Simulation.Content;
+using Spelljammer.Simulation.Encounters;
 
 return ContentContracts.Run();
 
@@ -33,6 +34,7 @@ internal static class ContentContracts
         SupernaturalDefinitionsAndExecutionAreBounded();
         MindlinkRequiresKnowledgeConsentAndStrain();
         RaceCapabilitiesRespectTheirBoundaries();
+        Milestone5EncounterAndShipContentIsLinked();
         Console.WriteLine("Content and character capability contracts passed.");
         return 0;
     }
@@ -47,6 +49,61 @@ internal static class ContentContracts
         True(ContentId.TryParse(maximum, out _), "A maximum-length ID was rejected.");
         False(ContentId.TryParse(maximum + "a", out _), "An oversized ID was accepted.");
         True(valid.CompareTo(new ContentId("attribute.toughness")) < 0, "ID comparison was not ordinal.");
+    }
+
+    private static void Milestone5EncounterAndShipContentIsLinked()
+    {
+        ContentCompilationResult compiled = CompileDirectory(Path.Combine(Milestone2Root, "base"));
+        True(compiled.Succeeded, Primary(compiled));
+        GameContentSnapshot snapshot = compiled.Snapshot!;
+        Equal(5, snapshot.EquipmentRegistry.Count, "The first encounter equipment set is incomplete.");
+        Equal(6, snapshot.BoardCellRegistry.Count, "The authored ruin does not contain six cells.");
+        Equal(5, snapshot.ZoneLinkRegistry.Count, "The authored ruin link graph is incomplete.");
+        Equal(1, snapshot.PersonalBoardRegistry.Count, "The first personal board was not published.");
+        Equal(1, snapshot.EncounterRegistry.Count, "The first encounter was not published.");
+        Equal(1, snapshot.ShipFrameRegistry.Count, "The Wayfarer frame was not published.");
+        Equal(11, snapshot.ShipModuleRegistry.Count, "The two ship technology packages are incomplete.");
+        Equal(2, snapshot.ShipWeaponConfigurationRegistry.Count, "The ship weapon configurations are incomplete.");
+
+        PersonalBoardDefinition boardDefinition = snapshot.PersonalBoards.Single();
+        BoardValidationResult board = TacticalBoard.Create(
+            boardDefinition,
+            snapshot.BoardCells.Where(value => boardDefinition.CellIds.Contains(value.CellId)),
+            snapshot.ZoneLinks.Where(value => boardDefinition.LinkIds.Contains(value.LinkId)));
+        True(board.Accepted, board.RejectionCode);
+        True(board.Board!.FindPath(new CellId("cell.ruin.entry"), new CellId("cell.ruin.extraction"), TacticalBoard.MaximumCells).Length == 6,
+            "The six-zone ruin does not have a bounded entry-to-extraction route.");
+
+        ShipFrameDefinition frame = snapshot.ShipFrames.Single();
+        ShipState arcane = CreateContentShip(snapshot, frame, "arcane", new ShipId("ship.first-voyage.arcane"));
+        ShipState industrial = CreateContentShip(snapshot, frame, "industrial", new ShipId("ship.first-voyage.industrial"));
+        True(arcane.Modules.Any(value => value.Definition.ModuleId == new ModuleId("module.power.aether-dynamo")),
+            "The arcane package lost its aether generator.");
+        True(industrial.Modules.Any(value => value.Definition.ModuleId == new ModuleId("module.power.diesel-generator")),
+            "The industrial package lost its diesel generator.");
+        Equal(frame.MaximumHull, arcane.Hull, "A valid loadout did not publish the frame's hull budget.");
+    }
+
+    private static ShipState CreateContentShip(GameContentSnapshot snapshot, ShipFrameDefinition frame, string path, ShipId shipId)
+    {
+        ContentId pathId = new($"ship.path.{path}");
+        ShipModuleDefinition[] modules = [.. snapshot.ShipModules.Where(value => value.CompatiblePathIds.Contains(pathId))
+            .GroupBy(value => value.MountId)
+            .Select(group => group.OrderBy(value => value.ModuleId).First())];
+        ShipWeaponConfigurationDefinition weapon = snapshot.ShipWeaponConfigurations.Single(value =>
+            value.NetworkId == new NetworkId(path == "arcane" ? "network.aether" : "network.power"));
+        ShipLoadoutResult result = ShipLoadoutSystem.Create(
+            shipId,
+            new TeamId("team.player"),
+            frame,
+            pathId,
+            modules,
+            weapon,
+            ImmutableDictionary<ResourceId, int>.Empty
+                .Add(weapon.ResourceId, 12)
+                .Add(new ResourceId("resource.spare-parts"), 4));
+        True(result.Accepted, result.RejectionCode);
+        return result.Ship!;
     }
 
     private static void ValidFixtureIsCanonicalAndDeterministic()
