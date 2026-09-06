@@ -18,9 +18,9 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 {
     internal const double LogicalWidth = 900;
     internal const double LogicalHeight = 650;
-    private const uint ExpectedUiInteropVersion = 1;
     private const uint ElementCapacity = 48;
     private const uint ActionCapacity = 32;
+    private const uint NonEditableTextCapacity = 1;
 
     private static readonly ulong RootKey = Key("spelljammer.settings.root");
     private static readonly ulong ModalKey = Key("spelljammer.settings.modal");
@@ -58,7 +58,6 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private static readonly ulong ResetButtonKey = Key("spelljammer.settings.reset");
     private static readonly ulong CancelButtonKey = Key("spelljammer.settings.cancel");
     private static readonly ulong ApplyButtonKey = Key("spelljammer.settings.apply");
-    private static readonly ulong PopupScrimKey = Key("spelljammer.settings.popup.scrim");
     private static readonly ulong PopupPanelKey = Key("spelljammer.settings.popup.panel");
     private static readonly ulong PopupTitleKey = Key("spelljammer.settings.popup.title");
     private static readonly ulong CancelAction = Key("spelljammer.settings.action.cancel");
@@ -85,6 +84,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private ulong[] elementKeys = [];
     private nint context;
     private ulong document;
+    private ulong revision;
     private ulong inputSequence;
     private GameSettingsProfile draft;
     private SettingsCategory category;
@@ -123,18 +123,20 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
         RefreshSnapshots();
         ThrowIfFailed(SpriteForgeNative.SpriteForge_UIBuildPresentation(
-            context, document, presentation, (uint)presentation.Length, out uint commandCount),
+            context, document, presentation, (uint)presentation.Length,
+            out uint requiredCommands, out uint commandCount, out _),
             "build the settings presentation");
+        RequireCompleteCopy(requiredCommands, commandCount, "settings presentation");
         for (int index = 0; index < commandCount; ++index)
         {
             EngineUiPresentationCommand command = presentation[index];
-            if (IsPopupElement(command.Source))
+            if (command.Type != EngineUiPresentationType.SolidQuad || IsPopupElement(command.Source))
             {
                 continue;
             }
 
             drawingContext.DrawRectangle(
-                ToBrush(command.Color), null, Scale(command.X, command.Y, command.Width, command.Height));
+                ToBrush(command.Color), null, ScaleAndClip(command));
         }
 
         DrawCategorySelection(drawingContext);
@@ -157,19 +159,19 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             for (int index = 0; index < commandCount; ++index)
             {
                 EngineUiPresentationCommand command = presentation[index];
-                if (!IsPopupElement(command.Source))
+                if (command.Type != EngineUiPresentationType.SolidQuad || !IsPopupElement(command.Source))
                 {
                     continue;
                 }
 
                 drawingContext.DrawRectangle(
-                    ToBrush(command.Color), null, Scale(command.X, command.Y, command.Width, command.Height));
+                    ToBrush(command.Color), null, ScaleAndClip(command));
             }
 
             DrawPopup(drawingContext);
         }
 
-        foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.Focused != 0))
+        foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.IsFocused))
         {
             drawingContext.DrawRectangle(null, new Pen(Brush("#80DED9"), 2),
                 Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height));
@@ -263,13 +265,6 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     private void CreateNativeDocument()
     {
-        uint version = SpriteForgeNative.SpriteForge_GetUIInteropVersion();
-        if (version != ExpectedUiInteropVersion)
-        {
-            throw new InvalidOperationException(
-                $"SpriteForge.dll exposes UI interop version {version}; Spelljammer expects {ExpectedUiInteropVersion}.");
-        }
-
         EngineUiDocumentDescription description = new()
         {
             RootKey = RootKey,
@@ -295,8 +290,20 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         {
             EngineUiElementDescription[] elements = BuildElements(allocatedNames);
             elementKeys = [.. elements.Select(value => value.Key)];
-            ThrowIfFailed(SpriteForgeNative.SpriteForge_UIAddElements(
-                context, document, elements, (uint)elements.Length), "commit the settings UI document");
+            EngineUiMutation[] mutations = elements.Select(static element => new EngineUiMutation
+            {
+                Type = EngineUiMutationType.Create,
+                Element = element,
+            }).ToArray();
+            ThrowIfFailed(SpriteForgeNative.SpriteForge_UICommit(
+                context, document, 1, mutations, (uint)mutations.Length, out EngineUiCommitReport report),
+                "commit the settings UI document");
+            if (report.Created != (uint)mutations.Length)
+            {
+                throw new InvalidOperationException("SpriteForge did not create the complete settings UI document.");
+            }
+
+            revision = report.Revision;
         }
         catch
         {
@@ -426,34 +433,36 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     private void AddPopupElements(List<EngineUiElementDescription> elements, List<nint> names)
     {
-        elements.Add(Panel(PopupScrimKey, 275, 112, 580, 382,
-            strings.Get("settings.accessibility.dialog"), names, Color(0.015f, 0.024f, 0.043f, 0.78f)));
         if (popup == ChoicePopup.Language)
         {
-            elements.Add(Element(PopupPanelKey, ModalKey, 548, 160, 282, 190, EngineUiBehavior.None,
+            elements.Add(Element(PopupPanelKey, RootKey, 0, 0, 282, 190, EngineUiBehavior.None,
                 strings.Get("settings.label.language"), names, modal: true, dismissAction: PopupCancelAction,
-                customColor: true, color: Color(0.082f, 0.110f, 0.165f)));
+                customColor: true, color: Color(0.082f, 0.110f, 0.165f),
+                popupAnchor: LanguageButtonKey, popupEnabled: true));
             elements.Add(TextElement(PopupTitleKey, PopupPanelKey, 20, 14, 242, 30,
                 strings.Get("settings.label.language"), names));
             for (int index = 0; index < GameSettingsChoices.Languages.Count; ++index)
             {
                 string language = GameSettingsChoices.Languages[index];
                 elements.Add(Button(LanguageChoiceKeys[index], PopupPanelKey, 20, 50 + index * 42, 242, 36,
-                    index, strings.LanguageName(language), names));
+                    index, strings.LanguageName(language), names,
+                    selected: string.Equals(language, draft.Language, StringComparison.Ordinal)));
             }
         }
         else
         {
-            elements.Add(Element(PopupPanelKey, ModalKey, 520, 126, 310, 292, EngineUiBehavior.None,
+            elements.Add(Element(PopupPanelKey, RootKey, 0, 0, 310, 292, EngineUiBehavior.None,
                 strings.Get("settings.label.resolution"), names, modal: true, dismissAction: PopupCancelAction,
-                customColor: true, color: Color(0.082f, 0.110f, 0.165f)));
+                customColor: true, color: Color(0.082f, 0.110f, 0.165f),
+                popupAnchor: ResolutionButtonKey, popupEnabled: true));
             elements.Add(TextElement(PopupTitleKey, PopupPanelKey, 20, 14, 270, 30,
                 strings.Get("settings.label.resolution"), names));
             for (int index = 0; index < GameSettingsChoices.Resolutions.Count; ++index)
             {
                 GameResolutionChoice resolution = GameSettingsChoices.Resolutions[index];
                 elements.Add(Button(ResolutionChoiceKeys[index], PopupPanelKey, 20, 50 + index * 44, 270, 38,
-                    index, strings.ResolutionName(resolution), names));
+                    index, strings.ResolutionName(resolution), names,
+                    selected: string.Equals(resolution.Id, draft.Resolution, StringComparison.Ordinal)));
             }
         }
     }
@@ -486,8 +495,9 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     private static EngineUiElementDescription Button(
         ulong key, ulong parent, float x, float y, float width, float height, int tabOrder,
-        string name, List<nint> names) =>
-        Element(key, parent, x, y, width, height, EngineUiBehavior.Button, name, names, tabOrder: tabOrder);
+        string name, List<nint> names, bool selected = false) =>
+        Element(key, parent, x, y, width, height, EngineUiBehavior.Button, name, names,
+            tabOrder: tabOrder, selected: selected);
 
     private static EngineUiElementDescription Toggle(
         ulong key, float x, float y, bool value, int tabOrder, string name, List<nint> names) =>
@@ -521,7 +531,10 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         ulong dismissAction = 0,
         EngineUiElementKind kind = EngineUiElementKind.Container,
         bool customColor = false,
-        EngineUiColor color = default)
+        EngineUiColor color = default,
+        bool selected = false,
+        ulong popupAnchor = 0,
+        bool popupEnabled = false)
     {
         byte[] encoded = Encoding.UTF8.GetBytes(accessibleName);
         nint name = Marshal.StringToCoTaskMemUTF8(accessibleName);
@@ -544,13 +557,32 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             TabOrder = tabOrder,
             Kind = kind,
             Behavior = behavior,
-            ToggleChecked = toggle ? 1u : 0u,
+            AccessibilityRole = AccessibilityRole(kind, behavior),
+            ChildLayout = EngineUiLayoutMode.Absolute,
+            WidthKind = EngineUiSizeKind.Fixed,
+            HeightKind = EngineUiSizeKind.Fixed,
+            ToggleValue = toggle ? 1u : 0u,
             Visible = 1,
             Enabled = 1,
             HitTestable = interactive ? 1u : 0u,
             Modal = modal ? 1u : 0u,
             Focusable = interactive ? 1u : 0u,
+            Selected = selected ? 1u : 0u,
             CustomColor = customColor ? 1u : 0u,
+            PopupAnchor = popupAnchor,
+            PopupGap = 6,
+            PopupSafeLeft = 24,
+            PopupSafeTop = 24,
+            PopupSafeRight = 24,
+            PopupSafeBottom = 24,
+            PopupEdge = EngineUiPopupEdge.Below,
+            PopupAlignment = EngineUiPopupAlignment.End,
+            PopupEnabled = popupEnabled ? 1u : 0u,
+            PopupAllowFlip = popupEnabled ? 1u : 0u,
+            PopupAllowClamp = popupEnabled ? 1u : 0u,
+            PopupScrollFallback = popupEnabled ? 1u : 0u,
+            PopupDismissOnOutsidePress = popupEnabled ? 1u : 0u,
+            TextMaximumBytes = NonEditableTextCapacity,
             Color = color,
             AccessibleNameUtf8 = name,
             AccessibleNameBytes = (uint)encoded.Length,
@@ -571,6 +603,8 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             Y = (float)(physical.Y * LogicalHeight / ActualHeight),
             Sequence = ++inputSequence,
             PointerId = 1,
+            Source = EngineInputDeviceKind.Mouse,
+            Button = EngineMouseButton.Left,
             InsideViewport = physical.X >= 0 && physical.Y >= 0 &&
                 physical.X < ActualWidth && physical.Y < ActualHeight ? 1u : 0u,
         }]);
@@ -581,7 +615,11 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         ThrowIfFailed(SpriteForgeNative.SpriteForge_UIProcessInput(
             context, document, input, (uint)input.Length), "process settings input");
         ThrowIfFailed(SpriteForgeNative.SpriteForge_UIConsumeActions(
-            context, document, actions, (uint)actions.Length, out uint actionCount), "consume settings actions");
+            context, document, actions, (uint)actions.Length, null, 0,
+            out uint requiredActions, out uint actionCount,
+            out uint requiredUtf8Bytes, out uint writtenUtf8Bytes), "consume settings actions");
+        RequireCompleteCopy(requiredActions, actionCount, "settings actions");
+        RequireCompleteCopy(requiredUtf8Bytes, writtenUtf8Bytes, "settings action text");
         for (int index = 0; index < actionCount; ++index)
         {
             HandleAction(actions[index]);
@@ -658,7 +696,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             draft = GameSettingsProfile.Default;
             status = strings.Get("settings.status.reset");
             statusIsError = false;
-            Recreate();
+            Recreate(ResetButtonKey);
         }
         else if (action.Source == ApplyButtonKey)
         {
@@ -730,26 +768,12 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     private void FocusElement(ulong target)
     {
-        RefreshSnapshots();
-        for (int attempt = 0; attempt <= elementKeys.Length; ++attempt)
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UISetFocus(
+            context, document, revision, target, out EngineUiFocusResult focus), "restore settings focus");
+        if (focus.FocusedKey != target)
         {
-            if (snapshots.TryGetValue(target, out EngineUiElementSnapshot targetSnapshot) &&
-                targetSnapshot.Focused != 0)
-            {
-                return;
-            }
-
-            Process([new EngineUiInput
-            {
-                Type = EngineUiInputType.Navigation,
-                Navigation = EngineUiNavigation.Next,
-                Sequence = ++inputSequence,
-                InsideViewport = 1,
-            }]);
-            RefreshSnapshots();
+            throw new InvalidOperationException("SpriteForge did not restore settings focus after rebuilding the page.");
         }
-
-        throw new InvalidOperationException("SpriteForge could not restore settings focus after rebuilding the page.");
     }
 
     private GameResolutionChoice CurrentResolution()
@@ -774,8 +798,10 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     {
         EngineUiElementSnapshot[] values = new EngineUiElementSnapshot[elementKeys.Length];
         ThrowIfFailed(SpriteForgeNative.SpriteForge_UIGetElementSnapshots(
-            context, document, elementKeys, (uint)elementKeys.Length, values, (uint)values.Length, out uint count),
+            context, document, elementKeys, (uint)elementKeys.Length, values, (uint)values.Length,
+            out uint required, out uint count),
             "copy settings element snapshots");
+        RequireCompleteCopy(required, count, "settings element snapshots");
         snapshots.Clear();
         for (int index = 0; index < count; ++index)
         {
@@ -943,6 +969,18 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         width * ActualWidth / LogicalWidth,
         height * ActualHeight / LogicalHeight);
 
+    private Rect ScaleAndClip(EngineUiPresentationCommand command)
+    {
+        Rect logical = new(command.X, command.Y, command.Width, command.Height);
+        if (command.Flags.HasFlag(EngineUiPresentationFlags.Clipped))
+        {
+            logical.Intersect(new Rect(command.ClipX, command.ClipY, command.ClipWidth, command.ClipHeight));
+        }
+
+        return logical.IsEmpty ? new Rect() : Scale(
+            (float)logical.X, (float)logical.Y, (float)logical.Width, (float)logical.Height);
+    }
+
     private static EngineUiColor Color(float red, float green, float blue, float alpha = 1) =>
         new() { Red = red, Green = green, Blue = blue, Alpha = alpha };
 
@@ -966,7 +1004,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private string ToggleText(bool enabled) => strings.Get(enabled ? "settings.state.on" : "settings.state.off");
 
     private static bool IsPopupElement(ulong key) =>
-        key == PopupScrimKey || key == PopupPanelKey || key == PopupTitleKey ||
+        key == PopupPanelKey || key == PopupTitleKey ||
         LanguageChoiceKeys.Contains(key) || ResolutionChoiceKeys.Contains(key);
 
     private static ulong CategoryKey(SettingsCategory value) => value switch
@@ -976,6 +1014,29 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         SettingsCategory.Interface => InterfaceCategoryKey,
         _ => throw new InvalidOperationException("The active settings category is invalid."),
     };
+
+    private static EngineUiAccessibilityRole AccessibilityRole(
+        EngineUiElementKind kind, EngineUiBehavior behavior) => behavior switch
+        {
+            EngineUiBehavior.Button => EngineUiAccessibilityRole.Button,
+            EngineUiBehavior.Toggle => EngineUiAccessibilityRole.Toggle,
+            EngineUiBehavior.Slider => EngineUiAccessibilityRole.Slider,
+            EngineUiBehavior.Scroll => EngineUiAccessibilityRole.ScrollArea,
+            EngineUiBehavior.Selection => EngineUiAccessibilityRole.ListItem,
+            EngineUiBehavior.TextEdit => EngineUiAccessibilityRole.TextField,
+            _ when kind == EngineUiElementKind.Text => EngineUiAccessibilityRole.Text,
+            _ when kind == EngineUiElementKind.Image => EngineUiAccessibilityRole.Image,
+            _ => EngineUiAccessibilityRole.Panel,
+        };
+
+    private static void RequireCompleteCopy(uint required, uint written, string operation)
+    {
+        if (required != written)
+        {
+            throw new InvalidOperationException(
+                $"SpriteForge returned {written} of {required} records while copying the {operation}.");
+        }
+    }
 
     private static void RequireActionValue(EngineUiAction action, EngineUiActionValueType expected)
     {
@@ -1013,6 +1074,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         SpriteForgeNative.SpriteForge_DestroyUIContext(context);
         context = nint.Zero;
         document = 0;
+        revision = 0;
         snapshots.Clear();
         elementKeys = [];
     }

@@ -15,11 +15,14 @@ sliders, toggles, buttons, and typed action queue to SpriteForge UI. The game
 maps copied stable actions to a draft profile and publishes that draft only
 after durable persistence succeeds.
 
-The integration requires SpriteForge UI interop version 1 from
-`Engine/Public/SpriteForgeUIInterop.h`. The ABI is deliberately generic; no
-Spelljammer setting name or rule is defined in the engine. Native calls remain
-on the WPF owner thread. UTF-8 accessibility names are copied during the call,
-and actions, element snapshots, and presentation records are copied into
+The integration consumes the single current SpriteForge managed-UI contract
+from `Engine/Public/SpriteForgeUIInterop.h`. The engine intentionally provides
+no legacy entry points or compatibility version query, so the public header,
+native DLL, and managed structures must come from the same SpriteForge build.
+The ABI remains generic; no Spelljammer setting name or rule is defined in the
+engine. Native calls stay on the WPF owner thread. UTF-8 accessibility names
+are copied during a revision-checked transactional commit, and actions,
+element snapshots, and tagged presentation records are copied into
 caller-owned bounded arrays.
 
 ## Profile and file contract
@@ -65,16 +68,20 @@ SpriteForge receives copied resolved accessible names and stable numeric
 element/action keys; it never receives localization catalog storage or
 translated identity.
 
-SpriteForge currently returns neutral solid rectangles plus element snapshots.
-The WPF host realizes those rectangles and resolved text. Direct realization
-through SpriteForge's renderer and a native UI Automation bridge for this
-managed child surface remain planned; keyboard-only operation is implemented,
-but full screen-reader integration must not yet be claimed.
+SpriteForge returns tagged, clipped presentation commands and document-logical
+element snapshots. The current WPF host realizes solid commands and draws the
+resolved game-localized text because it does not yet own native FontSystem text
+layout handles. Direct realization through SpriteForge's renderer and a native
+UI Automation bridge for this managed child surface remain planned;
+keyboard-only operation is implemented, but full screen-reader integration
+must not yet be claimed.
 
 The implemented settings overlay uses an original three-category layout:
 General contains language and resolution, Audio contains the volume controls,
 and Interface contains accessibility and interface-scale controls. Language
-and resolution open bounded modal option menus over the current category. The
+and resolution open engine-anchored modal option menus. SpriteForge places the
+popup relative to its selector, flips or clamps it inside the logical safe
+area, dismisses it on an outside press, and restores focus by stable key. The
 popup receives input exclusively while open, and Cancel or Escape closes the
 popup before it can close the settings overlay.
 
@@ -100,6 +107,6 @@ local preference document.
 codec determinism, schema-1 migration, stable language/resolution validation,
 invalid-input fallback, transactional publication, replacement failure,
 recovery, and exact cleanup. SpriteForge's
-`UIInteropTests.cpp` compiles the versioned ABI, modal control actions, copied
-layout/presentation, and failed-batch atomicity. CI or the user owns executable
-test runs under repository policy.
+`UIInteropTests.cpp` compiles the current ABI, transactional mutations,
+anchored/nested modal behavior, copied layout/presentation, and failed-batch
+atomicity. CI or the user owns executable test runs under repository policy.

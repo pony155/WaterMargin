@@ -13,9 +13,9 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
 {
     internal const double LogicalWidth = 1280;
     internal const double LogicalHeight = 720;
-    private const uint ExpectedUiInteropVersion = 1;
     private const uint ElementCapacity = 12;
     private const uint ActionCapacity = 8;
+    private const uint NonEditableTextCapacity = 1;
 
     private static readonly ulong RootKey = StableKey("spelljammer.menu.root");
     private static readonly ulong PanelKey = StableKey("spelljammer.menu.panel");
@@ -103,14 +103,22 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             document,
             presentation,
             (uint)presentation.Length,
-            out uint commandCount), "build the main-menu presentation");
+            out uint requiredCommands,
+            out uint commandCount,
+            out _), "build the main-menu presentation");
+        RequireCompleteCopy(requiredCommands, commandCount, "main-menu presentation");
         for (int index = 0; index < commandCount; ++index)
         {
             EngineUiPresentationCommand command = presentation[index];
+            if (command.Type != EngineUiPresentationType.SolidQuad)
+            {
+                continue;
+            }
+
             drawingContext.DrawRectangle(
                 ToBrush(command.Color),
                 null,
-                Scale(command.X, command.Y, command.Width, command.Height));
+                ScaleAndClip(command));
         }
 
         strings.BeginFrame();
@@ -199,13 +207,6 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
 
     private void CreateNativeDocument()
     {
-        uint version = SpriteForgeNative.SpriteForge_GetUIInteropVersion();
-        if (version != ExpectedUiInteropVersion)
-        {
-            throw new InvalidOperationException(
-                $"SpriteForge.dll exposes UI interop version {version}; Spelljammer expects {ExpectedUiInteropVersion}.");
-        }
-
         EngineUiDocumentDescription description = new()
         {
             RootKey = RootKey,
@@ -232,11 +233,22 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         try
         {
             EngineUiElementDescription[] elements = BuildElements(allocatedNames);
-            ThrowIfFailed(SpriteForgeNative.SpriteForge_UIAddElements(
+            EngineUiMutation[] mutations = elements.Select(static element => new EngineUiMutation
+            {
+                Type = EngineUiMutationType.Create,
+                Element = element,
+            }).ToArray();
+            ThrowIfFailed(SpriteForgeNative.SpriteForge_UICommit(
                 context,
                 document,
-                elements,
-                (uint)elements.Length), "commit the main-menu UI document");
+                1,
+                mutations,
+                (uint)mutations.Length,
+                out EngineUiCommitReport report), "commit the main-menu UI document");
+            if (report.Created != (uint)mutations.Length)
+            {
+                throw new InvalidOperationException("SpriteForge did not create the complete main-menu UI document.");
+            }
         }
         catch
         {
@@ -332,12 +344,17 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             TabOrder = tabOrder,
             Kind = kind,
             Behavior = behavior,
+            AccessibilityRole = AccessibilityRole(kind, behavior),
+            ChildLayout = EngineUiLayoutMode.Absolute,
+            WidthKind = EngineUiSizeKind.Fixed,
+            HeightKind = EngineUiSizeKind.Fixed,
             Visible = 1,
             Enabled = 1,
             HitTestable = interactive ? 1u : 0u,
             Modal = modal ? 1u : 0u,
             Focusable = interactive ? 1u : 0u,
             CustomColor = customColor ? 1u : 0u,
+            TextMaximumBytes = NonEditableTextCapacity,
             Color = color,
             AccessibleNameUtf8 = name,
             AccessibleNameBytes = (uint)encoded.Length,
@@ -370,7 +387,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             return;
         }
 
-        double scale = CalculateLayoutTransform().Scale;
+        double scale = CalculatePresentationLayout().PhysicalPixelsPerLogicalX;
         FormattedText formatted = new(
             text,
             strings.Culture,
@@ -395,9 +412,10 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             return;
         }
 
-        (double scale, double offsetX, double offsetY) = CalculateLayoutTransform();
-        float x = (float)((physical.X - offsetX) / scale);
-        float y = (float)((physical.Y - offsetY) / scale);
+        EngineUiPresentationLayout layout = CalculatePresentationLayout();
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIMapPhysicalPoint(
+            in layout, (float)physical.X, (float)physical.Y,
+            out float x, out float y, out uint insideViewport), "map main-menu pointer input");
         Process([new EngineUiInput
         {
             Type = type,
@@ -405,7 +423,9 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             Y = y,
             Sequence = ++inputSequence,
             PointerId = 1,
-            InsideViewport = x >= 0 && y >= 0 && x < LogicalWidth && y < LogicalHeight ? 1u : 0u,
+            Source = EngineInputDeviceKind.Mouse,
+            Button = EngineMouseButton.Left,
+            InsideViewport = insideViewport,
         }]);
     }
 
@@ -421,7 +441,14 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             document,
             actions,
             (uint)actions.Length,
-            out uint actionCount), "consume main-menu actions");
+            null,
+            0,
+            out uint requiredActions,
+            out uint actionCount,
+            out uint requiredUtf8Bytes,
+            out uint writtenUtf8Bytes), "consume main-menu actions");
+        RequireCompleteCopy(requiredActions, actionCount, "main-menu actions");
+        RequireCompleteCopy(requiredUtf8Bytes, writtenUtf8Bytes, "main-menu action text");
         for (int index = 0; index < actionCount; ++index)
         {
             EngineUiAction action = actions[index];
@@ -452,7 +479,9 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             (uint)elementKeys.Length,
             values,
             (uint)values.Length,
+            out uint required,
             out uint count), "copy main-menu element snapshots");
+        RequireCompleteCopy(required, count, "main-menu element snapshots");
         snapshots.Clear();
         for (int index = 0; index < count; ++index)
         {
@@ -468,17 +497,23 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             return;
         }
 
-        (double scale, double offsetX, double offsetY) = CalculateLayoutTransform();
-        Point logical = new((physical.X - offsetX) / scale, (physical.Y - offsetY) / scale);
+        EngineUiPresentationLayout layout = CalculatePresentationLayout();
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIMapPhysicalPoint(
+            in layout, (float)physical.X, (float)physical.Y,
+            out float logicalX, out float logicalY, out uint insideViewport), "map main-menu hover input");
+        Point logical = new(logicalX, logicalY);
         ulong next = 0;
-        foreach (ulong key in menuButtonKeys)
+        if (insideViewport != 0)
         {
-            if (snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot) &&
-                snapshot.Visible != 0 && snapshot.Enabled != 0 &&
-                new Rect(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height).Contains(logical))
+            foreach (ulong key in menuButtonKeys)
             {
-                next = key;
-                break;
+                if (snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot) &&
+                    snapshot.IsVisible && snapshot.IsEnabled &&
+                    new Rect(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height).Contains(logical))
+                {
+                    next = key;
+                    break;
+                }
             }
         }
 
@@ -497,18 +532,63 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
 
     private Rect Scale(float x, float y, float width, float height)
     {
-        (double scale, double offsetX, double offsetY) = CalculateLayoutTransform();
+        EngineUiPresentationLayout layout = CalculatePresentationLayout();
         return new Rect(
-            offsetX + x * scale,
-            offsetY + y * scale,
-            width * scale,
-            height * scale);
+            layout.ViewportX + x * layout.PhysicalPixelsPerLogicalX,
+            layout.ViewportY + y * layout.PhysicalPixelsPerLogicalY,
+            width * layout.PhysicalPixelsPerLogicalX,
+            height * layout.PhysicalPixelsPerLogicalY);
     }
 
-    private (double Scale, double OffsetX, double OffsetY) CalculateLayoutTransform()
+    private Rect ScaleAndClip(EngineUiPresentationCommand command)
     {
-        double scale = Math.Min(ActualWidth / LogicalWidth, ActualHeight / LogicalHeight);
-        return (scale, (ActualWidth - LogicalWidth * scale) / 2, (ActualHeight - LogicalHeight * scale) / 2);
+        Rect logical = new(command.X, command.Y, command.Width, command.Height);
+        if (command.Flags.HasFlag(EngineUiPresentationFlags.Clipped))
+        {
+            logical.Intersect(new Rect(command.ClipX, command.ClipY, command.ClipWidth, command.ClipHeight));
+        }
+
+        return logical.IsEmpty ? new Rect() : Scale(
+            (float)logical.X, (float)logical.Y, (float)logical.Width, (float)logical.Height);
+    }
+
+    private EngineUiPresentationLayout CalculatePresentationLayout()
+    {
+        EngineUiPresentationLayout layout = new()
+        {
+            LogicalWidth = (uint)LogicalWidth,
+            LogicalHeight = (uint)LogicalHeight,
+            PhysicalWidth = (uint)Math.Max(1, Math.Round(ActualWidth)),
+            PhysicalHeight = (uint)Math.Max(1, Math.Round(ActualHeight)),
+            ScalingMode = EngineUiScalingMode.FractionalFitNearest,
+            SmallWindowPolicy = EngineUiSmallWindowPolicy.FractionalFitNearest,
+        };
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UICalculatePresentationLayout(ref layout),
+            "calculate the main-menu presentation layout");
+        return layout;
+    }
+
+    private static EngineUiAccessibilityRole AccessibilityRole(
+        EngineUiElementKind kind, EngineUiBehavior behavior) => behavior switch
+        {
+            EngineUiBehavior.Button => EngineUiAccessibilityRole.Button,
+            EngineUiBehavior.Toggle => EngineUiAccessibilityRole.Toggle,
+            EngineUiBehavior.Slider => EngineUiAccessibilityRole.Slider,
+            EngineUiBehavior.Scroll => EngineUiAccessibilityRole.ScrollArea,
+            EngineUiBehavior.Selection => EngineUiAccessibilityRole.ListItem,
+            EngineUiBehavior.TextEdit => EngineUiAccessibilityRole.TextField,
+            _ when kind == EngineUiElementKind.Text => EngineUiAccessibilityRole.Text,
+            _ when kind == EngineUiElementKind.Image => EngineUiAccessibilityRole.Image,
+            _ => EngineUiAccessibilityRole.Panel,
+        };
+
+    private static void RequireCompleteCopy(uint required, uint written, string operation)
+    {
+        if (required != written)
+        {
+            throw new InvalidOperationException(
+                $"SpriteForge returned {written} of {required} records while copying the {operation}.");
+        }
     }
 
     private static EngineUiColor Color(float red, float green, float blue, float alpha = 1) =>

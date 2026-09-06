@@ -19,13 +19,15 @@ opens maximized. The background contains no interactive or localized text.
 
 ## UI ownership
 
-SpriteForge UI interop version 1 owns the retained main-menu grouping, fixed
-logical layout, button state, modal trapping, pointer hit testing, and copied
-stable actions. The managed WPF host realizes the authored image, copied solid
-presentation commands, hover outline, and game-localized text. The menu
-grouping and button fills are transparent so the labels appear directly over
-the authored background. The outline follows only the copied bounds of the
-button under the pointer. Main-menu selection and activation are intentionally
+The single current SpriteForge managed-UI contract owns the retained main-menu
+grouping, transactional creation, fixed logical layout, button state, modal
+trapping, pointer hit testing, and copied stable actions. Its authoritative
+presentation mapping converts WPF host coordinates to document-logical pointer
+coordinates. The managed WPF host realizes the authored image, copied tagged
+and clipped solid presentation commands, hover outline, and game-localized
+text. The menu grouping and button fills are transparent so the labels appear
+directly over the authored background. The outline follows only the copied
+bounds of the button under the pointer. Main-menu selection and activation are intentionally
 mouse-only; keyboard navigation and acceptance are not forwarded to the
 SpriteForge document. Settings and character creation retain their documented
 keyboard behavior.
