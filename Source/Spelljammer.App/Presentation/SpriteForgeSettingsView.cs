@@ -16,8 +16,8 @@ internal sealed class GameSettingsApplyRequestedEventArgs(GameSettingsProfile pr
 
 internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 {
-    internal const double LogicalWidth = 800;
-    internal const double LogicalHeight = 640;
+    internal const double LogicalWidth = 900;
+    internal const double LogicalHeight = 650;
     private const uint ExpectedUiInteropVersion = 1;
     private const uint ElementCapacity = 48;
     private const uint ActionCapacity = 32;
@@ -26,13 +26,16 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private static readonly ulong ModalKey = Key("spelljammer.settings.modal");
     private static readonly ulong TitleKey = Key("spelljammer.settings.title");
     private static readonly ulong IntroductionKey = Key("spelljammer.settings.introduction");
-    private static readonly ulong DisplayHeadingKey = Key("spelljammer.settings.display-heading");
+    private static readonly ulong SidebarKey = Key("spelljammer.settings.sidebar");
+    private static readonly ulong ContentKey = Key("spelljammer.settings.content");
+    private static readonly ulong GeneralCategoryKey = Key("spelljammer.settings.category.general");
+    private static readonly ulong AudioCategoryKey = Key("spelljammer.settings.category.audio");
+    private static readonly ulong InterfaceCategoryKey = Key("spelljammer.settings.category.interface");
+    private static readonly ulong PageHeadingKey = Key("spelljammer.settings.page-heading");
     private static readonly ulong LanguageLabelKey = Key("spelljammer.settings.language-label");
     private static readonly ulong LanguageButtonKey = Key("spelljammer.settings.language-button");
     private static readonly ulong ResolutionLabelKey = Key("spelljammer.settings.resolution-label");
     private static readonly ulong ResolutionButtonKey = Key("spelljammer.settings.resolution-button");
-    private static readonly ulong AudioHeadingKey = Key("spelljammer.settings.audio-heading");
-    private static readonly ulong AccessibilityHeadingKey = Key("spelljammer.settings.accessibility-heading");
     private static readonly ulong MasterLabelKey = Key("spelljammer.settings.master-label");
     private static readonly ulong MasterSliderKey = Key("spelljammer.settings.master-slider");
     private static readonly ulong MasterValueKey = Key("spelljammer.settings.master-value");
@@ -55,17 +58,37 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private static readonly ulong ResetButtonKey = Key("spelljammer.settings.reset");
     private static readonly ulong CancelButtonKey = Key("spelljammer.settings.cancel");
     private static readonly ulong ApplyButtonKey = Key("spelljammer.settings.apply");
+    private static readonly ulong PopupScrimKey = Key("spelljammer.settings.popup.scrim");
+    private static readonly ulong PopupPanelKey = Key("spelljammer.settings.popup.panel");
+    private static readonly ulong PopupTitleKey = Key("spelljammer.settings.popup.title");
     private static readonly ulong CancelAction = Key("spelljammer.settings.action.cancel");
+    private static readonly ulong PopupCancelAction = Key("spelljammer.settings.action.popup-cancel");
+    private static readonly ulong[] LanguageChoiceKeys =
+    [
+        Key("spelljammer.settings.language.en-us"),
+        Key("spelljammer.settings.language.fr-fr"),
+        Key("spelljammer.settings.language.zh-hant-tw"),
+    ];
+    private static readonly ulong[] ResolutionChoiceKeys =
+    [
+        Key("spelljammer.settings.resolution.desktop"),
+        Key("spelljammer.settings.resolution.1280x720"),
+        Key("spelljammer.settings.resolution.1600x900"),
+        Key("spelljammer.settings.resolution.1920x1080"),
+        Key("spelljammer.settings.resolution.2560x1440"),
+    ];
 
-    private readonly ulong[] elementKeys;
     private readonly Dictionary<ulong, EngineUiElementSnapshot> snapshots = [];
     private readonly EngineUiPresentationCommand[] presentation = new EngineUiPresentationCommand[ElementCapacity];
     private readonly EngineUiAction[] actions = new EngineUiAction[ActionCapacity];
     private readonly GameText strings;
+    private ulong[] elementKeys = [];
     private nint context;
     private ulong document;
     private ulong inputSequence;
     private GameSettingsProfile draft;
+    private SettingsCategory category;
+    private ChoicePopup popup;
     private string status;
     private bool statusIsError;
     private bool disposed;
@@ -75,20 +98,6 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         draft = initial;
         this.strings = strings;
         status = strings.Get("settings.status.ready");
-        elementKeys =
-        [
-            ModalKey, TitleKey, IntroductionKey,
-            DisplayHeadingKey, LanguageLabelKey, LanguageButtonKey, ResolutionLabelKey, ResolutionButtonKey,
-            AudioHeadingKey, AccessibilityHeadingKey,
-            MasterLabelKey, MasterSliderKey, MasterValueKey,
-            MusicLabelKey, MusicSliderKey, MusicValueKey,
-            EffectsLabelKey, EffectsSliderKey, EffectsValueKey,
-            SubtitlesLabelKey, SubtitlesToggleKey,
-            MotionLabelKey, MotionToggleKey,
-            ShakeLabelKey, ShakeToggleKey,
-            ScaleLabelKey, ScaleSliderKey, ScaleValueKey,
-            StatusKey, ResetButtonKey, CancelButtonKey, ApplyButtonKey,
-        ];
         Focusable = true;
         SnapsToDevicePixels = true;
         CreateNativeDocument();
@@ -100,76 +109,70 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     internal event EventHandler? CancelRequested;
 
     protected override Size MeasureOverride(Size availableSize) => new(LogicalWidth, LogicalHeight);
-
     protected override Size ArrangeOverride(Size finalSize) => finalSize;
-
     protected override AutomationPeer OnCreateAutomationPeer() => new FrameworkElementAutomationPeer(this);
 
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
-        drawingContext.DrawRectangle(Brush("#090D18"), null, new Rect(RenderSize));
+        drawingContext.DrawRectangle(Brush("#080D17"), null, new Rect(RenderSize));
         if (context == nint.Zero)
         {
             return;
         }
 
         RefreshSnapshots();
-        EngineStatus presentationStatus = SpriteForgeNative.SpriteForge_UIBuildPresentation(
-            context,
-            document,
-            presentation,
-            (uint)presentation.Length,
-            out uint commandCount);
-        ThrowIfFailed(presentationStatus, "build the settings presentation");
-        for (int index = 0; index < commandCount; index++)
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIBuildPresentation(
+            context, document, presentation, (uint)presentation.Length, out uint commandCount),
+            "build the settings presentation");
+        for (int index = 0; index < commandCount; ++index)
         {
             EngineUiPresentationCommand command = presentation[index];
-            drawingContext.DrawRectangle(ToBrush(command.Color), null, Scale(command.X, command.Y, command.Width, command.Height));
+            if (IsPopupElement(command.Source))
+            {
+                continue;
+            }
+
+            drawingContext.DrawRectangle(
+                ToBrush(command.Color), null, Scale(command.X, command.Y, command.Width, command.Height));
         }
 
-        DrawSlider(drawingContext, MasterSliderKey, draft.MasterVolume, GameSettingsProfile.MinimumVolume, GameSettingsProfile.MaximumVolume);
-        DrawSlider(drawingContext, MusicSliderKey, draft.MusicVolume, GameSettingsProfile.MinimumVolume, GameSettingsProfile.MaximumVolume);
-        DrawSlider(drawingContext, EffectsSliderKey, draft.EffectsVolume, GameSettingsProfile.MinimumVolume, GameSettingsProfile.MaximumVolume);
-        DrawSlider(drawingContext, ScaleSliderKey, draft.UiScalePercent,
-            GameSettingsProfile.MinimumUiScalePercent, GameSettingsProfile.MaximumUiScalePercent);
-        DrawToggle(drawingContext, SubtitlesToggleKey, draft.Subtitles);
-        DrawToggle(drawingContext, MotionToggleKey, draft.ReducedMotion);
-        DrawToggle(drawingContext, ShakeToggleKey, draft.ScreenShake);
-
+        DrawCategorySelection(drawingContext);
+        DrawPageControls(drawingContext);
         strings.BeginFrame();
-        DrawText(drawingContext, TitleKey, strings.Get("settings.title"), 28, "#F2E9D8", false);
+        DrawText(drawingContext, TitleKey, strings.Get("settings.title"), 29, "#F2E9D8", false);
         DrawText(drawingContext, IntroductionKey, strings.Get("settings.introduction"), 13, "#93A1BE", false);
-        DrawText(drawingContext, DisplayHeadingKey, strings.Get("settings.heading.display"), 14, "#D7AF70", false);
-        DrawText(drawingContext, LanguageLabelKey, strings.Get("settings.label.language"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, LanguageButtonKey, strings.LanguageName(draft.Language), 13, "#F2E9D8", true);
-        DrawText(drawingContext, ResolutionLabelKey, strings.Get("settings.label.resolution"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, ResolutionButtonKey, strings.ResolutionName(CurrentResolution()), 13, "#F2E9D8", true);
-        DrawText(drawingContext, AudioHeadingKey, strings.Get("settings.heading.audio"), 14, "#D7AF70", false);
-        DrawText(drawingContext, AccessibilityHeadingKey, strings.Get("settings.heading.accessibility"), 14, "#D7AF70", false);
-        DrawText(drawingContext, MasterLabelKey, strings.Get("settings.label.master-volume"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, MasterValueKey, strings.Percent(draft.MasterVolume), 14, "#80DED9", true);
-        DrawText(drawingContext, MusicLabelKey, strings.Get("settings.label.music-volume"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, MusicValueKey, strings.Percent(draft.MusicVolume), 14, "#80DED9", true);
-        DrawText(drawingContext, EffectsLabelKey, strings.Get("settings.label.effects-volume"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, EffectsValueKey, strings.Percent(draft.EffectsVolume), 14, "#80DED9", true);
-        DrawText(drawingContext, SubtitlesLabelKey, strings.Get("settings.label.subtitles"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, SubtitlesToggleKey, ToggleText(draft.Subtitles), 13, "#F2E9D8", true);
-        DrawText(drawingContext, MotionLabelKey, strings.Get("settings.label.reduced-motion"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, MotionToggleKey, ToggleText(draft.ReducedMotion), 13, "#F2E9D8", true);
-        DrawText(drawingContext, ShakeLabelKey, strings.Get("settings.label.screen-shake"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, ShakeToggleKey, ToggleText(draft.ScreenShake), 13, "#F2E9D8", true);
-        DrawText(drawingContext, ScaleLabelKey, strings.Get("settings.label.interface-scale"), 15, "#F2E9D8", false);
-        DrawText(drawingContext, ScaleValueKey, strings.Percent(draft.UiScalePercent), 14, "#80DED9", true);
+        DrawText(drawingContext, GeneralCategoryKey, strings.Get("settings.heading.display"), 15, "#F2E9D8", false, 16);
+        DrawText(drawingContext, AudioCategoryKey, strings.Get("settings.heading.audio"), 15, "#F2E9D8", false, 16);
+        DrawText(drawingContext, InterfaceCategoryKey, strings.Get("settings.heading.accessibility"), 15, "#F2E9D8", false, 16);
+        DrawText(drawingContext, PageHeadingKey, PageHeading(), 19, "#D7AF70", false);
+        DrawPageText(drawingContext);
         DrawText(drawingContext, StatusKey, status, 12, statusIsError ? "#F39A8D" : "#93A1BE", false);
         DrawText(drawingContext, ResetButtonKey, strings.Get("settings.button.reset"), 13, "#F2E9D8", true);
         DrawText(drawingContext, CancelButtonKey, strings.Get("settings.button.cancel"), 13, "#F2E9D8", true);
         DrawText(drawingContext, ApplyButtonKey, strings.Get("settings.button.apply"), 13, "#F2E9D8", true);
 
+        if (popup != ChoicePopup.None)
+        {
+            for (int index = 0; index < commandCount; ++index)
+            {
+                EngineUiPresentationCommand command = presentation[index];
+                if (!IsPopupElement(command.Source))
+                {
+                    continue;
+                }
+
+                drawingContext.DrawRectangle(
+                    ToBrush(command.Color), null, Scale(command.X, command.Y, command.Width, command.Height));
+            }
+
+            DrawPopup(drawingContext);
+        }
+
         foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.Focused != 0))
         {
-            Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
-            drawingContext.DrawRectangle(null, new Pen(Brush("#80DED9"), 2), bounds);
+            drawingContext.DrawRectangle(null, new Pen(Brush("#80DED9"), 2),
+                Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height));
         }
     }
 
@@ -228,9 +231,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     internal void SetApplyFailure(GameSettingsDiagnostic diagnostic)
     {
-        status = strings.Diagnostic(
-            "settings.status.save-failed",
-            GameSettingsDiagnostics.Stable(diagnostic));
+        status = strings.Diagnostic("settings.status.save-failed", GameSettingsDiagnostics.Stable(diagnostic));
         statusIsError = true;
         IsEnabled = true;
         Focus();
@@ -239,6 +240,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     internal void SetBusy()
     {
+        popup = ChoicePopup.None;
         status = strings.Get("settings.status.saving");
         statusIsError = false;
         IsEnabled = false;
@@ -277,23 +279,24 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             MaximumActions = ActionCapacity,
             Theme = new EngineUiTheme
             {
-                Panel = Color(0.067f, 0.094f, 0.153f),
-                Button = Color(0.157f, 0.216f, 0.333f),
-                ButtonHovered = Color(0.239f, 0.333f, 0.471f),
-                ButtonPressed = Color(0.090f, 0.125f, 0.196f),
-                ButtonFocused = Color(0.251f, 0.392f, 0.490f),
-                ButtonDisabled = Color(0.075f, 0.090f, 0.125f),
+                Panel = Color(0.055f, 0.078f, 0.125f),
+                Button = Color(0.145f, 0.204f, 0.302f),
+                ButtonHovered = Color(0.220f, 0.310f, 0.435f),
+                ButtonPressed = Color(0.082f, 0.122f, 0.188f),
+                ButtonFocused = Color(0.220f, 0.345f, 0.435f),
+                ButtonDisabled = Color(0.070f, 0.082f, 0.110f),
             },
         };
-        ThrowIfFailed(SpriteForgeNative.SpriteForge_CreateUIContext(in description, out context, out document),
-            "create the settings UI document");
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_CreateUIContext(
+            in description, out context, out document), "create the settings UI document");
 
         List<nint> allocatedNames = [];
         try
         {
             EngineUiElementDescription[] elements = BuildElements(allocatedNames);
-            ThrowIfFailed(SpriteForgeNative.SpriteForge_UIAddElements(context, document, elements, (uint)elements.Length),
-                "commit the settings UI document");
+            elementKeys = [.. elements.Select(value => value.Key)];
+            ThrowIfFailed(SpriteForgeNative.SpriteForge_UIAddElements(
+                context, document, elements, (uint)elements.Length), "commit the settings UI document");
         }
         catch
         {
@@ -309,71 +312,151 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         }
     }
 
-    private EngineUiElementDescription[] BuildElements(List<nint> allocatedNames) =>
-    [
-        Element(ModalKey, RootKey, 20, 20, 760, 600, EngineUiBehavior.None,
-            strings.Get("settings.accessibility.dialog"), allocatedNames, modal: true, dismissAction: CancelAction),
-        TextElement(TitleKey, 52, 35, 680, 38, strings.Get("settings.title"), allocatedNames),
-        TextElement(IntroductionKey, 52, 72, 680, 26,
-            strings.Get("settings.accessibility.description"), allocatedNames),
-        TextElement(DisplayHeadingKey, 52, 103, 680, 24,
-            strings.Get("settings.heading.display"), allocatedNames),
-        TextElement(LanguageLabelKey, 58, 132, 350, 32,
-            strings.Get("settings.label.language"), allocatedNames),
-        Button(LanguageButtonKey, 520, 128, 214, 36, 0,
-            AccessibleOption("settings.label.language", strings.LanguageName(draft.Language)), allocatedNames),
-        TextElement(ResolutionLabelKey, 58, 170, 350, 32,
-            strings.Get("settings.label.resolution"), allocatedNames),
-        Button(ResolutionButtonKey, 520, 166, 214, 36, 1,
-            AccessibleOption("settings.label.resolution", strings.ResolutionName(CurrentResolution())), allocatedNames),
-        TextElement(AudioHeadingKey, 52, 205, 680, 24, strings.Get("settings.heading.audio"), allocatedNames),
-        TextElement(MasterLabelKey, 58, 232, 260, 28,
-            strings.Get("settings.label.master-volume"), allocatedNames),
-        Slider(MasterSliderKey, 350, 234, draft.MasterVolume, 0, 100, 5, 2,
-            strings.Get("settings.label.master-volume"), allocatedNames),
-        TextElement(MasterValueKey, 662, 230, 72, 28,
-            AccessibleValue("settings.label.master-volume"), allocatedNames),
-        TextElement(MusicLabelKey, 58, 270, 260, 28,
-            strings.Get("settings.label.music-volume"), allocatedNames),
-        Slider(MusicSliderKey, 350, 272, draft.MusicVolume, 0, 100, 5, 3,
-            strings.Get("settings.label.music-volume"), allocatedNames),
-        TextElement(MusicValueKey, 662, 268, 72, 28,
-            AccessibleValue("settings.label.music-volume"), allocatedNames),
-        TextElement(EffectsLabelKey, 58, 308, 260, 28,
-            strings.Get("settings.label.effects-volume"), allocatedNames),
-        Slider(EffectsSliderKey, 350, 310, draft.EffectsVolume, 0, 100, 5, 4,
-            strings.Get("settings.label.effects-volume"), allocatedNames),
-        TextElement(EffectsValueKey, 662, 306, 72, 28,
-            AccessibleValue("settings.label.effects-volume"), allocatedNames),
-        TextElement(AccessibilityHeadingKey, 52, 345, 680, 24,
-            strings.Get("settings.heading.accessibility"), allocatedNames),
-        TextElement(SubtitlesLabelKey, 58, 372, 350, 32,
-            strings.Get("settings.label.subtitles"), allocatedNames),
-        Toggle(SubtitlesToggleKey, 610, 368, draft.Subtitles, 5,
-            strings.Get("settings.label.subtitles"), allocatedNames),
-        TextElement(MotionLabelKey, 58, 410, 350, 32,
-            strings.Get("settings.label.reduced-motion"), allocatedNames),
-        Toggle(MotionToggleKey, 610, 406, draft.ReducedMotion, 6,
-            strings.Get("settings.label.reduced-motion"), allocatedNames),
-        TextElement(ShakeLabelKey, 58, 448, 350, 32,
-            strings.Get("settings.label.screen-shake"), allocatedNames),
-        Toggle(ShakeToggleKey, 610, 444, draft.ScreenShake, 7,
-            strings.Get("settings.label.screen-shake"), allocatedNames),
-        TextElement(ScaleLabelKey, 58, 488, 260, 28,
-            strings.Get("settings.label.interface-scale"), allocatedNames),
-        Slider(ScaleSliderKey, 350, 490, draft.UiScalePercent, 75, 150, 5, 8,
-            strings.Get("settings.label.interface-scale"), allocatedNames),
-        TextElement(ScaleValueKey, 662, 486, 72, 28,
-            AccessibleValue("settings.label.interface-scale"), allocatedNames),
-        TextElement(StatusKey, 52, 525, 680, 28,
-            strings.Get("settings.accessibility.status"), allocatedNames),
-        Button(ResetButtonKey, 342, 560, 112, 42, 9,
-            strings.Get("settings.button.reset"), allocatedNames),
-        Button(CancelButtonKey, 470, 560, 112, 42, 10,
-            strings.Get("settings.button.cancel"), allocatedNames),
-        Button(ApplyButtonKey, 598, 560, 136, 42, 11,
-            strings.Get("settings.button.apply"), allocatedNames),
-    ];
+    private EngineUiElementDescription[] BuildElements(List<nint> names)
+    {
+        List<EngineUiElementDescription> elements =
+        [
+            Element(ModalKey, RootKey, 15, 15, 870, 620, EngineUiBehavior.None,
+                strings.Get("settings.accessibility.dialog"), names, modal: true, dismissAction: CancelAction),
+            TextElement(TitleKey, 45, 32, 810, 42, strings.Get("settings.title"), names),
+            TextElement(IntroductionKey, 45, 74, 810, 26, strings.Get("settings.accessibility.description"), names),
+            Panel(SidebarKey, 40, 112, 220, 382, strings.Get("settings.accessibility.dialog"), names),
+            Panel(ContentKey, 275, 112, 580, 382, strings.Get("settings.accessibility.dialog"), names),
+            Button(GeneralCategoryKey, 50, 126, 200, 56, 0, strings.Get("settings.heading.display"), names),
+            Button(AudioCategoryKey, 50, 196, 200, 56, 1, strings.Get("settings.heading.audio"), names),
+            Button(InterfaceCategoryKey, 50, 266, 200, 56, 2, strings.Get("settings.heading.accessibility"), names),
+            TextElement(PageHeadingKey, 305, 132, 520, 34, PageHeading(), names),
+            TextElement(StatusKey, 45, 512, 810, 28, strings.Get("settings.accessibility.status"), names),
+            Button(ResetButtonKey, 360, 562, 140, 48, 90, strings.Get("settings.button.reset"), names),
+            Button(CancelButtonKey, 515, 562, 140, 48, 91, strings.Get("settings.button.cancel"), names),
+            Button(ApplyButtonKey, 670, 562, 155, 48, 92, strings.Get("settings.button.apply"), names),
+        ];
+
+        switch (category)
+        {
+            case SettingsCategory.General:
+                AddGeneralElements(elements, names);
+                break;
+            case SettingsCategory.Audio:
+                AddAudioElements(elements, names);
+                break;
+            case SettingsCategory.Interface:
+                AddInterfaceElements(elements, names);
+                break;
+            default:
+                throw new InvalidOperationException("The active settings category is invalid.");
+        }
+
+        if (popup != ChoicePopup.None)
+        {
+            AddPopupElements(elements, names);
+        }
+
+        return [.. elements];
+    }
+
+    private void AddGeneralElements(List<EngineUiElementDescription> elements, List<nint> names)
+    {
+        elements.Add(TextElement(LanguageLabelKey, 310, 194, 260, 40,
+            strings.Get("settings.label.language"), names));
+        elements.Add(Button(LanguageButtonKey, 602, 190, 220, 44, 10,
+            AccessibleOption("settings.label.language", strings.LanguageName(draft.Language)), names));
+        elements.Add(TextElement(ResolutionLabelKey, 310, 258, 260, 40,
+            strings.Get("settings.label.resolution"), names));
+        elements.Add(Button(ResolutionButtonKey, 602, 254, 220, 44, 11,
+            AccessibleOption("settings.label.resolution", strings.ResolutionName(CurrentResolution())), names));
+    }
+
+    private void AddAudioElements(List<EngineUiElementDescription> elements, List<nint> names)
+    {
+        AddSliderRow(elements, names, MasterLabelKey, MasterSliderKey, MasterValueKey, 190,
+            draft.MasterVolume, "settings.label.master-volume", 10);
+        AddSliderRow(elements, names, MusicLabelKey, MusicSliderKey, MusicValueKey, 262,
+            draft.MusicVolume, "settings.label.music-volume", 11);
+        AddSliderRow(elements, names, EffectsLabelKey, EffectsSliderKey, EffectsValueKey, 334,
+            draft.EffectsVolume, "settings.label.effects-volume", 12);
+    }
+
+    private void AddSliderRow(
+        List<EngineUiElementDescription> elements,
+        List<nint> names,
+        ulong labelKey,
+        ulong sliderKey,
+        ulong valueKey,
+        float y,
+        int value,
+        string textKey,
+        int tabOrder)
+    {
+        elements.Add(TextElement(labelKey, 310, y, 210, 34, strings.Get(textKey), names));
+        elements.Add(Slider(sliderKey, 520, y + 4, 225, value, 0, 100, 5, tabOrder,
+            strings.Get(textKey), names));
+        elements.Add(TextElement(valueKey, 758, y, 64, 34, AccessibleValue(textKey), names));
+    }
+
+    private void AddInterfaceElements(List<EngineUiElementDescription> elements, List<nint> names)
+    {
+        AddToggleRow(elements, names, SubtitlesLabelKey, SubtitlesToggleKey, 184,
+            draft.Subtitles, "settings.label.subtitles", 10);
+        AddToggleRow(elements, names, MotionLabelKey, MotionToggleKey, 244,
+            draft.ReducedMotion, "settings.label.reduced-motion", 11);
+        AddToggleRow(elements, names, ShakeLabelKey, ShakeToggleKey, 304,
+            draft.ScreenShake, "settings.label.screen-shake", 12);
+        elements.Add(TextElement(ScaleLabelKey, 310, 368, 210, 34,
+            strings.Get("settings.label.interface-scale"), names));
+        elements.Add(Slider(ScaleSliderKey, 520, 372, 225, draft.UiScalePercent, 75, 150, 5, 13,
+            strings.Get("settings.label.interface-scale"), names));
+        elements.Add(TextElement(ScaleValueKey, 758, 368, 64, 34,
+            AccessibleValue("settings.label.interface-scale"), names));
+    }
+
+    private void AddToggleRow(
+        List<EngineUiElementDescription> elements,
+        List<nint> names,
+        ulong labelKey,
+        ulong toggleKey,
+        float y,
+        bool value,
+        string textKey,
+        int tabOrder)
+    {
+        elements.Add(TextElement(labelKey, 310, y, 280, 40, strings.Get(textKey), names));
+        elements.Add(Toggle(toggleKey, 682, y - 2, value, tabOrder, strings.Get(textKey), names));
+    }
+
+    private void AddPopupElements(List<EngineUiElementDescription> elements, List<nint> names)
+    {
+        elements.Add(Panel(PopupScrimKey, 275, 112, 580, 382,
+            strings.Get("settings.accessibility.dialog"), names, Color(0.015f, 0.024f, 0.043f, 0.78f)));
+        if (popup == ChoicePopup.Language)
+        {
+            elements.Add(Element(PopupPanelKey, ModalKey, 548, 160, 282, 190, EngineUiBehavior.None,
+                strings.Get("settings.label.language"), names, modal: true, dismissAction: PopupCancelAction,
+                customColor: true, color: Color(0.082f, 0.110f, 0.165f)));
+            elements.Add(TextElement(PopupTitleKey, PopupPanelKey, 20, 14, 242, 30,
+                strings.Get("settings.label.language"), names));
+            for (int index = 0; index < GameSettingsChoices.Languages.Count; ++index)
+            {
+                string language = GameSettingsChoices.Languages[index];
+                elements.Add(Button(LanguageChoiceKeys[index], PopupPanelKey, 20, 50 + index * 42, 242, 36,
+                    index, strings.LanguageName(language), names));
+            }
+        }
+        else
+        {
+            elements.Add(Element(PopupPanelKey, ModalKey, 520, 126, 310, 292, EngineUiBehavior.None,
+                strings.Get("settings.label.resolution"), names, modal: true, dismissAction: PopupCancelAction,
+                customColor: true, color: Color(0.082f, 0.110f, 0.165f)));
+            elements.Add(TextElement(PopupTitleKey, PopupPanelKey, 20, 14, 270, 30,
+                strings.Get("settings.label.resolution"), names));
+            for (int index = 0; index < GameSettingsChoices.Resolutions.Count; ++index)
+            {
+                GameResolutionChoice resolution = GameSettingsChoices.Resolutions[index];
+                elements.Add(Button(ResolutionChoiceKeys[index], PopupPanelKey, 20, 50 + index * 44, 270, 38,
+                    index, strings.ResolutionName(resolution), names));
+            }
+        }
+    }
 
     private string AccessibleValue(string settingKey) => strings.Format(
         "settings.accessibility.value",
@@ -384,23 +467,39 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
     private static EngineUiElementDescription TextElement(
         ulong key, float x, float y, float width, float height, string name, List<nint> names) =>
-        Element(key, ModalKey, x, y, width, height, EngineUiBehavior.None, name, names,
+        TextElement(key, ModalKey, x, y, width, height, name, names);
+
+    private static EngineUiElementDescription TextElement(
+        ulong key, ulong parent, float x, float y, float width, float height, string name, List<nint> names) =>
+        Element(key, parent, x, y, width, height, EngineUiBehavior.None, name, names,
             kind: EngineUiElementKind.Text, customColor: true, color: Color(0, 0, 0, 0));
+
+    private static EngineUiElementDescription Panel(
+        ulong key, float x, float y, float width, float height, string name, List<nint> names,
+        EngineUiColor? color = null) =>
+        Element(key, ModalKey, x, y, width, height, EngineUiBehavior.None, name, names,
+            customColor: true, color: color ?? Color(0.040f, 0.059f, 0.098f));
 
     private static EngineUiElementDescription Button(
         ulong key, float x, float y, float width, float height, int tabOrder, string name, List<nint> names) =>
-        Element(key, ModalKey, x, y, width, height, EngineUiBehavior.Button, name, names, tabOrder: tabOrder);
+        Button(key, ModalKey, x, y, width, height, tabOrder, name, names);
+
+    private static EngineUiElementDescription Button(
+        ulong key, ulong parent, float x, float y, float width, float height, int tabOrder,
+        string name, List<nint> names) =>
+        Element(key, parent, x, y, width, height, EngineUiBehavior.Button, name, names, tabOrder: tabOrder);
 
     private static EngineUiElementDescription Toggle(
         ulong key, float x, float y, bool value, int tabOrder, string name, List<nint> names) =>
-        Element(key, ModalKey, x, y, 124, 36, EngineUiBehavior.Toggle, name, names,
+        Element(key, ModalKey, x, y, 140, 44, EngineUiBehavior.Toggle, name, names,
             tabOrder: tabOrder, toggle: value);
 
     private static EngineUiElementDescription Slider(
-        ulong key, float x, float y, float value, float minimum, float maximum, float step,
+        ulong key, float x, float y, float width, float value, float minimum, float maximum, float step,
         int tabOrder, string name, List<nint> names) =>
-        Element(key, ModalKey, x, y, 290, 24, EngineUiBehavior.Slider, name, names,
-            tabOrder: tabOrder, sliderMinimum: minimum, sliderMaximum: maximum, sliderValue: value, sliderStep: step);
+        Element(key, ModalKey, x, y, width, 28, EngineUiBehavior.Slider, name, names,
+            tabOrder: tabOrder, sliderMinimum: minimum, sliderMaximum: maximum,
+            sliderValue: value, sliderStep: step);
 
     private static EngineUiElementDescription Element(
         ulong key,
@@ -472,90 +571,185 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             Y = (float)(physical.Y * LogicalHeight / ActualHeight),
             Sequence = ++inputSequence,
             PointerId = 1,
-            InsideViewport = physical.X >= 0 && physical.Y >= 0 && physical.X < ActualWidth && physical.Y < ActualHeight ? 1u : 0u,
+            InsideViewport = physical.X >= 0 && physical.Y >= 0 &&
+                physical.X < ActualWidth && physical.Y < ActualHeight ? 1u : 0u,
         }]);
     }
 
     private void Process(EngineUiInput[] input)
     {
-        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIProcessInput(context, document, input, (uint)input.Length),
-            "process settings input");
-        ConsumeActions();
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIProcessInput(
+            context, document, input, (uint)input.Length), "process settings input");
+        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIConsumeActions(
+            context, document, actions, (uint)actions.Length, out uint actionCount), "consume settings actions");
+        for (int index = 0; index < actionCount; ++index)
+        {
+            HandleAction(actions[index]);
+        }
+
         InvalidateVisual();
     }
 
-    private void ConsumeActions()
+    private void HandleAction(EngineUiAction action)
     {
-        ThrowIfFailed(SpriteForgeNative.SpriteForge_UIConsumeActions(
-            context, document, actions, (uint)actions.Length, out uint actionCount), "consume settings actions");
-        for (int index = 0; index < actionCount; index++)
+        if (popup != ChoicePopup.None)
         {
-            EngineUiAction action = actions[index];
-            if (action.Source == LanguageButtonKey)
-            {
-                draft = draft with { Language = NextLanguage(draft.Language) };
-            }
-            else if (action.Source == ResolutionButtonKey)
-            {
-                draft = draft with { Resolution = NextResolution(draft.Resolution) };
-            }
-            else if (action.Source == MasterSliderKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Scalar);
-                draft = draft with { MasterVolume = (int)MathF.Round(action.ScalarValue) };
-            }
-            else if (action.Source == MusicSliderKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Scalar);
-                draft = draft with { MusicVolume = (int)MathF.Round(action.ScalarValue) };
-            }
-            else if (action.Source == EffectsSliderKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Scalar);
-                draft = draft with { EffectsVolume = (int)MathF.Round(action.ScalarValue) };
-            }
-            else if (action.Source == ScaleSliderKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Scalar);
-                draft = draft with { UiScalePercent = (int)MathF.Round(action.ScalarValue) };
-            }
-            else if (action.Source == SubtitlesToggleKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Boolean);
-                draft = draft with { Subtitles = action.BooleanValue != 0 };
-            }
-            else if (action.Source == MotionToggleKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Boolean);
-                draft = draft with { ReducedMotion = action.BooleanValue != 0 };
-            }
-            else if (action.Source == ShakeToggleKey)
-            {
-                RequireActionValue(action, EngineUiActionValueType.Boolean);
-                draft = draft with { ScreenShake = action.BooleanValue != 0 };
-            }
-            else if (action.Source == ResetButtonKey)
-            {
-                Recreate(GameSettingsProfile.Default);
-            }
-            else if (action.Source == ApplyButtonKey)
-            {
-                ApplyRequested?.Invoke(this, new GameSettingsApplyRequestedEventArgs(draft));
-            }
-            else if (action.Source == CancelButtonKey || action.Type == CancelAction)
-            {
-                CancelRequested?.Invoke(this, EventArgs.Empty);
-            }
+            HandlePopupAction(action);
+            return;
+        }
+
+        if (action.Source == GeneralCategoryKey)
+        {
+            SelectCategory(SettingsCategory.General);
+        }
+        else if (action.Source == AudioCategoryKey)
+        {
+            SelectCategory(SettingsCategory.Audio);
+        }
+        else if (action.Source == InterfaceCategoryKey)
+        {
+            SelectCategory(SettingsCategory.Interface);
+        }
+        else if (action.Source == LanguageButtonKey)
+        {
+            OpenPopup(ChoicePopup.Language);
+        }
+        else if (action.Source == ResolutionButtonKey)
+        {
+            OpenPopup(ChoicePopup.Resolution);
+        }
+        else if (action.Source == MasterSliderKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Scalar);
+            draft = draft with { MasterVolume = (int)MathF.Round(action.ScalarValue) };
+        }
+        else if (action.Source == MusicSliderKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Scalar);
+            draft = draft with { MusicVolume = (int)MathF.Round(action.ScalarValue) };
+        }
+        else if (action.Source == EffectsSliderKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Scalar);
+            draft = draft with { EffectsVolume = (int)MathF.Round(action.ScalarValue) };
+        }
+        else if (action.Source == ScaleSliderKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Scalar);
+            draft = draft with { UiScalePercent = (int)MathF.Round(action.ScalarValue) };
+        }
+        else if (action.Source == SubtitlesToggleKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Boolean);
+            draft = draft with { Subtitles = action.BooleanValue != 0 };
+        }
+        else if (action.Source == MotionToggleKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Boolean);
+            draft = draft with { ReducedMotion = action.BooleanValue != 0 };
+        }
+        else if (action.Source == ShakeToggleKey)
+        {
+            RequireActionValue(action, EngineUiActionValueType.Boolean);
+            draft = draft with { ScreenShake = action.BooleanValue != 0 };
+        }
+        else if (action.Source == ResetButtonKey)
+        {
+            draft = GameSettingsProfile.Default;
+            status = strings.Get("settings.status.reset");
+            statusIsError = false;
+            Recreate();
+        }
+        else if (action.Source == ApplyButtonKey)
+        {
+            ApplyRequested?.Invoke(this, new GameSettingsApplyRequestedEventArgs(draft));
+        }
+        else if (action.Source == CancelButtonKey || action.Type == CancelAction)
+        {
+            CancelRequested?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    private void Recreate(GameSettingsProfile profile)
+    private void HandlePopupAction(EngineUiAction action)
     {
-        draft = profile;
-        status = strings.Get("settings.status.reset");
-        statusIsError = false;
+        ulong[] keys = popup == ChoicePopup.Language ? LanguageChoiceKeys : ResolutionChoiceKeys;
+        int selected = Array.IndexOf(keys, action.Source);
+        if (selected >= 0)
+        {
+            if (popup == ChoicePopup.Language)
+            {
+                draft = draft with { Language = GameSettingsChoices.Languages[selected] };
+            }
+            else
+            {
+                draft = draft with { Resolution = GameSettingsChoices.Resolutions[selected].Id };
+            }
+
+            ulong selectorKey = popup == ChoicePopup.Language ? LanguageButtonKey : ResolutionButtonKey;
+            popup = ChoicePopup.None;
+            Recreate(selectorKey);
+        }
+        else if (action.Type == PopupCancelAction || action.Type == CancelAction)
+        {
+            ulong selectorKey = popup == ChoicePopup.Language ? LanguageButtonKey : ResolutionButtonKey;
+            popup = ChoicePopup.None;
+            Recreate(selectorKey);
+        }
+    }
+
+    private void SelectCategory(SettingsCategory value)
+    {
+        if (category == value)
+        {
+            return;
+        }
+
+        category = value;
+        popup = ChoicePopup.None;
+        Recreate(CategoryKey(value));
+    }
+
+    private void OpenPopup(ChoicePopup value)
+    {
+        popup = value;
+        Recreate();
+    }
+
+    private void Recreate(ulong focusKey = 0)
+    {
         DestroyNativeDocument();
         CreateNativeDocument();
+        if (focusKey != 0)
+        {
+            FocusElement(focusKey);
+        }
+
+        Focus();
+        InvalidateVisual();
+    }
+
+    private void FocusElement(ulong target)
+    {
+        RefreshSnapshots();
+        for (int attempt = 0; attempt <= elementKeys.Length; ++attempt)
+        {
+            if (snapshots.TryGetValue(target, out EngineUiElementSnapshot targetSnapshot) &&
+                targetSnapshot.Focused != 0)
+            {
+                return;
+            }
+
+            Process([new EngineUiInput
+            {
+                Type = EngineUiInputType.Navigation,
+                Navigation = EngineUiNavigation.Next,
+                Sequence = ++inputSequence,
+                InsideViewport = 1,
+            }]);
+            RefreshSnapshots();
+        }
+
+        throw new InvalidOperationException("SpriteForge could not restore settings focus after rebuilding the page.");
     }
 
     private GameResolutionChoice CurrentResolution()
@@ -568,24 +762,13 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         return resolution;
     }
 
-    private static string NextLanguage(string current) =>
-        NextChoice(GameSettingsChoices.Languages, current, static value => value);
-
-    private static string NextResolution(string current) =>
-        NextChoice(GameSettingsChoices.Resolutions, current, static value => value.Id).Id;
-
-    private static T NextChoice<T>(IReadOnlyList<T> choices, string current, Func<T, string> id)
+    private string PageHeading() => category switch
     {
-        for (int index = 0; index < choices.Count; ++index)
-        {
-            if (string.Equals(id(choices[index]), current, StringComparison.Ordinal))
-            {
-                return choices[(index + 1) % choices.Count];
-            }
-        }
-
-        throw new InvalidOperationException($"Current settings option '{current}' is unsupported.");
-    }
+        SettingsCategory.General => strings.Get("settings.heading.display"),
+        SettingsCategory.Audio => strings.Get("settings.heading.audio"),
+        SettingsCategory.Interface => strings.Get("settings.heading.accessibility"),
+        _ => throw new InvalidOperationException("The active settings category is invalid."),
+    };
 
     private void RefreshSnapshots()
     {
@@ -594,9 +777,99 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
             context, document, elementKeys, (uint)elementKeys.Length, values, (uint)values.Length, out uint count),
             "copy settings element snapshots");
         snapshots.Clear();
-        for (int index = 0; index < count; index++)
+        for (int index = 0; index < count; ++index)
         {
             snapshots.Add(values[index].Key, values[index]);
+        }
+    }
+
+    private void DrawCategorySelection(DrawingContext drawingContext)
+    {
+        ulong key = CategoryKey(category);
+        if (!snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot))
+        {
+            return;
+        }
+
+        Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
+        drawingContext.DrawRectangle(Brush("#334A62"), null, bounds);
+        drawingContext.DrawRectangle(Brush("#D7AF70"), null, new Rect(bounds.X, bounds.Y, 5, bounds.Height));
+    }
+
+    private void DrawPageControls(DrawingContext drawingContext)
+    {
+        switch (category)
+        {
+            case SettingsCategory.Audio:
+                DrawSlider(drawingContext, MasterSliderKey, draft.MasterVolume, 0, 100);
+                DrawSlider(drawingContext, MusicSliderKey, draft.MusicVolume, 0, 100);
+                DrawSlider(drawingContext, EffectsSliderKey, draft.EffectsVolume, 0, 100);
+                break;
+            case SettingsCategory.Interface:
+                DrawToggle(drawingContext, SubtitlesToggleKey, draft.Subtitles);
+                DrawToggle(drawingContext, MotionToggleKey, draft.ReducedMotion);
+                DrawToggle(drawingContext, ShakeToggleKey, draft.ScreenShake);
+                DrawSlider(drawingContext, ScaleSliderKey, draft.UiScalePercent, 75, 150);
+                break;
+        }
+    }
+
+    private void DrawPageText(DrawingContext drawingContext)
+    {
+        switch (category)
+        {
+            case SettingsCategory.General:
+                DrawText(drawingContext, LanguageLabelKey, strings.Get("settings.label.language"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, LanguageButtonKey, strings.LanguageName(draft.Language) + "  ▾", 14, "#F2E9D8", true);
+                DrawText(drawingContext, ResolutionLabelKey, strings.Get("settings.label.resolution"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, ResolutionButtonKey, strings.ResolutionName(CurrentResolution()) + "  ▾", 14, "#F2E9D8", true);
+                break;
+            case SettingsCategory.Audio:
+                DrawText(drawingContext, MasterLabelKey, strings.Get("settings.label.master-volume"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, MasterValueKey, strings.Percent(draft.MasterVolume), 14, "#80DED9", true);
+                DrawText(drawingContext, MusicLabelKey, strings.Get("settings.label.music-volume"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, MusicValueKey, strings.Percent(draft.MusicVolume), 14, "#80DED9", true);
+                DrawText(drawingContext, EffectsLabelKey, strings.Get("settings.label.effects-volume"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, EffectsValueKey, strings.Percent(draft.EffectsVolume), 14, "#80DED9", true);
+                break;
+            case SettingsCategory.Interface:
+                DrawText(drawingContext, SubtitlesLabelKey, strings.Get("settings.label.subtitles"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, SubtitlesToggleKey, ToggleText(draft.Subtitles), 13, "#F2E9D8", true);
+                DrawText(drawingContext, MotionLabelKey, strings.Get("settings.label.reduced-motion"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, MotionToggleKey, ToggleText(draft.ReducedMotion), 13, "#F2E9D8", true);
+                DrawText(drawingContext, ShakeLabelKey, strings.Get("settings.label.screen-shake"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, ShakeToggleKey, ToggleText(draft.ScreenShake), 13, "#F2E9D8", true);
+                DrawText(drawingContext, ScaleLabelKey, strings.Get("settings.label.interface-scale"), 15, "#F2E9D8", false);
+                DrawText(drawingContext, ScaleValueKey, strings.Percent(draft.UiScalePercent), 14, "#80DED9", true);
+                break;
+        }
+    }
+
+    private void DrawPopup(DrawingContext drawingContext)
+    {
+        string title = popup == ChoicePopup.Language
+            ? strings.Get("settings.label.language")
+            : strings.Get("settings.label.resolution");
+        DrawText(drawingContext, PopupTitleKey, title, 16, "#D7AF70", false);
+        if (popup == ChoicePopup.Language)
+        {
+            for (int index = 0; index < GameSettingsChoices.Languages.Count; ++index)
+            {
+                string language = GameSettingsChoices.Languages[index];
+                string selected = string.Equals(language, draft.Language, StringComparison.Ordinal) ? "✓  " : string.Empty;
+                DrawText(drawingContext, LanguageChoiceKeys[index], selected + strings.LanguageName(language),
+                    14, "#F2E9D8", false, 12);
+            }
+        }
+        else
+        {
+            for (int index = 0; index < GameSettingsChoices.Resolutions.Count; ++index)
+            {
+                GameResolutionChoice resolution = GameSettingsChoices.Resolutions[index];
+                string selected = string.Equals(resolution.Id, draft.Resolution, StringComparison.Ordinal) ? "✓  " : string.Empty;
+                DrawText(drawingContext, ResolutionChoiceKeys[index], selected + strings.ResolutionName(resolution),
+                    14, "#F2E9D8", false, 12);
+            }
         }
     }
 
@@ -614,7 +887,8 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         drawingContext.DrawRectangle(Brush("#80DED9"), null,
             new Rect(track.X, track.Y, track.Width * normalized, track.Height));
         double knobX = track.X + track.Width * normalized;
-        drawingContext.DrawEllipse(Brush("#F2E9D8"), null, new Point(knobX, bounds.Y + bounds.Height / 2), 6, 6);
+        drawingContext.DrawEllipse(Brush("#F2E9D8"), null,
+            new Point(knobX, bounds.Y + bounds.Height / 2), 6, 6);
     }
 
     private void DrawToggle(DrawingContext drawingContext, ulong key, bool enabled)
@@ -625,33 +899,42 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         }
 
         Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
-        Rect indicator = new(bounds.X + 10, bounds.Y + bounds.Height / 2 - 6, 12, 12);
+        Rect indicator = new(bounds.X + 12, bounds.Y + bounds.Height / 2 - 7, 14, 14);
         drawingContext.DrawRectangle(enabled ? Brush("#80DED9") : Brush("#101827"), null, indicator);
     }
 
-    private void DrawText(DrawingContext drawingContext, ulong key, string text, double fontSize, string color, bool centered)
+    private void DrawText(
+        DrawingContext drawingContext,
+        ulong key,
+        string text,
+        double fontSize,
+        string color,
+        bool centered,
+        double horizontalInset = 0)
     {
         if (!snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot))
         {
             return;
         }
 
+        Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
+        double inset = horizontalInset * ActualWidth / LogicalWidth;
         FormattedText formatted = new(
             text,
             strings.Culture,
             FlowDirection.LeftToRight,
-            new Typeface(centered ? "Consolas" : "Segoe UI"),
+            new Typeface(centered ? "Segoe UI Semibold" : "Segoe UI"),
             fontSize * ActualHeight / LogicalHeight,
             Brush(color),
             VisualTreeHelper.GetDpi(this).PixelsPerDip)
         {
-            MaxTextWidth = Math.Max(1, snapshot.Width * ActualWidth / LogicalWidth),
+            MaxTextWidth = Math.Max(1, bounds.Width - inset * 2),
+            MaxTextHeight = Math.Max(1, bounds.Height),
+            TextAlignment = centered ? TextAlignment.Center : TextAlignment.Left,
             Trimming = TextTrimming.CharacterEllipsis,
         };
-        Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
-        double x = centered ? bounds.X + Math.Max(0, (bounds.Width - formatted.Width) / 2) : bounds.X;
         double y = bounds.Y + Math.Max(0, (bounds.Height - formatted.Height) / 2);
-        drawingContext.DrawText(formatted, new Point(x, y));
+        drawingContext.DrawText(formatted, new Point(bounds.X + inset, y));
     }
 
     private Rect Scale(float x, float y, float width, float height) => new(
@@ -680,8 +963,28 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     }
 
     private static byte Channel(float value) => (byte)Math.Round(Math.Clamp(value, 0, 1) * byte.MaxValue);
-
     private string ToggleText(bool enabled) => strings.Get(enabled ? "settings.state.on" : "settings.state.off");
+
+    private static bool IsPopupElement(ulong key) =>
+        key == PopupScrimKey || key == PopupPanelKey || key == PopupTitleKey ||
+        LanguageChoiceKeys.Contains(key) || ResolutionChoiceKeys.Contains(key);
+
+    private static ulong CategoryKey(SettingsCategory value) => value switch
+    {
+        SettingsCategory.General => GeneralCategoryKey,
+        SettingsCategory.Audio => AudioCategoryKey,
+        SettingsCategory.Interface => InterfaceCategoryKey,
+        _ => throw new InvalidOperationException("The active settings category is invalid."),
+    };
+
+    private static void RequireActionValue(EngineUiAction action, EngineUiActionValueType expected)
+    {
+        if (action.ValueType != expected)
+        {
+            throw new InvalidOperationException(
+                $"SpriteForge returned {action.ValueType} for settings element {action.Source:x16}; expected {expected}.");
+        }
+    }
 
     private static ulong Key(string value)
     {
@@ -698,7 +1001,6 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     }
 
     private void View_Loaded(object sender, RoutedEventArgs e) => Focus();
-
     private void View_Unloaded(object sender, RoutedEventArgs e) => Dispose();
 
     private void DestroyNativeDocument()
@@ -712,22 +1014,29 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         context = nint.Zero;
         document = 0;
         snapshots.Clear();
+        elementKeys = [];
     }
 
     private static void ThrowIfFailed(EngineStatus status, string operation)
     {
         if (status != EngineStatus.Success)
         {
-            throw new InvalidOperationException($"SpriteForge.dll could not {operation} ({status}, {(int)status}).");
+            throw new InvalidOperationException(
+                $"SpriteForge.dll could not {operation} ({status}, {(int)status}).");
         }
     }
 
-    private static void RequireActionValue(EngineUiAction action, EngineUiActionValueType expected)
+    private enum SettingsCategory : byte
     {
-        if (action.ValueType != expected)
-        {
-            throw new InvalidOperationException(
-                $"SpriteForge returned {action.ValueType} for settings action {action.Source}; expected {expected}.");
-        }
+        General,
+        Audio,
+        Interface,
+    }
+
+    private enum ChoicePopup : byte
+    {
+        None,
+        Language,
+        Resolution,
     }
 }

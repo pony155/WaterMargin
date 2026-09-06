@@ -20,16 +20,15 @@ opens maximized. The background contains no interactive or localized text.
 ## UI ownership
 
 SpriteForge UI interop version 1 owns the retained main-menu grouping, fixed
-logical layout, button state, focus, modal trapping, hit testing,
-pointer/keyboard navigation, and copied stable actions. The managed WPF host
-realizes the authored image, copied solid presentation commands, focus outline,
-and game-localized text. The menu grouping and button fills are transparent so
-the labels appear directly over the authored background. The outline follows
-the copied bounds of the button under the pointer and moves SpriteForge focus
-to that same button. Subsequent keyboard navigation and acceptance therefore
-continue from the hovered selection; keyboard input then becomes the active
-selection source until the pointer moves again. This mirrors the settings-dialog boundary
-until SpriteForge exposes direct managed-host texture presentation.
+logical layout, button state, modal trapping, pointer hit testing, and copied
+stable actions. The managed WPF host realizes the authored image, copied solid
+presentation commands, hover outline, and game-localized text. The menu
+grouping and button fills are transparent so the labels appear directly over
+the authored background. The outline follows only the copied bounds of the
+button under the pointer. Main-menu selection and activation are intentionally
+mouse-only; keyboard navigation and acceptance are not forwarded to the
+SpriteForge document. Settings and character creation retain their documented
+keyboard behavior.
 
 The logical menu canvas is 1280 by 720 pixels. It is uniformly scaled and
 centered inside the client area, while the background independently uses cover

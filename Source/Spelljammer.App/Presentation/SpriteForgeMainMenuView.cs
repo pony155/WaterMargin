@@ -58,10 +58,9 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         this.strings = strings;
         this.version = version;
         background = LoadBackground();
-        Focusable = true;
+        Focusable = false;
         SnapsToDevicePixels = true;
         CreateNativeDocument();
-        Loaded += View_Loaded;
         Unloaded += View_Unloaded;
     }
 
@@ -137,13 +136,6 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         {
             DrawOutline(drawingContext, hovered);
         }
-        else
-        {
-            foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.Focused != 0))
-            {
-                DrawOutline(drawingContext, snapshot);
-            }
-        }
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
@@ -165,7 +157,6 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         base.OnMouseLeftButtonDown(e);
-        Focus();
         CaptureMouse();
         SendPointer(EngineUiInputType.PointerDown, e.GetPosition(this));
         e.Handled = true;
@@ -179,36 +170,6 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         e.Handled = true;
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
-    {
-        EngineUiNavigation navigation = e.Key switch
-        {
-            Key.Tab when Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) => EngineUiNavigation.Previous,
-            Key.Tab => EngineUiNavigation.Next,
-            Key.Left => EngineUiNavigation.Left,
-            Key.Right => EngineUiNavigation.Right,
-            Key.Up => EngineUiNavigation.Up,
-            Key.Down => EngineUiNavigation.Down,
-            Key.Enter or Key.Space => EngineUiNavigation.Accept,
-            _ => EngineUiNavigation.None,
-        };
-        if (navigation == EngineUiNavigation.None)
-        {
-            base.OnKeyDown(e);
-            return;
-        }
-
-        hoveredButtonKey = 0;
-        Process([new EngineUiInput
-        {
-            Type = EngineUiInputType.Navigation,
-            Navigation = navigation,
-            Sequence = ++inputSequence,
-            InsideViewport = 1,
-        }]);
-        e.Handled = true;
-    }
-
     public void Dispose()
     {
         if (disposed)
@@ -219,7 +180,6 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         disposed = true;
         DestroyNativeDocument();
 
-        Loaded -= View_Loaded;
         Unloaded -= View_Unloaded;
         GC.SuppressFinalize(this);
     }
@@ -525,36 +485,8 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         if (next != hoveredButtonKey)
         {
             hoveredButtonKey = next;
-            if (next != 0)
-            {
-                FocusButton(next);
-            }
-
             InvalidateVisual();
         }
-    }
-
-    private void FocusButton(ulong target)
-    {
-        RefreshSnapshots();
-        for (int attempt = 0; attempt <= menuButtonKeys.Length; ++attempt)
-        {
-            if (snapshots.Values.Any(value => value.Key == target && value.Focused != 0))
-            {
-                return;
-            }
-
-            Process([new EngineUiInput
-            {
-                Type = EngineUiInputType.Navigation,
-                Navigation = EngineUiNavigation.Next,
-                Sequence = ++inputSequence,
-                InsideViewport = 1,
-            }]);
-            RefreshSnapshots();
-        }
-
-        throw new InvalidOperationException("SpriteForge could not focus the hovered main-menu item.");
     }
 
     private void DrawOutline(DrawingContext drawingContext, EngineUiElementSnapshot snapshot)
@@ -613,8 +545,6 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
 
         return hash == 0 ? 1 : hash;
     }
-
-    private void View_Loaded(object sender, RoutedEventArgs e) => Focus();
 
     private void View_Unloaded(object sender, RoutedEventArgs e) => Dispose();
 

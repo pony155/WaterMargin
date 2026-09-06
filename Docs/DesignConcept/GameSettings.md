@@ -240,13 +240,15 @@ actionable localized diagnostic.
 
 ## Settings interface
 
-The implemented in-window dialog has clear current values, cycling language and
-resolution selectors, whole-profile Reset, Apply, and Cancel. SpriteForge owns
-its retained document, bounded controls, layout, focus, modal routing,
-pointer/keyboard input, and typed actions through
+The implemented in-window dialog has a left-side General, Audio, and Interface
+category list, clear current values, popup language and resolution selectors,
+whole-profile Reset, Apply, and Cancel. Multiple-choice selectors open bounded
+modal option menus, and Cancel or Escape dismisses the option menu before the
+settings dialog. SpriteForge owns its retained document, bounded controls,
+layout, focus, modal routing, pointer/keyboard input, and typed actions through
 the version 1 UI C ABI. The WPF host draws copied solid presentation records
 and game-localized text while direct SpriteForge renderer realization remains
-engine work. Searchable categories, per-category reset, and a campaign summary
+engine work. Searchable settings, per-category reset, and a campaign summary
 reachable after creation remain planned. Labels describe effects directly;
 terms such as “harder” are supplemented with the affected budgets or rules.
 

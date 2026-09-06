@@ -9,10 +9,11 @@ stable language and resolution choices, bounded master, music, and effects
 volumes, subtitles, reduced motion, screen shake, and interface scale.
 
 The WPF host owns startup loading and the in-window overlay lifecycle. The
-overlay delegates its retained document, fixed logical layout, focus, modal
-trapping, pointer/keyboard interaction, sliders, toggles, buttons, and typed
-action queue to SpriteForge UI. The game maps copied stable actions to a draft
-profile and publishes that draft only after durable persistence succeeds.
+overlay delegates its retained document, fixed logical layout, category
+navigation, focus, nested modal choice menus, pointer/keyboard interaction,
+sliders, toggles, buttons, and typed action queue to SpriteForge UI. The game
+maps copied stable actions to a draft profile and publishes that draft only
+after durable persistence succeeds.
 
 The integration requires SpriteForge UI interop version 1 from
 `Engine/Public/SpriteForgeUIInterop.h`. The ABI is deliberately generic; no
@@ -69,6 +70,13 @@ The WPF host realizes those rectangles and resolved text. Direct realization
 through SpriteForge's renderer and a native UI Automation bridge for this
 managed child surface remain planned; keyboard-only operation is implemented,
 but full screen-reader integration must not yet be claimed.
+
+The implemented settings overlay uses an original three-category layout:
+General contains language and resolution, Audio contains the volume controls,
+and Interface contains accessibility and interface-scale controls. Language
+and resolution open bounded modal option menus over the current category. The
+popup receives input exclusively while open, and Cancel or Escape closes the
+popup before it can close the settings overlay.
 
 ## Determinism and deferred work
 

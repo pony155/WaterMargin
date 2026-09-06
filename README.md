@@ -61,7 +61,7 @@ Implemented foundations include:
   language and safe resolution choices, stable diagnostics, and a
   keyboard-operable localized in-window SpriteForge UI modal;
 - a localized SpriteForge UI main menu using the base-pack background asset,
-  with bounded keyboard/pointer actions for New Game, Game Settings, and Quit
+  with bounded mouse actions for New Game, Game Settings, and Quit
   Game;
 - an in-window SpriteForge character-creation UI for choosing among the 11
   authored first-voyage captain profiles and an explicit rerollable voyage
