@@ -220,12 +220,12 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             MaximumActions = ActionCapacity,
             Theme = new EngineUiTheme
             {
-                Panel = Color(0.025f, 0.035f, 0.070f, 0.78f),
-                Button = Color(0.100f, 0.125f, 0.205f, 0.92f),
-                ButtonHovered = Color(0.200f, 0.235f, 0.350f, 0.96f),
-                ButtonPressed = Color(0.055f, 0.070f, 0.125f, 0.98f),
-                ButtonFocused = Color(0.245f, 0.230f, 0.350f, 0.96f),
-                ButtonDisabled = Color(0.050f, 0.060f, 0.090f, 0.70f),
+                Panel = Color(0, 0, 0, 0),
+                Button = Color(0, 0, 0, 0),
+                ButtonHovered = Color(0, 0, 0, 0),
+                ButtonPressed = Color(0, 0, 0, 0),
+                ButtonFocused = Color(0, 0, 0, 0),
+                ButtonDisabled = Color(0, 0, 0, 0),
             },
         };
         ThrowIfFailed(SpriteForgeNative.SpriteForge_CreateUIContext(
@@ -263,7 +263,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     [
         Element(PanelKey, RootKey, 800, 70, 420, 580, EngineUiBehavior.None,
             strings.Get("menu.accessibility.main"), allocatedNames, modal: true,
-            customColor: true, color: Color(0.025f, 0.035f, 0.070f, 0.78f)),
+            customColor: true, color: Color(0, 0, 0, 0)),
         TextElement(TitleKey, 30, 55, 360, 72, strings.Get("menu.title"), allocatedNames),
         TextElement(SubtitleKey, 30, 135, 360, 50, strings.Get("menu.subtitle"), allocatedNames),
         Button(SettingsButtonKey, 60, 290, 300, 68, 0,

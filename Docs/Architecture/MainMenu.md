@@ -14,23 +14,25 @@ Content/Packs/base/Assets/UI/MainMenu/Background.png
 
 The WPF project links that exact base-pack file as a compiled application
 resource. `SpriteForgeMainMenuView` loads it without filesystem discovery and
-draws it with aspect-preserving cover scaling. The background contains no
-interactive or localized text.
+draws it edge-to-edge with aspect-preserving cover scaling. The main window
+opens maximized. The background contains no interactive or localized text.
 
 ## UI ownership
 
-SpriteForge UI interop version 1 owns the retained main-menu panel, fixed
+SpriteForge UI interop version 1 owns the retained main-menu grouping, fixed
 logical layout, button state, focus, modal trapping, hit testing,
 pointer/keyboard navigation, and copied stable actions. The managed WPF host
 realizes the authored image, copied solid presentation commands, focus outline,
-and game-localized text. This mirrors the implemented settings-dialog boundary
+and game-localized text. The menu grouping and button fills are transparent so
+the labels appear directly over the authored background; the focus outline
+remains visible for keyboard navigation. This mirrors the settings-dialog boundary
 until SpriteForge exposes direct managed-host texture presentation.
 
 The logical menu canvas is 1280 by 720 pixels. It is uniformly scaled and
 centered inside the client area, while the background independently uses cover
 scaling so resizing does not distort the artwork or controls. The dark right
-side of the composition holds the menu panel and preserves the ship silhouette
-on the left.
+side of the composition holds the transparent menu labels and preserves the
+ship silhouette on the left.
 
 ## Localization and lifecycle
 

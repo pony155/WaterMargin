@@ -42,7 +42,7 @@ menu action constructs them.
 
 | File | Responsibility |
 | --- | --- |
-| `MainMenuWindow.cs` | Current top-level window and application flow coordinator. It owns the shared settings registry, settings path, and `GameText`; hosts `SpriteForgeMainMenuView`; opens the modal settings dialog; forwards save/load status to the menu; shuts down on Quit; and detaches/disposes the view when closed. |
+| `MainMenuWindow.cs` | Current maximized top-level window and application flow coordinator. It owns the shared settings registry, settings path, and `GameText`; hosts `SpriteForgeMainMenuView`; opens the modal settings dialog; forwards save/load status to the menu; shuts down on Quit; and detaches/disposes the view when closed. |
 | `GameSettingsDialog.cs` | WPF modal shell around `SpriteForgeSettingsView`. It starts settings publication on a worker thread, prevents duplicate Apply operations and closure during a write, reports failures without replacing active settings, and returns `DialogResult = true` only after successful durable publication. |
 | `MainWindow.xaml` | Retained expedition-prototype layout. It defines resource/fuel/hull displays, movement and voyage commands, an `EngineViewport`, and renderer playback controls. Most of its player-visible strings predate the current localization boundary. This window is not reachable from the current main menu. |
 | `MainWindow.xaml.cs` | Retained expedition-prototype coordinator. It owns an `ExpeditionSimulation` and current `ExpeditionState`, converts button clicks into typed commands, presents sector/resource results, controls the renderer animation, and can open the shared settings dialog. It is currently inactive because startup creates `MainMenuWindow` instead. |
@@ -52,7 +52,7 @@ menu action constructs them.
 | File | Responsibility |
 | --- | --- |
 | `GameText.cs` | Application localization facade. It reads the embedded `en-US` menu and settings artifacts with size bounds, decodes and stages both catalogs transactionally, publishes the locale, begins formatting frames, and exposes small helpers for static text, formatted values, percentages, and stable diagnostics. |
-| `SpriteForgeMainMenuView.cs` | Current main-menu surface. It loads the packaged `Background.png`, draws it with aspect-preserving cover scaling, and uses a fixed 1280x720 logical UI canvas. SpriteForge owns retained elements, hit testing, focus, pointer/keyboard processing, and action generation; WPF realizes copied solid presentation commands and localized text. The view emits only `SettingsRequested` and `QuitRequested`, keeps bounded element/action buffers, and releases its native UI context deterministically. |
+| `SpriteForgeMainMenuView.cs` | Current main-menu surface. It loads the packaged `Background.png`, draws it edge-to-edge with aspect-preserving cover scaling, and uses a fixed 1280x720 logical UI canvas. Menu grouping and button fills are transparent, leaving localized labels and the keyboard focus outline over the artwork. SpriteForge owns retained elements, hit testing, focus, pointer/keyboard processing, and action generation; WPF realizes copied presentation commands and localized text. The view emits only `SettingsRequested` and `QuitRequested`, keeps bounded element/action buffers, and releases its native UI context deterministically. |
 | `SpriteForgeSettingsView.cs` | Interactive settings surface and draft editor on an 800x640 logical canvas. It defines SpriteForge sliders, toggles, buttons, modal focus behavior, and accessibility names for audio and interface preferences. Native actions update an immutable draft profile or emit Apply/Cancel events; WPF draws the copied presentation, value labels, focus outlines, and status messages. Reset reconstructs the native document from defaults. |
 | `EngineViewport.cs` | Retained expedition renderer host. It derives from `HwndHost`, creates a child Win32 window, checks SpriteForge rendering ABI v1, creates a renderer and an in-memory RGBA sprite sheet, submits bounded sprite draws, and advances a four-frame animation with a WPF render-priority timer. It owns and destroys the native texture, renderer, and child window. It is only used by the inactive `MainWindow`. |
 
@@ -118,4 +118,3 @@ dotnet build .\Spelljammer.slnx -p:SpriteForgeNativeDir="$nativeDir"
 dotnet run --project .\Source\Spelljammer.App\Spelljammer.App.csproj `
     -p:SpriteForgeNativeDir="$nativeDir"
 ```
-

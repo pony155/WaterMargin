@@ -26,6 +26,7 @@ internal sealed class MainMenuWindow : Window
         Height = 720;
         MinWidth = 960;
         MinHeight = 540;
+        WindowState = WindowState.Maximized;
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Background = Brushes.Black;
         UseLayoutRounding = true;
