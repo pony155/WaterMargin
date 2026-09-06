@@ -41,12 +41,14 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         StatusKey,
         VersionKey,
     ];
+    private readonly ulong[] menuButtonKeys = [NewGameButtonKey, SettingsButtonKey, QuitButtonKey];
     private readonly Dictionary<ulong, EngineUiElementSnapshot> snapshots = [];
     private readonly EngineUiPresentationCommand[] presentation = new EngineUiPresentationCommand[ElementCapacity];
     private readonly EngineUiAction[] actions = new EngineUiAction[ActionCapacity];
     private nint context;
     private ulong document;
     private ulong inputSequence;
+    private ulong hoveredButtonKey;
     private string status = string.Empty;
     private bool statusIsError;
     private bool disposed;
@@ -131,17 +133,33 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         DrawText(drawingContext, VersionKey, strings.Version(version), 13,
             "#C4BBD1", TextAlignment.Right, FontWeights.Normal);
 
-        foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.Focused != 0))
+        if (hoveredButtonKey != 0 && snapshots.TryGetValue(hoveredButtonKey, out EngineUiElementSnapshot hovered))
         {
-            drawingContext.DrawRectangle(null, new Pen(Brush("#D7AF70"), 3),
-                Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height));
+            DrawOutline(drawingContext, hovered);
+        }
+        else
+        {
+            foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.Focused != 0))
+            {
+                DrawOutline(drawingContext, snapshot);
+            }
         }
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
+        Point position = e.GetPosition(this);
+        SendPointer(EngineUiInputType.PointerMoved, position);
+        UpdateHoveredButton(position);
+    }
+
+    protected override void OnMouseLeave(MouseEventArgs e)
+    {
+        base.OnMouseLeave(e);
+        hoveredButtonKey = 0;
         SendPointer(EngineUiInputType.PointerMoved, e.GetPosition(this));
+        InvalidateVisual();
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
@@ -180,6 +198,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             return;
         }
 
+        hoveredButtonKey = 0;
         Process([new EngineUiInput
         {
             Type = EngineUiInputType.Navigation,
@@ -479,6 +498,69 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         {
             snapshots.Add(values[index].Key, values[index]);
         }
+    }
+
+    private void UpdateHoveredButton(Point physical)
+    {
+        if (ActualWidth <= 0 || ActualHeight <= 0)
+        {
+            hoveredButtonKey = 0;
+            return;
+        }
+
+        (double scale, double offsetX, double offsetY) = CalculateLayoutTransform();
+        Point logical = new((physical.X - offsetX) / scale, (physical.Y - offsetY) / scale);
+        ulong next = 0;
+        foreach (ulong key in menuButtonKeys)
+        {
+            if (snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot) &&
+                snapshot.Visible != 0 && snapshot.Enabled != 0 &&
+                new Rect(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height).Contains(logical))
+            {
+                next = key;
+                break;
+            }
+        }
+
+        if (next != hoveredButtonKey)
+        {
+            hoveredButtonKey = next;
+            if (next != 0)
+            {
+                FocusButton(next);
+            }
+
+            InvalidateVisual();
+        }
+    }
+
+    private void FocusButton(ulong target)
+    {
+        RefreshSnapshots();
+        for (int attempt = 0; attempt <= menuButtonKeys.Length; ++attempt)
+        {
+            if (snapshots.Values.Any(value => value.Key == target && value.Focused != 0))
+            {
+                return;
+            }
+
+            Process([new EngineUiInput
+            {
+                Type = EngineUiInputType.Navigation,
+                Navigation = EngineUiNavigation.Next,
+                Sequence = ++inputSequence,
+                InsideViewport = 1,
+            }]);
+            RefreshSnapshots();
+        }
+
+        throw new InvalidOperationException("SpriteForge could not focus the hovered main-menu item.");
+    }
+
+    private void DrawOutline(DrawingContext drawingContext, EngineUiElementSnapshot snapshot)
+    {
+        drawingContext.DrawRectangle(null, new Pen(Brush("#D7AF70"), 3),
+            Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height));
     }
 
     private Rect Scale(float x, float y, float width, float height)

@@ -24,8 +24,11 @@ logical layout, button state, focus, modal trapping, hit testing,
 pointer/keyboard navigation, and copied stable actions. The managed WPF host
 realizes the authored image, copied solid presentation commands, focus outline,
 and game-localized text. The menu grouping and button fills are transparent so
-the labels appear directly over the authored background; the focus outline
-remains visible for keyboard navigation. This mirrors the settings-dialog boundary
+the labels appear directly over the authored background. The outline follows
+the copied bounds of the button under the pointer and moves SpriteForge focus
+to that same button. Subsequent keyboard navigation and acceptance therefore
+continue from the hovered selection; keyboard input then becomes the active
+selection source until the pointer moves again. This mirrors the settings-dialog boundary
 until SpriteForge exposes direct managed-host texture presentation.
 
 The logical menu canvas is 1280 by 720 pixels. It is uniformly scaled and
