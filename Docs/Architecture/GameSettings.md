@@ -5,8 +5,8 @@
 `Spelljammer.Settings` owns the first versioned local player-preference
 profile. It is headless and has no WPF, SpriteForge, localization, native
 pointer, or authoritative campaign dependency. The active profile contains
-bounded master, music, and effects volumes, subtitles, reduced motion, screen
-shake, and interface scale.
+stable language and resolution choices, bounded master, music, and effects
+volumes, subtitles, reduced motion, screen shake, and interface scale.
 
 The WPF host owns startup loading and the modal lifecycle. The dialog delegates
 its retained document, fixed logical layout, focus, modal trapping,
@@ -23,18 +23,25 @@ caller-owned bounded arrays.
 
 ## Profile and file contract
 
-The current profile schema is 1. Volumes are integers from 0 through 100 and
-interface scale is an integer percentage from 75 through 150. The strict JSON
-codec rejects duplicate or unknown properties, malformed input, unsupported
-schema versions, out-of-range values, trailing data, and documents larger than
-64 KiB. Invalid input resolves to safe defaults with a stable diagnostic; it
-is never partially published.
+The current profile schema is 2. Volumes are integers from 0 through 100 and
+interface scale is an integer percentage from 75 through 150. Language is one
+of `en-US` or `fr-FR`; resolution is `desktop`, `1280x720`, `1600x900`,
+`1920x1080`, or `2560x1440`. The strict JSON codec rejects duplicate or unknown
+properties, malformed input, unsupported schema versions, unknown stable
+options, out-of-range values, trailing data, and documents larger than 64 KiB.
+Schema 1 profiles migrate in memory to schema 2 with `en-US` and `desktop`
+defaults while retaining all prior values. Invalid input resolves to safe
+defaults with a stable diagnostic; it is never partially published.
 
 The current-user path is:
 
 ```text
 %LOCALAPPDATA%\Spelljammer\settings.v1.json
 ```
+
+The historical filename remains stable so existing profiles are discovered;
+the `schemaVersion` field inside the document is the authoritative format
+version.
 
 Apply encodes the complete candidate, writes a uniquely named temporary file
 in the same directory, flushes it durably, decodes and compares the staged
@@ -46,13 +53,16 @@ cleanup deletes only that recovery path.
 
 ## Presentation and localization
 
-The settings source strings live in
-`Content/Packs/base/Localization/en-US/settings.sfloc.json`. The offline
-compiler produces a validated artifact before WPF compilation and embeds it in
-the application. At startup the game-owned localization runtime decodes,
-stages, and publishes the `settings` namespace on the UI thread. SpriteForge
-receives copied resolved accessible names and stable numeric element/action
-keys; it never receives localization catalog storage or translated identity.
+The settings source strings live in the `en-US` and `fr-FR` catalogs under
+`Content/Packs/base/Localization`. The offline compiler produces validated
+artifacts before WPF compilation and embeds them in the application. At
+startup the game-owned localization runtime decodes all installed application
+catalogs, then stages and publishes the selected locale and its explicit
+fallback on the UI thread. Applying a new language republishes the locale and
+rebuilds the main-menu presentation text and copied accessibility names.
+SpriteForge receives copied resolved accessible names and stable numeric
+element/action keys; it never receives localization catalog storage or
+translated identity.
 
 SpriteForge currently returns neutral solid rectangles plus element snapshots.
 The WPF host realizes those rectangles and resolved text. Direct realization
@@ -61,6 +71,10 @@ managed child surface remain planned; keyboard-only operation is implemented,
 but full screen-reader integration must not yet be claimed.
 
 ## Determinism and deferred work
+
+Desktop resolution maximizes the WPF window. Fixed resolution presets restore,
+center, and clamp the window to the current desktop work area; they do not
+change the monitor mode or renderer resolution.
 
 The local profile is not stored in a campaign, content lock, semantic
 fingerprint, replay, or simulation state. Reduced motion changes only the
@@ -75,8 +89,9 @@ local preference document.
 ## Verification ownership
 
 `Tests/Spelljammer.Settings.Tests` is a compile-only contract executable for
-codec determinism, invalid-input fallback, transactional publication,
-replacement failure, recovery, and exact cleanup. SpriteForge's
+codec determinism, schema-1 migration, stable language/resolution validation,
+invalid-input fallback, transactional publication, replacement failure,
+recovery, and exact cleanup. SpriteForge's
 `UIInteropTests.cpp` compiles the versioned ABI, modal control actions, copied
 layout/presentation, and failed-batch atomicity. CI or the user owns executable
 test runs under repository policy.

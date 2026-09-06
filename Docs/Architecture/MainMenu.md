@@ -34,13 +34,20 @@ scaling so resizing does not distort the artwork or controls. The dark right
 side of the composition holds the transparent menu labels and preserves the
 ship silhouette on the left.
 
+A localized version label is right-aligned at the bottom-right of the logical
+canvas. Its value comes from the WPF application's informational-version
+metadata with build metadata removed; `VersionPrefix` is currently `0.1.0`.
+This keeps the visible version aligned with the executable rather than with an
+independent presentation constant.
+
 ## Localization and lifecycle
 
-Player-visible strings are authored in
-`Content/Packs/base/Localization/en-US/menu.sfloc.json`. The offline compiler
-builds the `menu` and `settings` catalogs before WPF compilation and embeds
-both artifacts. The application stages and publishes both complete namespaces
-on the UI thread before constructing the menu.
+Player-visible strings are authored in the `en-US` and `fr-FR` menu/settings
+catalogs under `Content/Packs/base/Localization`. The offline compiler builds
+all four catalogs before WPF compilation and embeds the artifacts. The
+application stages and publishes both complete namespaces in the selected
+locale on the UI thread before constructing the menu. Applying a language
+change republishes the catalogs and rebuilds the retained menu document.
 
 Game Settings opens the existing owner-modal settings dialog. Quit Game emits
 a copied stable action and requests ordinary application shutdown. Closing the

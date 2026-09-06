@@ -3,10 +3,10 @@
 The Game-owned localization runtime resolves immutable static and typed
 messages from validated `.sfloc` artifacts. `en-US` is the source locale;
 `qps-ploc` (accented/expanded) and `qps-keyecho` are development-only
-transforms. The WPF host now stages its embedded `menu` and `settings`
-catalogs on the UI owner thread and displays resolved text in the main menu and
-settings dialog. Locale selection and localization of the older expedition
-prototype remain planned.
+transforms. The WPF host now stages embedded `en-US` and `fr-FR` `menu` and
+`settings` catalogs on the UI owner thread, displays resolved text in the main
+menu and settings dialog, and republishes those surfaces when language changes.
+Localization of the older expedition prototype remains planned.
 
 ## Runtime contract
 

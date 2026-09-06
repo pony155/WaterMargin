@@ -29,6 +29,13 @@
       "description": "Main-menu game title.",
       "message": "Spelljammer"
     },
+    "menu.version": {
+      "description": "Application version shown in the lower-right corner of the main menu.",
+      "arguments": {
+        "version": "text"
+      },
+      "message": "Version {version}"
+    },
     "menu.window-title": {
       "description": "Operating-system title for the main-menu window.",
       "message": "Spelljammer"

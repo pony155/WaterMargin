@@ -1,6 +1,8 @@
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using Spelljammer.Localization;
+using Spelljammer.Settings;
 
 namespace Spelljammer.Presentation;
 
@@ -10,16 +12,21 @@ internal sealed class GameText
     [
         "Spelljammer.Localization.en-US.menu.sfloc",
         "Spelljammer.Localization.en-US.settings.sfloc",
+        "Spelljammer.Localization.fr-FR.menu.sfloc",
+        "Spelljammer.Localization.fr-FR.settings.sfloc",
     ];
 
     private readonly LocalizationService localization;
+    private readonly IReadOnlyCollection<LocalizationCatalog> catalogs;
+    private CultureInfo culture = CultureInfo.InvariantCulture;
 
-    private GameText(LocalizationService localization)
+    private GameText(LocalizationService localization, IReadOnlyCollection<LocalizationCatalog> catalogs)
     {
         this.localization = localization;
+        this.catalogs = catalogs;
     }
 
-    internal static GameText Load()
+    internal static GameText Load(string language)
     {
         Assembly assembly = typeof(GameText).Assembly;
         List<LocalizationCatalog> catalogs = new(ResourceNames.Length);
@@ -47,12 +54,21 @@ internal sealed class GameText
             "en-US",
             RequiredNamespaces: ["menu", "settings"])),
             "Could not initialize the application localization service.");
-        LocaleId locale = LocaleId.Create("en-US");
-        Require(service.StageLocale(locale, catalogs, out LocaleGeneration? generation),
-            "Could not stage the application localization catalogs.");
-        Require(service.PublishLocale(generation!), "Could not publish the application localization catalogs.");
-        return new GameText(service);
+        GameText result = new(service, catalogs);
+        result.SetLanguage(language);
+        return result;
     }
+
+    internal void SetLanguage(string language)
+    {
+        LocaleId locale = LocaleId.Create(language);
+        Require(localization.StageLocale(locale, catalogs, out LocaleGeneration? generation),
+            $"Could not stage application locale '{language}'.");
+        Require(localization.PublishLocale(generation!), $"Could not publish application locale '{language}'.");
+        culture = CultureInfo.GetCultureInfo(language);
+    }
+
+    internal CultureInfo Culture => culture;
 
     internal void BeginFrame() => Require(
         localization.BeginFormattingFrame(),
@@ -74,6 +90,28 @@ internal sealed class GameText
 
     internal string Percent(int value) =>
         Format("settings.value.percent", LocalizationArgument.Integer("value", value));
+
+    internal string Version(string value) =>
+        Format("menu.version", LocalizationArgument.Text("version", value));
+
+    internal string LanguageName(string language) => Get(language switch
+    {
+        "en-US" => "settings.value.language.en-us",
+        "fr-FR" => "settings.value.language.fr-fr",
+        _ => throw new ArgumentOutOfRangeException(nameof(language)),
+    });
+
+    internal string ResolutionName(GameResolutionChoice resolution) => resolution.IsDesktop
+        ? Get("settings.value.resolution.desktop")
+        : Format(
+            "settings.value.resolution.pixels",
+            LocalizationArgument.Integer("width", resolution.Width),
+            LocalizationArgument.Integer("height", resolution.Height));
+
+    internal string AccessibleOption(string setting, string value) => Format(
+        "settings.accessibility.option",
+        LocalizationArgument.Text("setting", setting),
+        LocalizationArgument.Text("value", value));
 
     internal string Diagnostic(string name, string code) =>
         Format(name, LocalizationArgument.Text("code", code));

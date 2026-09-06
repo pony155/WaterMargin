@@ -8,6 +8,7 @@ internal static class SettingsContracts
     public static int Run()
     {
         ProfileRoundTripsDeterministically();
+        Version1ProfilesMigrateToSafeDisplayDefaults();
         InvalidDocumentsReturnStableDefaults();
         FailedReplacementRetainsActiveSettings();
         Console.WriteLine("Game settings contracts passed.");
@@ -21,6 +22,8 @@ internal static class SettingsContracts
             MasterVolume = 55,
             ReducedMotion = true,
             UiScalePercent = 125,
+            Language = "fr-FR",
+            Resolution = "1600x900",
         };
         byte[] first = GameSettingsCodec.Encode(profile);
         byte[] second = GameSettingsCodec.Encode(profile);
@@ -32,6 +35,21 @@ internal static class SettingsContracts
         Equal(profile, decoded.Profile, "Settings did not round-trip.");
     }
 
+    private static void Version1ProfilesMigrateToSafeDisplayDefaults()
+    {
+        GameSettingsReadResult migrated = GameSettingsCodec.Decode(Encoding.UTF8.GetBytes(
+            "{\"schemaVersion\":1,\"masterVolume\":55,\"musicVolume\":45,\"effectsVolume\":35," +
+            "\"subtitles\":false,\"reducedMotion\":true,\"screenShake\":false,\"uiScalePercent\":125}"));
+        True(migrated.Loaded, migrated.Diagnostic.ToString());
+        Equal(GameSettingsProfile.CurrentSchemaVersion, migrated.Profile.SchemaVersion,
+            "Migrated settings retained the legacy schema.");
+        Equal(55, migrated.Profile.MasterVolume, "Migration lost an existing preference.");
+        Equal(GameSettingsChoices.DefaultLanguage, migrated.Profile.Language,
+            "Migration did not choose the safe language default.");
+        Equal(GameSettingsChoices.DesktopResolution, migrated.Profile.Resolution,
+            "Migration did not choose the safe display default.");
+    }
+
     private static void InvalidDocumentsReturnStableDefaults()
     {
         GameSettingsReadResult duplicate = GameSettingsCodec.Decode(
@@ -40,13 +58,26 @@ internal static class SettingsContracts
         Equal(GameSettingsProfile.Default, duplicate.Profile, "Corrupt settings did not use safe defaults.");
 
         GameSettingsReadResult incomplete = GameSettingsCodec.Decode(
-            Encoding.UTF8.GetBytes("{\"schemaVersion\":1}"));
+            Encoding.UTF8.GetBytes("{\"schemaVersion\":2}"));
         Equal(GameSettingsDiagnostic.Corrupt, incomplete.Diagnostic, "Incomplete settings diagnostic changed.");
 
         GameSettingsReadResult unsupported = GameSettingsCodec.Decode(Encoding.UTF8.GetBytes(
-            "{\"schemaVersion\":2,\"masterVolume\":80,\"musicVolume\":65,\"effectsVolume\":80," +
-            "\"subtitles\":true,\"reducedMotion\":false,\"screenShake\":true,\"uiScalePercent\":100}"));
+            "{\"schemaVersion\":3}"));
         Equal(GameSettingsDiagnostic.Unsupported, unsupported.Diagnostic, "Unsupported schema diagnostic changed.");
+
+        GameSettingsReadResult invalidLanguage = GameSettingsCodec.Decode(Encoding.UTF8.GetBytes(
+            "{\"schemaVersion\":2,\"masterVolume\":80,\"musicVolume\":65,\"effectsVolume\":80," +
+            "\"subtitles\":true,\"reducedMotion\":false,\"screenShake\":true,\"uiScalePercent\":100," +
+            "\"language\":\"invalid\",\"resolution\":\"desktop\"}"));
+        Equal(GameSettingsDiagnostic.InvalidValue, invalidLanguage.Diagnostic,
+            "Unsupported language diagnostic changed.");
+
+        GameSettingsReadResult invalidResolution = GameSettingsCodec.Decode(Encoding.UTF8.GetBytes(
+            "{\"schemaVersion\":2,\"masterVolume\":80,\"musicVolume\":65,\"effectsVolume\":80," +
+            "\"subtitles\":true,\"reducedMotion\":false,\"screenShake\":true,\"uiScalePercent\":100," +
+            "\"language\":\"en-US\",\"resolution\":\"1234x567\"}"));
+        Equal(GameSettingsDiagnostic.InvalidValue, invalidResolution.Diagnostic,
+            "Unsupported resolution diagnostic changed.");
 
         byte[] oversized = new byte[GameSettingsProfile.MaximumSerializedBytes + 1];
         Equal(GameSettingsDiagnostic.Oversized, GameSettingsCodec.Decode(oversized).Diagnostic,

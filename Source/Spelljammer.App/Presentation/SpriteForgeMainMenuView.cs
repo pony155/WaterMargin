@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -25,8 +24,10 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     private static readonly ulong SettingsButtonKey = StableKey("spelljammer.menu.settings");
     private static readonly ulong QuitButtonKey = StableKey("spelljammer.menu.quit");
     private static readonly ulong StatusKey = StableKey("spelljammer.menu.status");
+    private static readonly ulong VersionKey = StableKey("spelljammer.menu.version");
 
     private readonly GameText strings;
+    private readonly string version;
     private readonly BitmapSource background;
     private readonly ulong[] elementKeys =
     [
@@ -36,6 +37,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         SettingsButtonKey,
         QuitButtonKey,
         StatusKey,
+        VersionKey,
     ];
     private readonly Dictionary<ulong, EngineUiElementSnapshot> snapshots = [];
     private readonly EngineUiPresentationCommand[] presentation = new EngineUiPresentationCommand[ElementCapacity];
@@ -47,9 +49,10 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     private bool statusIsError;
     private bool disposed;
 
-    internal SpriteForgeMainMenuView(GameText strings)
+    internal SpriteForgeMainMenuView(GameText strings, string version)
     {
         this.strings = strings;
+        this.version = version;
         background = LoadBackground();
         Focusable = true;
         SnapsToDevicePixels = true;
@@ -65,6 +68,13 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     {
         status = text;
         statusIsError = isError;
+        InvalidateVisual();
+    }
+
+    internal void RefreshLanguage()
+    {
+        DestroyNativeDocument();
+        CreateNativeDocument();
         InvalidateVisual();
     }
 
@@ -100,15 +110,21 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         }
 
         strings.BeginFrame();
-        DrawText(drawingContext, TitleKey, strings.Get("menu.title"), 48, "#F4E7CE", true, FontWeights.SemiBold);
-        DrawText(drawingContext, SubtitleKey, strings.Get("menu.subtitle"), 16, "#C4BBD1", true, FontWeights.Normal);
-        DrawText(drawingContext, SettingsButtonKey, strings.Get("menu.button.settings"), 20, "#F4E7CE", true, FontWeights.SemiBold);
-        DrawText(drawingContext, QuitButtonKey, strings.Get("menu.button.quit"), 20, "#F4E7CE", true, FontWeights.SemiBold);
+        DrawText(drawingContext, TitleKey, strings.Get("menu.title"), 48, "#F4E7CE",
+            TextAlignment.Center, FontWeights.SemiBold);
+        DrawText(drawingContext, SubtitleKey, strings.Get("menu.subtitle"), 16, "#C4BBD1",
+            TextAlignment.Center, FontWeights.Normal);
+        DrawText(drawingContext, SettingsButtonKey, strings.Get("menu.button.settings"), 20, "#F4E7CE",
+            TextAlignment.Center, FontWeights.SemiBold);
+        DrawText(drawingContext, QuitButtonKey, strings.Get("menu.button.quit"), 20, "#F4E7CE",
+            TextAlignment.Center, FontWeights.SemiBold);
         if (!string.IsNullOrEmpty(status))
         {
             DrawText(drawingContext, StatusKey, status, 13,
-                statusIsError ? "#F39A8D" : "#B8C7DF", true, FontWeights.Normal);
+                statusIsError ? "#F39A8D" : "#B8C7DF", TextAlignment.Center, FontWeights.Normal);
         }
+        DrawText(drawingContext, VersionKey, strings.Version(version), 13,
+            "#C4BBD1", TextAlignment.Right, FontWeights.Normal);
 
         foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.Focused != 0))
         {
@@ -177,12 +193,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         }
 
         disposed = true;
-        if (context != nint.Zero)
-        {
-            SpriteForgeNative.SpriteForge_DestroyUIContext(context);
-            context = nint.Zero;
-            document = 0;
-        }
+        DestroyNativeDocument();
 
         Loaded -= View_Loaded;
         Unloaded -= View_Unloaded;
@@ -272,6 +283,9 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             strings.Get("menu.button.quit"), allocatedNames),
         TextElement(StatusKey, 35, 485, 350, 58,
             strings.Get("menu.accessibility.status"), allocatedNames),
+        Element(VersionKey, RootKey, 1010, 674, 240, 26, EngineUiBehavior.None,
+            strings.Version(version), allocatedNames, kind: EngineUiElementKind.Text,
+            customColor: true, color: Color(0, 0, 0, 0)),
     ];
 
     private static EngineUiElementDescription TextElement(
@@ -362,7 +376,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         string text,
         double fontSize,
         string color,
-        bool centered,
+        TextAlignment alignment,
         FontWeight weight)
     {
         if (!snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot))
@@ -373,7 +387,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         double scale = CalculateLayoutTransform().Scale;
         FormattedText formatted = new(
             text,
-            CultureInfo.CurrentUICulture,
+            strings.Culture,
             FlowDirection.LeftToRight,
             new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, weight, FontStretches.Normal),
             fontSize * scale,
@@ -381,7 +395,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             VisualTreeHelper.GetDpi(this).PixelsPerDip)
         {
             MaxTextWidth = Math.Max(1, snapshot.Width * scale),
-            TextAlignment = centered ? TextAlignment.Center : TextAlignment.Left,
+            TextAlignment = alignment,
             Trimming = TextTrimming.CharacterEllipsis,
         };
         Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
@@ -510,6 +524,19 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     private void View_Loaded(object sender, RoutedEventArgs e) => Focus();
 
     private void View_Unloaded(object sender, RoutedEventArgs e) => Dispose();
+
+    private void DestroyNativeDocument()
+    {
+        if (context == nint.Zero)
+        {
+            return;
+        }
+
+        SpriteForgeNative.SpriteForge_DestroyUIContext(context);
+        context = nint.Zero;
+        document = 0;
+        snapshots.Clear();
+    }
 
     private static void ThrowIfFailed(EngineStatus status, string operation)
     {

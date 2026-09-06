@@ -13,7 +13,7 @@ public partial class App : Application
         string settingsPath = GameSettingsPath.CurrentUser;
         (GameSettingsRegistry registry, GameSettingsDiagnostic diagnostic) =
             await Task.Run(() => GameSettingsRegistry.Load(settingsPath));
-        GameText strings = GameText.Load();
+        GameText strings = GameText.Load(registry.Active.Language);
         MainMenuWindow window = new(registry, settingsPath, diagnostic, strings);
         MainWindow = window;
         ShutdownMode = ShutdownMode.OnMainWindowClose;

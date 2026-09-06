@@ -13,6 +13,14 @@
       "description": "Accessible name for the explanatory settings text.",
       "message": "Settings description"
     },
+    "settings.accessibility.option": {
+      "description": "Accessible name containing a setting and its selected option.",
+      "arguments": {
+        "setting": "text",
+        "value": "text"
+      },
+      "message": "{setting}: {value}"
+    },
     "settings.accessibility.status": {
       "description": "Accessible name for the settings status region.",
       "message": "Settings status"
@@ -48,6 +56,10 @@
       "description": "Audio section heading.",
       "message": "Audio"
     },
+    "settings.heading.display": {
+      "description": "Display and language section heading.",
+      "message": "Display & language"
+    },
     "settings.introduction": {
       "description": "Explanation shown at the top of settings.",
       "message": "Player preferences are local and never alter deterministic voyage results."
@@ -60,6 +72,10 @@
       "description": "Interface scale setting label.",
       "message": "Interface scale"
     },
+    "settings.label.language": {
+      "description": "Language setting label.",
+      "message": "Language"
+    },
     "settings.label.master-volume": {
       "description": "Master volume setting label.",
       "message": "Master volume"
@@ -71,6 +87,10 @@
     "settings.label.reduced-motion": {
       "description": "Reduced motion setting label.",
       "message": "Reduced motion"
+    },
+    "settings.label.resolution": {
+      "description": "Display resolution setting label.",
+      "message": "Resolution"
     },
     "settings.label.screen-shake": {
       "description": "Screen shake setting label.",
@@ -132,6 +152,26 @@
         "value": "integer"
       },
       "message": "{value, number}%"
+    },
+    "settings.value.language.en-us": {
+      "description": "Name of the English language option.",
+      "message": "English"
+    },
+    "settings.value.language.fr-fr": {
+      "description": "Name of the French language option.",
+      "message": "French"
+    },
+    "settings.value.resolution.desktop": {
+      "description": "Resolution option that uses the desktop work area.",
+      "message": "Desktop"
+    },
+    "settings.value.resolution.pixels": {
+      "description": "Fixed display resolution option.",
+      "arguments": {
+        "width": "integer",
+        "height": "integer"
+      },
+      "message": "{width, number} × {height, number}"
     }
   }
 }

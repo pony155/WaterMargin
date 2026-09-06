@@ -5,7 +5,7 @@ namespace Spelljammer.Settings;
 
 public static class GameSettingsCodec
 {
-    private static readonly string[] RequiredProperties =
+    private static readonly string[] Version1Properties =
     [
         "schemaVersion",
         "masterVolume",
@@ -15,6 +15,13 @@ public static class GameSettingsCodec
         "reducedMotion",
         "screenShake",
         "uiScalePercent",
+    ];
+
+    private static readonly string[] CurrentProperties =
+    [
+        .. Version1Properties,
+        "language",
+        "resolution",
     ];
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -57,16 +64,40 @@ public static class GameSettingsCodec
 
         try
         {
-            RejectDuplicateProperties(bytes.Span);
-            GameSettingsProfile? profile = JsonSerializer.Deserialize<GameSettingsProfile>(bytes.Span, JsonOptions);
-            if (profile is null)
+            HashSet<string> properties = CollectProperties(bytes.Span);
+            using JsonDocument document = JsonDocument.Parse(bytes, new JsonDocumentOptions
+            {
+                AllowTrailingCommas = false,
+                CommentHandling = JsonCommentHandling.Disallow,
+                MaxDepth = 8,
+            });
+            JsonElement root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object ||
+                !root.TryGetProperty("schemaVersion", out JsonElement schemaElement) ||
+                !schemaElement.TryGetInt32(out int schemaVersion))
             {
                 return Failed(GameSettingsDiagnostic.Corrupt);
             }
 
-            if (profile.SchemaVersion != GameSettingsProfile.CurrentSchemaVersion)
+            if (schemaVersion == 1)
+            {
+                return DecodeVersion1(bytes.Span, properties);
+            }
+
+            if (schemaVersion != GameSettingsProfile.CurrentSchemaVersion)
             {
                 return Failed(GameSettingsDiagnostic.Unsupported);
+            }
+
+            if (!properties.SetEquals(CurrentProperties))
+            {
+                return Failed(GameSettingsDiagnostic.Corrupt);
+            }
+
+            GameSettingsProfile? profile = JsonSerializer.Deserialize<GameSettingsProfile>(bytes.Span, JsonOptions);
+            if (profile is null)
+            {
+                return Failed(GameSettingsDiagnostic.Corrupt);
             }
 
             return profile.IsValid
@@ -83,7 +114,36 @@ public static class GameSettingsCodec
         }
     }
 
-    private static void RejectDuplicateProperties(ReadOnlySpan<byte> json)
+    private static GameSettingsReadResult DecodeVersion1(ReadOnlySpan<byte> bytes, HashSet<string> properties)
+    {
+        if (!properties.SetEquals(Version1Properties))
+        {
+            return Failed(GameSettingsDiagnostic.Corrupt);
+        }
+
+        Version1Profile? legacy = JsonSerializer.Deserialize<Version1Profile>(bytes, JsonOptions);
+        if (legacy is null || legacy.SchemaVersion != 1)
+        {
+            return Failed(GameSettingsDiagnostic.Corrupt);
+        }
+
+        GameSettingsProfile migrated = new(
+            GameSettingsProfile.CurrentSchemaVersion,
+            legacy.MasterVolume,
+            legacy.MusicVolume,
+            legacy.EffectsVolume,
+            legacy.Subtitles,
+            legacy.ReducedMotion,
+            legacy.ScreenShake,
+            legacy.UiScalePercent,
+            GameSettingsChoices.DefaultLanguage,
+            GameSettingsChoices.DesktopResolution);
+        return migrated.IsValid
+            ? new GameSettingsReadResult(migrated, true, GameSettingsDiagnostic.None)
+            : Failed(GameSettingsDiagnostic.InvalidValue);
+    }
+
+    private static HashSet<string> CollectProperties(ReadOnlySpan<byte> json)
     {
         Utf8JsonReader reader = new(json, new JsonReaderOptions
         {
@@ -119,11 +179,23 @@ public static class GameSettingsCodec
             }
         }
 
-        if (rootProperties is null || !rootProperties.SetEquals(RequiredProperties))
+        if (rootProperties is null || objects.Count != 0)
         {
-            throw new JsonException("Settings document does not contain the complete schema.");
+            throw new JsonException("Settings document must contain exactly one complete root object.");
         }
+
+        return rootProperties;
     }
+
+    private sealed record Version1Profile(
+        int SchemaVersion,
+        int MasterVolume,
+        int MusicVolume,
+        int EffectsVolume,
+        bool Subtitles,
+        bool ReducedMotion,
+        bool ScreenShake,
+        int UiScalePercent);
 
     private static GameSettingsReadResult Failed(GameSettingsDiagnostic diagnostic) =>
         new(GameSettingsProfile.Default, false, diagnostic);

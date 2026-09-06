@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
@@ -27,6 +26,11 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private static readonly ulong ModalKey = Key("spelljammer.settings.modal");
     private static readonly ulong TitleKey = Key("spelljammer.settings.title");
     private static readonly ulong IntroductionKey = Key("spelljammer.settings.introduction");
+    private static readonly ulong DisplayHeadingKey = Key("spelljammer.settings.display-heading");
+    private static readonly ulong LanguageLabelKey = Key("spelljammer.settings.language-label");
+    private static readonly ulong LanguageButtonKey = Key("spelljammer.settings.language-button");
+    private static readonly ulong ResolutionLabelKey = Key("spelljammer.settings.resolution-label");
+    private static readonly ulong ResolutionButtonKey = Key("spelljammer.settings.resolution-button");
     private static readonly ulong AudioHeadingKey = Key("spelljammer.settings.audio-heading");
     private static readonly ulong AccessibilityHeadingKey = Key("spelljammer.settings.accessibility-heading");
     private static readonly ulong MasterLabelKey = Key("spelljammer.settings.master-label");
@@ -73,7 +77,9 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         status = strings.Get("settings.status.ready");
         elementKeys =
         [
-            ModalKey, TitleKey, IntroductionKey, AudioHeadingKey, AccessibilityHeadingKey,
+            ModalKey, TitleKey, IntroductionKey,
+            DisplayHeadingKey, LanguageLabelKey, LanguageButtonKey, ResolutionLabelKey, ResolutionButtonKey,
+            AudioHeadingKey, AccessibilityHeadingKey,
             MasterLabelKey, MasterSliderKey, MasterValueKey,
             MusicLabelKey, MusicSliderKey, MusicValueKey,
             EffectsLabelKey, EffectsSliderKey, EffectsValueKey,
@@ -134,6 +140,11 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         strings.BeginFrame();
         DrawText(drawingContext, TitleKey, strings.Get("settings.title"), 28, "#F2E9D8", false);
         DrawText(drawingContext, IntroductionKey, strings.Get("settings.introduction"), 13, "#93A1BE", false);
+        DrawText(drawingContext, DisplayHeadingKey, strings.Get("settings.heading.display"), 14, "#D7AF70", false);
+        DrawText(drawingContext, LanguageLabelKey, strings.Get("settings.label.language"), 15, "#F2E9D8", false);
+        DrawText(drawingContext, LanguageButtonKey, strings.LanguageName(draft.Language), 13, "#F2E9D8", true);
+        DrawText(drawingContext, ResolutionLabelKey, strings.Get("settings.label.resolution"), 15, "#F2E9D8", false);
+        DrawText(drawingContext, ResolutionButtonKey, strings.ResolutionName(CurrentResolution()), 13, "#F2E9D8", true);
         DrawText(drawingContext, AudioHeadingKey, strings.Get("settings.heading.audio"), 14, "#D7AF70", false);
         DrawText(drawingContext, AccessibilityHeadingKey, strings.Get("settings.heading.accessibility"), 14, "#D7AF70", false);
         DrawText(drawingContext, MasterLabelKey, strings.Get("settings.label.master-volume"), 15, "#F2E9D8", false);
@@ -302,61 +313,74 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     [
         Element(ModalKey, RootKey, 20, 20, 760, 600, EngineUiBehavior.None,
             strings.Get("settings.accessibility.dialog"), allocatedNames, modal: true, dismissAction: CancelAction),
-        TextElement(TitleKey, 52, 42, 680, 40, strings.Get("settings.title"), allocatedNames),
-        TextElement(IntroductionKey, 52, 80, 680, 30,
+        TextElement(TitleKey, 52, 35, 680, 38, strings.Get("settings.title"), allocatedNames),
+        TextElement(IntroductionKey, 52, 72, 680, 26,
             strings.Get("settings.accessibility.description"), allocatedNames),
-        TextElement(AudioHeadingKey, 52, 115, 680, 24, strings.Get("settings.heading.audio"), allocatedNames),
-        TextElement(MasterLabelKey, 58, 148, 260, 28,
+        TextElement(DisplayHeadingKey, 52, 103, 680, 24,
+            strings.Get("settings.heading.display"), allocatedNames),
+        TextElement(LanguageLabelKey, 58, 132, 350, 32,
+            strings.Get("settings.label.language"), allocatedNames),
+        Button(LanguageButtonKey, 520, 128, 214, 36, 0,
+            AccessibleOption("settings.label.language", strings.LanguageName(draft.Language)), allocatedNames),
+        TextElement(ResolutionLabelKey, 58, 170, 350, 32,
+            strings.Get("settings.label.resolution"), allocatedNames),
+        Button(ResolutionButtonKey, 520, 166, 214, 36, 1,
+            AccessibleOption("settings.label.resolution", strings.ResolutionName(CurrentResolution())), allocatedNames),
+        TextElement(AudioHeadingKey, 52, 205, 680, 24, strings.Get("settings.heading.audio"), allocatedNames),
+        TextElement(MasterLabelKey, 58, 232, 260, 28,
             strings.Get("settings.label.master-volume"), allocatedNames),
-        Slider(MasterSliderKey, 350, 150, draft.MasterVolume, 0, 100, 5, 0,
+        Slider(MasterSliderKey, 350, 234, draft.MasterVolume, 0, 100, 5, 2,
             strings.Get("settings.label.master-volume"), allocatedNames),
-        TextElement(MasterValueKey, 662, 146, 72, 28,
+        TextElement(MasterValueKey, 662, 230, 72, 28,
             AccessibleValue("settings.label.master-volume"), allocatedNames),
-        TextElement(MusicLabelKey, 58, 193, 260, 28,
+        TextElement(MusicLabelKey, 58, 270, 260, 28,
             strings.Get("settings.label.music-volume"), allocatedNames),
-        Slider(MusicSliderKey, 350, 195, draft.MusicVolume, 0, 100, 5, 1,
+        Slider(MusicSliderKey, 350, 272, draft.MusicVolume, 0, 100, 5, 3,
             strings.Get("settings.label.music-volume"), allocatedNames),
-        TextElement(MusicValueKey, 662, 191, 72, 28,
+        TextElement(MusicValueKey, 662, 268, 72, 28,
             AccessibleValue("settings.label.music-volume"), allocatedNames),
-        TextElement(EffectsLabelKey, 58, 238, 260, 28,
+        TextElement(EffectsLabelKey, 58, 308, 260, 28,
             strings.Get("settings.label.effects-volume"), allocatedNames),
-        Slider(EffectsSliderKey, 350, 240, draft.EffectsVolume, 0, 100, 5, 2,
+        Slider(EffectsSliderKey, 350, 310, draft.EffectsVolume, 0, 100, 5, 4,
             strings.Get("settings.label.effects-volume"), allocatedNames),
-        TextElement(EffectsValueKey, 662, 236, 72, 28,
+        TextElement(EffectsValueKey, 662, 306, 72, 28,
             AccessibleValue("settings.label.effects-volume"), allocatedNames),
-        TextElement(AccessibilityHeadingKey, 52, 285, 680, 24,
+        TextElement(AccessibilityHeadingKey, 52, 345, 680, 24,
             strings.Get("settings.heading.accessibility"), allocatedNames),
-        TextElement(SubtitlesLabelKey, 58, 320, 350, 32,
+        TextElement(SubtitlesLabelKey, 58, 372, 350, 32,
             strings.Get("settings.label.subtitles"), allocatedNames),
-        Toggle(SubtitlesToggleKey, 610, 316, draft.Subtitles, 3,
+        Toggle(SubtitlesToggleKey, 610, 368, draft.Subtitles, 5,
             strings.Get("settings.label.subtitles"), allocatedNames),
-        TextElement(MotionLabelKey, 58, 365, 350, 32,
+        TextElement(MotionLabelKey, 58, 410, 350, 32,
             strings.Get("settings.label.reduced-motion"), allocatedNames),
-        Toggle(MotionToggleKey, 610, 361, draft.ReducedMotion, 4,
+        Toggle(MotionToggleKey, 610, 406, draft.ReducedMotion, 6,
             strings.Get("settings.label.reduced-motion"), allocatedNames),
-        TextElement(ShakeLabelKey, 58, 410, 350, 32,
+        TextElement(ShakeLabelKey, 58, 448, 350, 32,
             strings.Get("settings.label.screen-shake"), allocatedNames),
-        Toggle(ShakeToggleKey, 610, 406, draft.ScreenShake, 5,
+        Toggle(ShakeToggleKey, 610, 444, draft.ScreenShake, 7,
             strings.Get("settings.label.screen-shake"), allocatedNames),
-        TextElement(ScaleLabelKey, 58, 458, 260, 28,
+        TextElement(ScaleLabelKey, 58, 488, 260, 28,
             strings.Get("settings.label.interface-scale"), allocatedNames),
-        Slider(ScaleSliderKey, 350, 460, draft.UiScalePercent, 75, 150, 5, 6,
+        Slider(ScaleSliderKey, 350, 490, draft.UiScalePercent, 75, 150, 5, 8,
             strings.Get("settings.label.interface-scale"), allocatedNames),
-        TextElement(ScaleValueKey, 662, 456, 72, 28,
+        TextElement(ScaleValueKey, 662, 486, 72, 28,
             AccessibleValue("settings.label.interface-scale"), allocatedNames),
-        TextElement(StatusKey, 52, 505, 680, 28,
+        TextElement(StatusKey, 52, 525, 680, 28,
             strings.Get("settings.accessibility.status"), allocatedNames),
-        Button(ResetButtonKey, 342, 550, 112, 42, 7,
+        Button(ResetButtonKey, 342, 560, 112, 42, 9,
             strings.Get("settings.button.reset"), allocatedNames),
-        Button(CancelButtonKey, 470, 550, 112, 42, 8,
+        Button(CancelButtonKey, 470, 560, 112, 42, 10,
             strings.Get("settings.button.cancel"), allocatedNames),
-        Button(ApplyButtonKey, 598, 550, 136, 42, 9,
+        Button(ApplyButtonKey, 598, 560, 136, 42, 11,
             strings.Get("settings.button.apply"), allocatedNames),
     ];
 
     private string AccessibleValue(string settingKey) => strings.Format(
         "settings.accessibility.value",
         Spelljammer.Localization.LocalizationArgument.Text("setting", strings.Get(settingKey)));
+
+    private string AccessibleOption(string settingKey, string value) =>
+        strings.AccessibleOption(strings.Get(settingKey), value);
 
     private static EngineUiElementDescription TextElement(
         ulong key, float x, float y, float width, float height, string name, List<nint> names) =>
@@ -467,7 +491,15 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         for (int index = 0; index < actionCount; index++)
         {
             EngineUiAction action = actions[index];
-            if (action.Source == MasterSliderKey)
+            if (action.Source == LanguageButtonKey)
+            {
+                draft = draft with { Language = NextLanguage(draft.Language) };
+            }
+            else if (action.Source == ResolutionButtonKey)
+            {
+                draft = draft with { Resolution = NextResolution(draft.Resolution) };
+            }
+            else if (action.Source == MasterSliderKey)
             {
                 RequireActionValue(action, EngineUiActionValueType.Scalar);
                 draft = draft with { MasterVolume = (int)MathF.Round(action.ScalarValue) };
@@ -526,6 +558,35 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
         CreateNativeDocument();
     }
 
+    private GameResolutionChoice CurrentResolution()
+    {
+        if (!GameSettingsChoices.TryGetResolution(draft.Resolution, out GameResolutionChoice resolution))
+        {
+            throw new InvalidOperationException($"Unsupported draft display resolution '{draft.Resolution}'.");
+        }
+
+        return resolution;
+    }
+
+    private static string NextLanguage(string current) =>
+        NextChoice(GameSettingsChoices.Languages, current, static value => value);
+
+    private static string NextResolution(string current) =>
+        NextChoice(GameSettingsChoices.Resolutions, current, static value => value.Id).Id;
+
+    private static T NextChoice<T>(IReadOnlyList<T> choices, string current, Func<T, string> id)
+    {
+        for (int index = 0; index < choices.Count; ++index)
+        {
+            if (string.Equals(id(choices[index]), current, StringComparison.Ordinal))
+            {
+                return choices[(index + 1) % choices.Count];
+            }
+        }
+
+        throw new InvalidOperationException($"Current settings option '{current}' is unsupported.");
+    }
+
     private void RefreshSnapshots()
     {
         EngineUiElementSnapshot[] values = new EngineUiElementSnapshot[elementKeys.Length];
@@ -577,7 +638,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
 
         FormattedText formatted = new(
             text,
-            CultureInfo.CurrentUICulture,
+            strings.Culture,
             FlowDirection.LeftToRight,
             new Typeface(centered ? "Consolas" : "Segoe UI"),
             fontSize * ActualHeight / LogicalHeight,

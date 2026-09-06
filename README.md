@@ -56,8 +56,9 @@ Implemented foundations include:
 - a versioned, bounded campaign-save envelope with content preflight, stable-ID
   reconstruction, transactional publication, durable replacement and recovery,
   and deterministic explicit migrations;
-- a versioned local settings profile with strict bounded JSON, durable
-  replacement/recovery, stable diagnostics, and a keyboard-operable localized
+- a versioned local settings profile with strict bounded JSON, schema-1
+  migration, durable replacement/recovery, English/French language and safe
+  resolution choices, stable diagnostics, and a keyboard-operable localized
   SpriteForge UI modal;
 - a localized SpriteForge UI main menu using the base-pack background asset,
   with bounded keyboard/pointer actions for Game Settings and Quit Game;

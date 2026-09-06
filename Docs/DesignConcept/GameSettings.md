@@ -5,11 +5,13 @@
 This document defines the settings experience, ownership model, campaign-rule
 configuration, accessibility options, persistence rules, and determinism
 requirements. The first local player-preference profile and a SpriteForge UI
-settings dialog are implemented. They cover master, music, and effects volume,
-subtitles, reduced motion, screen shake, and interface scale. Reduced motion is
-applied to the current drive animation; the other values are persisted for
-gameplay/presentation systems that do not yet exist. Display-device selection,
-input remapping, locale selection, and campaign-rule settings remain planned.
+settings dialog are implemented. They cover English/French language selection,
+Desktop or bounded window-resolution presets, master, music, and effects
+volume, subtitles, reduced motion, screen shake, and interface scale. Language
+and resolution apply to the current main menu; reduced motion applies to the
+retained drive animation. The other values are persisted for presentation
+systems that do not yet exist. Display-device selection, input remapping, and
+campaign-rule settings remain planned.
 
 Settings fall into two different domains. Player and device preferences may be
 changed without rewriting a campaign. Rules that affect generation or
@@ -50,10 +52,13 @@ disable an inconvenient rule in an existing campaign.
 
 ### Display and interface
 
-Planned display choices include window mode, monitor, resolution, render scale,
-frame limit, vertical synchronization, UI scale, safe-area margin, and cursor
-confinement. The settings UI previews changes that could make the application
-hard to use and reverts them after a bounded confirmation period.
+The first display choices are Desktop mode and bounded 1280x720, 1600x900,
+1920x1080, and 2560x1440 window-size presets. Desktop maximizes to the current
+work area; a fixed preset is centered and clamped to that work area, so it
+cannot make the settings entry point unreachable. Monitor selection, exclusive
+fullscreen, render scale, frame limit, vertical synchronization, safe-area
+margin, cursor confinement, and confirmation/revert for riskier future video
+changes remain planned.
 
 UI scale is independent from world-render scale. Information needed to issue a
 command remains available at every supported scale; reducing visual detail may
@@ -91,6 +96,8 @@ locale identifiers and the game-owned catalog fallback rules defined in
 
 Changing language rebuilds presentation text only. It cannot change stable-ID
 sorting, command dispatch, generated names, random choices, or save identity.
+English (`en-US`) and French (`fr-FR`) menu/settings catalogs are currently
+installed; French explicitly falls back to the complete English source locale.
 
 ## Accessibility
 
@@ -231,9 +238,10 @@ actionable localized diagnostic.
 
 ## Settings interface
 
-The implemented first dialog has clear current values, whole-profile Reset,
-Apply, and Cancel. SpriteForge owns its retained document, bounded controls,
-layout, focus, modal routing, pointer/keyboard input, and typed actions through
+The implemented dialog has clear current values, cycling language and
+resolution selectors, whole-profile Reset, Apply, and Cancel. SpriteForge owns
+its retained document, bounded controls, layout, focus, modal routing,
+pointer/keyboard input, and typed actions through
 the version 1 UI C ABI. The WPF host draws copied solid presentation records
 and game-localized text while direct SpriteForge renderer realization remains
 engine work. Searchable categories, per-category reset, and a campaign summary
@@ -252,8 +260,8 @@ final summary confirmation but will not hide values behind nested screens.
 
 The delivered slice adds:
 
-- a versioned local profile with master/effects/music volumes, subtitles, UI
-  scale, reduced motion, and screen shake;
+- a versioned local profile with language, resolution, master/effects/music
+  volumes, subtitles, UI scale, reduced motion, and screen shake;
 - bounded strict JSON parsing, transactional load/apply/reset, durable
   same-directory replacement, exact-file recovery, and stable diagnostics;
 - a localized SpriteForge UI modal with mouse interaction and keyboard focus,
@@ -263,7 +271,7 @@ The delivered slice adds:
 
 The remaining first-slice work is:
 
-- locale selection and a small remappable keyboard-command set;
+- a small remappable keyboard-command set and broader locale coverage;
 - a versioned campaign-settings record containing the explicit seed, the
   16-system voyage galaxy preset, Standard voyage pressure, event controls,
   and crises Off;
@@ -281,8 +289,9 @@ deferred.
 ## Acceptance criteria
 
 The first two criteria and keyboard operation are covered by the implemented
-player-profile slice. The campaign and full text-scaling criteria remain gates
-for later work.
+player-profile slice. English/French locale switching and safe window-size
+presets are live; the campaign and full text-scaling criteria remain gates for
+later work.
 
 - Invalid or unsupported settings retain the previous working configuration.
 - Reset and recovery touch only the exact intended settings artifacts.
