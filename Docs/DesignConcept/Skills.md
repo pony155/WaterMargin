@@ -84,19 +84,35 @@ care, and discovery:
 
 | Skill | Stable ID | Scope and boundaries |
 | --- | --- | --- |
+| Athletics | `skill.athletics` | Covers running, jumping, climbing, swimming, lifting endurance, and sustained physical movement. |
+| Acrobatics | `skill.acrobatics` | Covers balance, tumbling, controlled falls, narrow footing, and rapid body positioning. |
+| EVA | `skill.eva` | Covers suit operation, tether use, handholds, propellant movement, and work in vacuum or microgravity. |
+| Stealth | `skill.stealth` | Reduces observable evidence through positioning, timing, noise control, and concealment without removing authoritative presence. |
+| Piloting | `skill.piloting` | Controls ship maneuvers, approach vectors, docking, evasion, and disengagement within the vessel's capabilities. |
+| Astrogation | `skill.astrogation` | Plans routes, interprets Starways, estimates travel costs, and evaluates navigation uncertainty. |
+| Sensors | `skill.sensors` | Operates detection systems, improves contact confidence, identifies signatures, and distinguishes noise from evidence. |
+| Rigging | `skill.rigging` | Deploys sails, tethers, lines, external fittings, and load-bearing arrangements under changing motion. |
+| Salvage | `skill.salvage` | Assesses wrecks, extracts bounded recoverable material, preserves evidence, and avoids destabilizing hazards. |
+| Gunnery | `skill.gunnery` | Operates personal firearms and manually controlled mounted weapons. Ship cannons use their module statistics and ship targeting state without a Gunnery requirement. |
+| Defense | `skill.defense` | Covers active guarding, shields, parries, protective positioning, and learned defensive techniques. |
 | Magic | `skill.magic` | Measures spell theory and control. Active casting requires `access.magic` plus a known spell; individual spells are techniques or discoveries, not classes. |
 | Psionics | `skill.psionics` | Measures psychic theory and control. Active techniques require `access.psionics`; every effect defines its target, range, consent or resistance rule, and strain cost. |
 | Enchantment | `skill.enchantment` | Designs, binds, identifies, maintains, and removes persistent magical effects on equipment, ship fittings, and locations. |
 | Melee | `skill.melee` | Covers unarmed combat and hand-held weapons. Weapon tags and learned techniques create differences without separate weapon classes. |
-| Archery | `skill.archery` | Covers bows, crossbows, unusual string weapons, ammunition choice, and aimed physical projectiles. Ship guns and personal firearms use Gunnery. |
+| Archery | `skill.archery` | Covers bows, crossbows, unusual string weapons, ammunition choice, and aimed physical projectiles. Personal firearms use Gunnery; ship cannon commands require neither Skill. |
 | Alchemy | `skill.alchemy` | Identifies reagents and produces medicines, stimulants, toxins, blood substitutes, volatile mixtures, and magical compounds. |
 | Crafting | `skill.crafting` | Fabricates and improves personal equipment, ammunition, tools, fittings, and replacement parts from known designs. |
 | Engineering | `skill.engineering` | Diagnoses, operates, maintains, and repairs ship modules, machinery, power systems, and habitat infrastructure. |
 | Merchant | `skill.merchant` | Appraises goods, reads markets, manages cargo contracts, recognizes commercial customs, and detects pricing fraud. |
 | Negotiation | `skill.negotiation` | Bargains, mediates disputes, proposes terms, and secures concessions without overriding another character's agency. |
+| Medicine | `skill.medicine` | Diagnoses, stabilizes, treats, and supports recovery from injuries, illness, poisoning, and environmental exposure. |
 | Cooking | `skill.cooking` | Plans meals, preserves provisions, safely handles unusual diets, and turns limited ingredients into nutrition and morale. |
+| Xenology | `skill.xenology` | Studies unfamiliar organisms, ecologies, physiology, behavior, and contamination without assigning cultural stereotypes. |
 | Ancient Lore | `skill.ancient-lore` | Recognizes lost civilizations, obsolete customs, relic functions, old routes, and the historical context of discoveries. |
 | Language and Literacy | `skill.language-literacy` | Governs speaking, understanding, reading, writing, translation, and script decipherment for learned languages and scripts. |
+| Command | `skill.command` | Coordinates crew priorities, communicates orders, and sustains organized action without replacing another character's expertise. |
+| Insight | `skill.insight` | Interprets behavior, intent, uncertainty, and social evidence without becoming an automatic truth detector. |
+| Deception | `skill.deception` | Creates plausible false impressions through words, disguise, timing, and evidence while preserving counter-observation. |
 
 Engineering diagnoses, operates, and repairs ship systems; Crafting manufactures
 their physical components. Enchantment binds persistent magical effects to a

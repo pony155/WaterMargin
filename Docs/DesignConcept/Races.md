@@ -303,7 +303,7 @@ The planned position catalog includes:
 | Care | Doctor, Medic, Chef, Steward | Treatment, surgery, quarantine, meals, sanitation, and crew comfort |
 | Technical | Chief Engineer, Engineer, Artificer, Rigger | Drive operation, repairs, fabrication, rigging, and power allocation |
 | Exploration | Scout, Xenologist, Salvager, Alchemist | Surveys, field samples, ruins, reagents, and recovery operations |
-| Security | Master-at-Arms, Marine, Archer, Gunner | Watches, boarding defense, weapons, prisoners, and drills |
+| Security | Master-at-Arms, Marine, Archer | Watches, boarding defense, personal weapons, prisoners, and drills |
 | Mystic | Ship Mage, Warden, Mindwarden | Magical navigation, wards, enchantments, psychic contact, curses, and anomalies |
 | Civil | Envoy, Trader, Chronicler, Antiquarian | Negotiation, commerce, languages, records, lore, and faction relations |
 

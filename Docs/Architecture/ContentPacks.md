@@ -94,7 +94,7 @@ file may contain a developer-specific absolute path.
 
 ## Pack manifest
 
-Every pack contains exactly one manifest resembling:
+Every pack contains exactly one root `manifest.json` using the version 1 schema:
 
 ```json
 {
@@ -131,16 +131,18 @@ spell.warding.brace-ward
 combat.context.ruin
 ```
 
-The reviewed Product-document snapshot is maintained in
+The reviewed design-document snapshot is maintained in
 [`ContentIdInventory.md`](ContentIdInventory.md).
 
-IDs use lowercase ASCII letters, digits, periods, and hyphens, begin with a
-definition-kind segment, and have a fixed maximum byte length. Case folding,
+The exact grammar, 127-byte maximum, comparison rules, base namespaces, pack
+namespace form, version responsibilities, and canonical fingerprint bytes are
+frozen in [`ContentContractsV1.md`](ContentContractsV1.md). Case folding,
 Unicode normalization, display names, and paths never change identity.
 
-The base pack reserves the short IDs documented under `Docs/Product`. A mod
-uses an owned namespace, for example `skill.mod.starwrights.gravimetry`. Its
-manifest declares that namespace and cannot define IDs owned by another pack.
+The base pack reserves the short IDs documented under `Docs/DesignConcept`. A
+third-party pack has an ID such as `mod.starwrights` and uses that namespace in
+definitions, for example `skill.mod.starwrights.gravimetry`. It cannot define
+IDs owned by another pack.
 
 Renaming an ID requires a versioned persistence migration. Display-name
 similarity is never used to guess replacements.
@@ -160,8 +162,9 @@ The loader performs bounded phases:
    subsystem checks over the whole candidate set.
 8. **Compile:** assign deterministic dense indices and create immutable arrays
    and lookup tables.
-9. **Fingerprint:** hash canonical manifests and semantic content, excluding
-   irrelevant whitespace and filesystem metadata.
+9. **Fingerprint:** hash the canonical semantic projection of ordered
+   manifests and definitions, excluding release-only metadata, irrelevant
+   whitespace, and filesystem metadata.
 10. **Publish:** replace the previous menu-time registry only after all phases
     succeed.
 
@@ -219,29 +222,19 @@ failure policy. Changing language does not change the gameplay fingerprint.
 
 ## Limits and diagnostics
 
-One reviewed `ContentLimits` contract bounds packs, dependency edges, files,
-bytes, JSON depth and tokens, string sizes, arrays, definitions per kind,
-references, graph traversals, and retained diagnostics. Values begin
-conservatively and change through profiling, never by removing bounds.
+The exact version 1 `ContentLimits` values and diagnostic registry are frozen
+in
+[`ContentLimitsAndDiagnostics.md`](ContentLimitsAndDiagnostics.md). Values may
+change in a later contract through profiling, never by silently removing
+bounds.
 
 The parser rejects duplicate JSON properties, invalid UTF-8, non-finite
 numbers, unknown required schema versions, and values that cannot round-trip
 through their declared numeric type.
 
-Every diagnostic contains a stable code, severity, pack ID, normalized relative
-path, definition ID when available, JSON property path, and message. Initial
-codes include:
-
-```text
-CONTENT_DUPLICATE_ID
-CONTENT_UNKNOWN_REFERENCE
-CONTENT_DEPENDENCY_CYCLE
-CONTENT_NAMESPACE_VIOLATION
-CONTENT_LIMIT_EXCEEDED
-CONTENT_INCOMPATIBLE_GAME_VERSION
-```
-
-Normal UI diagnostics do not expose arbitrary absolute user paths.
+Every diagnostic contains the stable fields defined by that registry. Normal
+UI diagnostics do not expose arbitrary absolute user paths or unbounded source
+content.
 
 ## Verification contract
 

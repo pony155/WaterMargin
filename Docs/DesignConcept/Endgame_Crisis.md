@@ -244,9 +244,9 @@ Possible final resolutions include:
   forged priorities whose risks remain visible; or
 - destroy its central coordination while accepting uncontrolled remnant fleets.
 
-Engineering, Crafting, Gunnery, Merchant, Negotiation, Ancient Lore, and both
-ship technology paths can contribute. Direct combat is possible but cannot be
-the only authored route.
+Engineering, Crafting, Merchant, Negotiation, Ancient Lore, ship weapon
+loadouts, and both ship technology paths can contribute. Direct combat is
+possible but cannot be the only authored route.
 
 ### The Mawflight
 
@@ -284,10 +284,11 @@ Possible final resolutions include:
 - evacuate vulnerable regions and fight a delaying campaign until the
   migration passes.
 
-Gunnery and boarding remain important, but Xenology, Alchemy, Medicine,
-Sensors, Cooking and food logistics, Engineering, and signal research can
-change the war. Adaptation counters repeated tactics through explicit bounded
-tags; it never grants instant immunity to whatever last harmed a brood.
+Ship weapon loadouts and boarding remain important, but Xenology, Alchemy,
+Medicine, Sensors, Cooking and food logistics, Engineering, and signal research
+can change the war. Adaptation counters repeated tactics through explicit
+bounded tags; it never grants instant immunity to whatever last harmed a
+brood.
 
 ### The Distant Throne
 

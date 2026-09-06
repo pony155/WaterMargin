@@ -23,6 +23,12 @@ Ship engagements, boarding transitions, and shipboard combat are defined in
   explicit connections.
 - Keep definitions data-driven and use stable IDs for saves, scenarios,
   balancing, and eventual modding.
+- Resolve ship engagements in real time with tactical pause: pausing allows
+  inspection and order entry, while station readiness, crew workload, module
+  timing, and resources determine execution after simulation resumes.
+- Place ships on a bounded continuous 2D combat map using deterministic
+  fixed-point position, heading, and velocity; tactical cells belong only to
+  personal combat.
 
 ## Ship composition
 
@@ -38,8 +44,10 @@ A ship consists of distinct persistent layers:
 | Crew stations | Places where assigned duties operate or assist modules |
 | Ship state | Damage, faults, modifications, contents, history, and active policies |
 
-A room is navigable ship space. A module is installed equipment that occupies
-one or more mounting cells inside a compartment or on an exterior hardpoint.
+A frame defines named interior, armor, power-core, propulsion, prow, and weapon
+mounts with size, orientation, structural-load, and access limits. A room is
+navigable ship space. A module is installed equipment that occupies one or
+more mounting cells inside a compartment or one compatible exterior mount.
 Not every room is a module, and portable cargo does not become a module until a
 validated installation command commits it.
 
@@ -51,11 +59,20 @@ Every module definition declares:
 - footprint, mass, mount tags, orientation rules, and access requirements;
 - network ports and bounded input, output, storage, and throughput values;
 - supported operating modes and transition costs;
-- crew stations and recommended skills;
+- crew stations and recommended skills when that module requires an operator;
 - produced capabilities, resource conversions, heat, noise, and signature;
 - integrity, armor, fault, breach, and repair rules;
 - compatible upgrades, enchantments, ammunition, and cargo tags; and
 - explicit incompatibilities and any unique-installation limit.
+
+Armor modules additionally declare coverage, protection, and damage-type
+responses. Ship cannon modules declare hardpoint size, firing arc, damage,
+rate of fire, effective and maximum range, reload time, damage type, damage
+area, armor penetration, and ammunition or supply paths. Cannons do not declare
+recoil or require a Gunner, crew station, or Gunnery Skill check.
+Propulsion and power modules declare startup, shutdown, thrust, storage, fuel,
+cooling, and backbone requirements. Prow modules declare collision clearance,
+structural load, and whether they obstruct another prow fitting.
 
 Module definitions use IDs in the form `module.<category>.<name>`. Installed
 instances receive separate stable IDs so two cargo holds can share one
@@ -119,6 +136,37 @@ generator, adding mass, footprint, heat, maintenance, and a bounded conversion
 loss. Hybrid ships are therefore supported as deliberate specialist builds,
 but cannot collect both paths' strongest benefits without paying visible costs.
 
+## Player ship customization
+
+A ship loadout is a validated composition, not a linear equipment score. The
+player can replace, relocate, orient, configure, repair, or remove installed
+modules when an appropriate facility and resources are available.
+Configuration selects only options declared by the module definition or an
+installed upgrade; it never permits arbitrary editing of combat statistics.
+
+| System | Mount and choices | Important consequences |
+| --- | --- | --- |
+| Armor | Install plating on compatible frame sections and choose protected arcs, material, thickness, and enchantments | Mass, maneuverability, coverage gaps, repair material, heat, and protection by damage type |
+| Power | Choose an Arcane or Industrial core, storage, distribution, cooling, and optional converters | Available energy media, peak and sustained output, failure modes, signature, fuel, and maintenance |
+| Propulsion | Fit path-compatible main drives and maneuvering systems | Acceleration, turning, braking, propellant or aether use, heat, noise, and escape capability |
+| Prow | Install a ram, figurehead, sensor fitting, boarding device, or leave the mount clear | Collision capability, forward mass, clearance, identity, morale, enchantment capacity, and docking restrictions |
+| Weapons | Fit cannon or other weapon modules to hardpoints, then set orientation and ammunition supply | Damage, rate of fire, effective and maximum range, firing arc, reload time, damage type and area, armor penetration, ammunition, heat, and magazine risk |
+| Support | Configure cargo, habitat, medical, workshop, sensor, ward, and utility modules | Voyage endurance, recovery options, information, salvage, spare capacity, and survivability |
+
+Installed modules have persistent instance IDs. Two ships can use the same
+module definition in different locations, and two instances on one ship can
+have different orientation, ammunition, damage, enchantments, faults, and
+repair history. Cosmetic paint and an unpowered figurehead carving do not alter
+gameplay fingerprints; a figurehead enchantment, ward, sensor, or morale effect
+must be an explicit gameplay definition.
+
+The refit preview reports displaced cargo, disconnected networks, uncovered
+arcs, overloaded structure, blocked firing or docking clearance, insufficient
+crew access, and resulting mass, power, heat, thrust, and signature before the
+player confirms. Installation is transactional: all removals, relocations,
+connections, costs, and installed instances commit together or the original
+ship remains unchanged.
+
 ## Planned module catalog
 
 ### Command and navigation
@@ -167,13 +215,15 @@ but cannot collect both paths' strongest benefits without paying visible costs.
 | Lore Vault | `module.research.lore-vault` | Preserves artifacts, inscriptions, translations, and authenticated discoveries | Ancient Lore or Language and Literacy; Antiquarian |
 | Salvage Rig | `module.utility.salvage-rig` | Recovers cargo and wreck material without bringing every hazard aboard | Salvage or Rigging; Salvager |
 
-### Defense and contact
+### Defense, prow, weapons, and contact
 
 | Module | Stable ID | Function | Typical skill or position |
 | --- | --- | --- | --- |
 | Reinforced Plating | `module.defense.reinforced-plating` | Adds localized protection at the cost of mass and maneuverability | Engineering |
 | Ward Projector | `module.defense.ward-projector` | Sustains a bounded defense against magical, psychic, or environmental threats | Magic, Psionics, or Enchantment; Warden |
-| Deck Battery | `module.weapon.deck-battery` | Mounts a tagged ship weapon and stores its ready ammunition | Gunnery; Gunner |
+| Prow Ram | `module.prow.ram` | Reinforces a compatible prow for deliberate collision attacks while transmitting impact risk into the frame | Piloting or Engineering; Pilot |
+| Ship Figurehead | `module.prow.figurehead` | Provides a customizable prow fitting that can host declared enchantments, wards, sensors, or command effects | Crafting or Enchantment; Artificer |
+| Deck Battery | `module.weapon.deck-battery` | Mounts configurable cannon or other tagged ship weapons with declared damage, rate of fire, range, reload, damage type and area, armor penetration, arc, and ammunition | No Skill or crew position requirement |
 | Boarding Lock | `module.contact.boarding-lock` | Controls docking, boarding, quarantine seals, and ship-to-ship access | Engineering or Defense; Master-at-Arms |
 | Signal Lantern | `module.contact.signal-lantern` | Sends identification, negotiation, warning, and distress signals | Language and Literacy or Negotiation; Envoy |
 | Psychic Resonator | `module.contact.psychic-resonator` | Amplifies permitted mindlinks and detects nearby psychic signaling | Psionics; Mindwarden or Envoy |
@@ -252,10 +302,12 @@ before the repair command is committed.
 
 Installation, removal, and replacement are transactional. The simulation
 validates frame capacity, footprint, mass, access, network compatibility,
-cargo displacement, crew safety, and unique limits before changing the working
-configuration. Failed validation leaves the previous ship intact. Major refits
-normally require an anchorage or shipyard; explicitly tagged field modules may
-be swapped during a voyage.
+cargo displacement, armor coverage, firing arcs, cannon hardpoint size,
+collision loads, prow and docking clearance, module-specific crew access, and
+unique limits before changing the working configuration. Failed validation
+leaves the previous ship intact.
+Major refits normally require an anchorage or shipyard; explicitly tagged field
+modules may be swapped during a voyage.
 
 ## Data and persistence
 
@@ -305,17 +357,20 @@ modules, and a choice between two fixed energy packages:
 | Cargo Hold and Salvage Rig | Bounded recovery and cargo capacity |
 | Workshop | Engineering repair and replacement parts |
 | Signal Lantern | Contact, negotiation, warnings, and distress calls |
+| Deck Battery | One configurable cannon mount and its ammunition flow |
+| Prow Ram or Ship Figurehead | One visible loadout choice with a mechanical or customizable identity tradeoff |
 
 | Energy package | Starting modules | Slice tradeoff |
 | --- | --- | --- |
 | Arcane | Flux Sail, Aether Dynamo, Crystal Accumulator, and Ward Projector | Lower mass and supernatural defense against scarce reagents and aether instability |
 | Industrial | Propellant Drive, Diesel Generator, Flywheel Bank, and Reinforced Plating | Durable repairable dieselpunk output against greater mass, fuel, coolant, heat, and noise |
 
-The player selects one package before departure. The slice needs only one
+The player selects one energy package, one armor arrangement, one prow fitting,
+and one weapon configuration before departure. The slice needs only one
 energy-allocation decision, one path-specific module fault, one crew-operated
-repair, and one choice where cargo, safety, or capability competes for limited
-capacity. The fault must expose the affected module, network, and repair path.
-Full hybrid construction, changing paths during a voyage, atompunk Industrial
-upgrades, multiple frames, boarding layouts, broad weapon customization, module
-manufacturing, and unrestricted shipyards remain deferred until that loop is
-deterministic and readable.
+repair, and one choice where cargo, protection, firepower, or maneuverability
+competes for limited capacity. The fault must expose the affected module,
+network, and repair path. Full hybrid construction, changing paths during a
+voyage, atompunk Industrial upgrades, multiple frames, structural frame
+editing, large equipment catalogs, module manufacturing, and unrestricted
+shipyards remain deferred until that loop is deterministic and readable.

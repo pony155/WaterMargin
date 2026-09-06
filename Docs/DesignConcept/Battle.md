@@ -6,7 +6,8 @@ This document defines the planned combat framework for ship engagements,
 boarding actions, shipboard melee, space-ruin expeditions, EVA fighting,
 settlement conflicts, and related tactical encounters. It is not implemented
 yet. The current voyage prototype has aggregate Hull damage but no weapons,
-combatants, tactical spaces, injuries, initiative, hostile AI, or battle saves.
+combatants, tactical spaces, injuries, Turn Meters, Action Points, hostile AI,
+or battle saves.
 
 Battle is one possible way to resolve an encounter, not a separate campaign
 genre. Exploration, negotiation, stealth, rescue, sabotage, surrender, and
@@ -30,26 +31,35 @@ retreat remain valid before and during combat.
   outcomes; eliminating every opponent is not the default objective.
 - Bound pathfinding, visibility, reactions, projectiles, effects, AI planning,
   and per-tick work.
+- Give ship engagements and personal combat distinct pacing while keeping both
+  deterministic on the same authoritative fixed-tick simulation.
 
 ## Combat contexts
 
-All contexts share actors, actions, timing, detection, damage, conditions, and
-save rules while supplying different spatial and environmental data.
+All contexts share actors, action phases, detection, damage, conditions, and
+save rules while supplying different spatial, environmental, and command-time
+models.
 
-| Context | Stable ID | Tactical space | Typical objectives |
-| --- | --- | --- | --- |
-| Ship engagement | `combat.context.ship` | Range bands, relative vectors, firing arcs, and local objects | Escape, disable, escort, blockade, capture, or destroy |
-| Boarding and ship interior | `combat.context.boarding` | Compartments connected by doors, hatches, ladders, ducts, and breaches | Repel, seize a module, rescue crew, sabotage, or reach a lock |
-| Space ruin | `combat.context.ruin` | Authored or generated zones, passages, seals, traps, and vertical links | Explore, recover an artifact, survive defenses, or withdraw |
-| EVA and hull exterior | `combat.context.eva` | Anchors, surfaces, open gaps, debris, and tether routes | Repair, cross hulls, cut entry, rescue, or defend an exterior module |
-| Station or settlement | `combat.context.settlement` | Rooms, streets, docks, crowds, restricted areas, and exits | Protect civilians, arrest, escape, hold ground, or negotiate |
-| Surface expedition | `combat.context.surface` | Bounded terrain zones, elevation, weather, hazards, and extraction points | Survey, hunt, rescue, defend camp, or reach transport |
+| Context | Stable ID | Command-time model | Tactical space | Typical objectives |
+| --- | --- | --- | --- | --- |
+| Ship engagement | `combat.context.ship` | Real-time with tactical pause | Bounded continuous 2D coordinates, headings, velocity vectors, firing arcs, and local objects | Escape, disable, escort, blockade, capture, or destroy |
+| Boarding and ship interior | `combat.context.boarding` | Personal timeline with Turn Meter and Action Points | Hex cells grouped into compartments and connected through doors, hatches, ladders, ducts, and breaches | Repel, seize a module, rescue crew, sabotage, or reach a lock |
+| Space ruin | `combat.context.ruin` | Personal timeline with Turn Meter and Action Points | Authored or generated hex boards, rooms, seals, traps, and vertical links | Explore, recover an artifact, survive defenses, or withdraw |
+| EVA and hull exterior | `combat.context.eva` | Personal timeline with Turn Meter and Action Points | Hex cells anchored to surfaces, open gaps, debris, and tether routes | Repair, cross hulls, cut entry, rescue, or defend an exterior module |
+| Station or settlement | `combat.context.settlement` | Personal timeline with Turn Meter and Action Points | Hex cells grouped into rooms, streets, docks, crowds, restricted areas, and exits | Protect civilians, arrest, escape, hold ground, or negotiate |
+| Surface expedition | `combat.context.surface` | Personal timeline with Turn Meter and Action Points | Bounded hex terrain with elevation, weather, hazards, and extraction points | Survey, hunt, rescue, defend camp, or reach transport |
 
-The first implementation uses graphs of tactically meaningful zones rather
-than seamless three-dimensional terrain. A zone can be a ship compartment,
-ruin chamber, stretch of hull, street, or terrain area. Authored links encode
-doors, cover, distance, height, pressure seals, line of sight, and movement
-requirements.
+Ship combat is continuous in both time and space: ships do not occupy cells and
+do not jump between range bands. The player may pause it to inspect the
+situation, issue or revise uncommitted orders, and then resume. Personal combat
+is not organized into global rounds: each actor becomes ready on an individual
+timeline and receives a bounded Action Point budget for that activation.
+
+The first personal-combat implementation uses bounded hex boards grouped into
+tactically meaningful zones rather than seamless three-dimensional terrain. A
+zone can be a ship compartment, ruin chamber, stretch of hull, street, or
+terrain area. Cells and zone links encode occupancy, doors, cover, distance,
+height, pressure seals, line of sight, and movement requirements.
 
 ## Encounter structure
 
@@ -58,7 +68,8 @@ A tactical encounter declares:
 - stable encounter definition and instance IDs;
 - context, location, participants, teams, knowledge, and initial placements;
 - objectives, optional objectives, failure conditions, and escape routes;
-- zone graph, cover, visibility, atmosphere, gravity, lighting, and hazards;
+- ship tactical geometry or personal hex board, zone graph, cover, visibility,
+  atmosphere, gravity, lighting, and hazards;
 - neutral actors, civilians, prisoners, cargo, and protected infrastructure;
 - reinforcement sources, limits, arrival conditions, and warning rules;
 - surrender, negotiation, retreat, pursuit, and cleanup behavior;
@@ -72,9 +83,78 @@ hazards, and objectives; it does not generate unreviewed narrative text.
 
 ## Time and command model
 
-Authoritative combat advances on the fixed simulation tick. The player may
-pause at allowed command boundaries to inspect state and issue orders, but
-opening a panel or taking longer to decide never changes the result.
+Authoritative combat advances on the fixed simulation tick. Rendering cadence,
+animation, wall-clock delay, and the time a player spends paused never advance
+the simulation or alter a result. Ship and personal combat use different
+command-time models over that shared clock.
+
+### Ship combat: real-time with tactical pause
+
+Ship engagements advance continuously while unpaused. Navigation, weapons,
+defenses, sensors, heat, power, aether flow, crew stations, damage control,
+hazards, and opposing ships may all progress during the same ticks.
+
+Ship position, heading, velocity, and maneuver state use deterministic
+fixed-point values on a bounded continuous 2D map. A spatial index may divide
+the map internally for bounded queries, but those partitions are not movement
+cells and cannot quantize a ship's legal position.
+
+The player can pause at any completed tick boundary to:
+
+- inspect only information currently available to the crew;
+- issue maneuver, targeting, station, allocation, damage-control, boarding,
+  communication, or retreat orders;
+- reorder or cancel commands that have not begun their Reserve phase; and
+- review predicted paths, firing arcs, costs, dependencies, and rejection
+  reasons without receiving a guaranteed outcome preview.
+
+Pausing is a command interface, not a character ability or consumable. AI does
+not advance, hidden timers do not run, and resources are not consumed while the
+authoritative clock is paused. Once play resumes, orders execute when their
+declared conditions and station requirements become valid. An order that has
+reserved resources or committed an effect follows its explicit cancellation
+and rollback rule rather than receiving an automatic refund.
+
+Ship orders do not use personal Action Points. Their pacing comes from crew and
+station availability, preparation and recovery ticks, module readiness,
+resource flow, and bounded command queues.
+
+### Personal combat: individual timeline activations
+
+Boarding, ruin, EVA, settlement, and surface combat use a tactical hex board
+and individual readiness rather than team turns or global rounds. Every actor
+owns two separate bounded values:
+
+- **Turn Meter:** determines when that actor becomes Ready. It advances only
+  with authoritative combat time. Agility, equipment, injuries, conditions,
+  preparation, and recovery can modify its documented fill rate.
+- **Action Points (AP):** determine how much the actor can plan during one
+  activation. Moving through cells, attacking, using an item, operating an
+  object, casting, assisting, and changing stance have explicit AP costs.
+
+When an actor's Turn Meter reaches its threshold, the actor enters the Ready
+queue. Equal-tick readiness is ordered by documented priority, then stable
+Actor ID; UI selection order never breaks ties. A player-controlled Ready actor
+pauses authoritative time while the player assembles or confirms a bounded
+action plan. AI-controlled actors choose plans from the same observed state and
+legal-action rules without wall-clock delay affecting the result.
+
+An activation ends when its AP is spent, the actor ends voluntarily, the actor
+becomes unable to act, or a declared plan reaches its bounded limit. Unspent AP
+does not carry into the next activation. AP deliberately reserved for a
+reaction remains unavailable to ordinary actions until it is spent or expires
+at that actor's next activation.
+
+Committing a plan does not guarantee every step. Planned actions still prepare,
+validate at their execution boundary, trigger reactions, commit atomically,
+and recover over simulation ticks. Movement may be interrupted by a newly
+blocked cell, an actor can be incapacitated before a later planned attack, and
+reserved but uncommitted costs follow their declared rollback rules. After the
+activation resolves, recovery delays and Turn Meter progression determine when
+the actor becomes Ready again. A fast actor may therefore activate more often
+without receiving unlimited AP in one activation.
+
+### Shared action lifecycle
 
 Actions use explicit phases:
 
@@ -88,14 +168,15 @@ Actions use explicit phases:
 5. **Commit:** resolve the action and publish its effects atomically.
 6. **Recover:** apply recovery time, sustain costs, exposure, and cooldown.
 
-Movement, weapon fire, spells, psychic techniques, repairs, medical actions,
-and environmental changes can overlap. Equal-tick conflicts use documented
-priority categories and stable actor IDs as final tie-breakers, never UI order
-or thread completion timing.
+Ship movement, weapon fire, spells, psychic techniques, repairs, medical
+actions, personal plans, and environmental changes can overlap on the fixed
+timeline. Equal-tick conflicts use documented priority categories and stable
+actor IDs as final tie-breakers, never UI order or thread completion timing.
 
-A reaction reserves attention or equipment before its trigger occurs. Overwatch,
-parry, intercept, counterspell, emergency seal, and protective movement are
-examples. Actors cannot receive unlimited free reactions from one event.
+A reaction reserves attention, personal AP, a station, or equipment before its
+trigger occurs. Overwatch, parry, intercept, counterspell, emergency seal, and
+protective movement are examples. Actors cannot receive unlimited free
+reactions from one event.
 
 ## Action resolution
 
@@ -110,7 +191,8 @@ Examples include:
 
 - Strength plus Melee to force an armored opponent away from a hatch;
 - Agility plus Archery to fire a bow across a low-gravity ruin chamber;
-- Intelligence plus Gunnery to calculate a shot through moving debris;
+- Intelligence plus Sensors to establish a firing solution through moving
+  debris;
 - Willpower plus Magic to sustain Brace Ward under fire, requiring
   `access.magic` and the known spell;
 - Charisma plus Command to coordinate a fighting withdrawal;
@@ -129,20 +211,46 @@ harm, resource use, and rejection or failure reason.
 
 ## Spatial rules
 
-Zones contain bounded capacity and tagged positions such as exposed, covered,
-elevated, sealed, unstable, anchored, occupied, or hazardous. Links define
-movement time, direction, access, traversal skill, visibility, and whether a
-door or barrier can close across them.
+### Personal boards
 
-Distance uses contextual range bands rather than one universal meter scale:
+Personal-combat boards contain a bounded number of hex cells. Each cell belongs
+to one tactical zone and can be exposed, covered, elevated, sealed, unstable,
+anchored, occupied, or hazardous. Cell edges and zone links define movement AP
+and time, direction, access, traversal skill, visibility, and whether a door or
+barrier can close across them. Large creatures and objects declare multi-cell
+footprints explicitly.
 
-- personal encounters use engaged, near, far, and beyond;
-- ship encounters use grappled, close, exchange, long, and contact-only; and
+### Continuous ship map
+
+The ship battlefield is a bounded continuous 2D coordinate space with no
+movement grid. Ships, stations, wrecks, projectiles, hazards, and other local
+objects have fixed-point position and bounded collision or interaction shapes.
+Ships also track heading, velocity, maneuver commitment, and the capabilities
+that limit turning, acceleration, braking, and reverse thrust.
+
+A maneuver order declares a desired course, thrust, facing, orbit, intercept,
+escort offset, or disengagement vector. The ship moves through every
+intermediate position as fixed ticks commit; it never teleports from cell to
+cell or range band to range band. Terrain, collisions, weapon arcs, projectile
+paths, sensor confidence, and boarding alignment query this continuous state.
+
+The implementation may use a deterministic bounded spatial partition to avoid
+checking every object against every other object. That partition is an
+acceleration structure only and is neither visible gameplay topology nor a
+source of position rounding.
+
+Distance presentation remains contextual:
+
+- personal encounters derive engaged, near, far, and beyond from hex distance,
+  elevation, intervening edges, and the action's scale;
+- ship encounters derive grappled, close, exchange, and long labels from exact
+  continuous distance, relative motion, and the observing system; and
 - sensors can detect beyond weapon range with confidence and identity limits.
 
-Content definitions map range bands to authored distances when exact units are
-needed. A personal bow cannot target a ship merely because both definitions say
-"far."
+Ship movement, collision, and targeting use authored ship-scale distance units;
+range labels never replace coordinates. Personal actions may map their bands to
+hex-distance rules. A personal bow cannot target a ship merely because both
+interfaces display "far."
 
 Movement does not provide cost-free attacks. Crossing a watched link, leaving
 engagement, opening a pressure door, climbing, drifting without an anchor, or
@@ -165,13 +273,18 @@ source, observation path, and trigger.
 ## Ship-to-ship engagements
 
 Ship combat combines navigation, crew stations, weapons, defenses, damage
-control, and objectives. It is not a duel between two aggregate health bars.
+control, and objectives in real time with tactical pause. It is not a duel
+between two aggregate health bars, and it does not wait for alternating ship
+turns.
 
 The tactical state tracks:
 
-- relative range band, approach vector, velocity commitment, and escape route;
+- fixed-point position, heading, velocity, acceleration or thrust commitment,
+  collision shape, exact relative vectors, and escape route;
 - sensor contact and identification confidence;
-- available firing arcs, weapon readiness, ammunition, heat, and charge;
+- available firing arcs, weapon damage, rate of fire, effective and maximum
+  range, reload state, damage type and area, armor penetration, ammunition,
+  heat, and charge;
 - power and aether allocation across propulsion, defense, weapons, sensors, and
   damaged networks;
 - exposed or protected modules and compartments;
@@ -179,20 +292,40 @@ The tactical state tracks:
   and
 - boarding alignment, docking locks, tethers, breaches, and separation risk.
 
-Crew act through stations. A Pilot maneuvers, Gunner aims and fires, Engineer
-reroutes power or performs damage control, Ship Mage operates Arcane effects,
-Mindwarden handles psychic threats, and Captain sets objectives and priorities.
+Crew act through stations while the ship clock runs. A Pilot maneuvers,
+Engineer reroutes power or performs damage control, Ship Mage operates Arcane
+effects, Mindwarden handles psychic threats, and Captain sets objectives and
+priorities. The player directly orders installed ship cannons; firing does not
+require a Gunner position or Gunnery Skill check. Other station orders still
+need any declared operator, preparation, resources, and recovery time.
 Positions grant responsibility and authority, not automatic skill ranks.
 
-Typical ship actions include scan, identify, close, evade, hold vector, fire,
-intercept, brace, vent heat, reroute power, repair, jam, signal, negotiate,
-launch boarding, repel boarding, rescue, disengage, and surrender.
+Typical ship actions include scan, identify, set course, apply thrust, turn,
+brake, intercept, match velocity, hold formation, evade, fire, ram, brace, vent
+heat, reroute power, repair, jam, signal, negotiate, launch boarding, repel
+boarding, rescue, disengage, and surrender.
 
 Weapons target a ship, visible module, exposed compartment, projectile, or
 declared area according to their tags. Precision targeting requires sufficient
 knowledge and firing solution. Damage can breach hull, disable modules, ignite
 cargo, injure crew, cut networks, change maneuver capability, or force
 evacuation.
+
+A legal cannon order requires a ready, undamaged-enough installed weapon, a
+target or area inside its firing arc and range, and its declared ammunition or
+charge. Rate of fire schedules shots; reload time controls when the cannon can
+fire again. Damage, damage type, damage area, and armor penetration resolve
+against the target's protection. Cannon resolution does not add a recoil stat
+or wait for an assigned Gunner.
+
+A ram requires a compatible installed prow module, a legal collision course,
+and sufficient relative velocity. Impact resolves damage and impulse for both
+ships, including the attacking frame; a ram is not a cost-free melee attack.
+A figurehead is visual customization unless an installed enchantment, ward,
+sensor, or command effect gives it explicit mechanics and resource demands.
+Cannon and other weapon modules retain their installed orientation, firing arc,
+damage profile, rate of fire, range, reload state, damage area, armor
+penetration, ammunition route, heat, and individual damage state.
 
 Disengagement is a contest of position, propulsion, detection, terrain, and
 pursuit commitment. A faster ship does not automatically escape if trapped at
@@ -205,11 +338,13 @@ Boarding Lock, matched-vector grapple, shuttle, EVA crossing, breached hull, or
 an explicit Passage spell. The transition preserves ship motion, exterior
 hazards, damage, crew positions, and reinforcement travel time.
 
-The ship interior is a compartment graph. Doors, pressure seals, gravity,
-lighting, smoke, fire, coolant, radiation, noise, narrow passages, and fragile
-systems shape close combat. Defenders can lock routes, evacuate compartments,
-cut gravity, vent an empty zone, move cargo as cover, isolate networks, or
-counter-board through another path.
+The ship interior is a compartment graph whose active encounter areas are
+resolved as bounded hex boards. Doors, pressure seals, gravity, lighting,
+smoke, fire, coolant, radiation, noise, narrow passages, and fragile systems
+shape cell movement, AP costs, line of sight, action timing, and close combat.
+Defenders can lock routes, evacuate compartments, cut gravity, vent an empty
+zone, move cargo as cover, isolate networks, or counter-board through another
+path.
 
 Melee weapons are valuable in cramped compartments because they are controllable
 and do not require ammunition. Ranged weapons offer reach but must declare
@@ -229,7 +364,7 @@ does not reveal the whole map or discard previous discoveries, opened seals,
 translated scripts, disabled traps, moved objects, contamination, or consumed
 supplies.
 
-A ruin zone may contain:
+A ruin board may contain:
 
 - ancient guardians, scavengers, rival expeditions, predators, or trapped
   survivors;
@@ -281,14 +416,18 @@ ship handles one bounded objective within them.
 
 ## Weapons, armor, and techniques
 
-Weapons are data-authored items with stable IDs and tags for skill, grip, range,
-delivery, damage type, penetration, recoil, ammunition or charge, preparation,
-action time, recovery, noise, trace, and valid targets.
+Weapons are data-authored items with stable IDs and tags appropriate to their
+scale. Personal weapons can declare skill, grip, range, delivery, damage type,
+penetration, recoil, ammunition or charge, preparation, action time, recovery,
+noise, trace, and valid targets. Ship cannons instead declare damage, rate of
+fire, effective and maximum range, firing arc, reload time, damage type, damage
+area, armor penetration, ammunition or charge, heat, trace, and valid targets.
 
 - Melee covers unarmed attacks and handheld close-combat weapons.
 - Archery covers bows, crossbows, and unusual string-launched weapons.
-- Gunnery covers personal firearms, mounted weapons, and ship weapons; each
-  definition declares its supported scale.
+- Gunnery covers personal firearms and manually operated mounted weapons. Ship
+  cannon commands use the installed weapon and ship targeting state without a
+  Gunnery requirement.
 - Magic and Psionics use their own skills, learned content, resources, and
   access requirements.
 - Defense covers active protection, positioning, shields, and learned defensive
@@ -425,29 +564,34 @@ An authored encounter definition resembles:
 ```
 
 Persistent battle state stores definition revisions, encounter seed and random
-streams, tick, participants, teams, knowledge, zone state, objectives, reserved
-resources, scheduled actions, reactions, projectiles, active effects, hazards,
-injuries, ship damage, reinforcement state, retreat paths, and committed event
-history.
+streams, tick, participants, teams, knowledge, continuous ship positions,
+headings and velocities, personal zone and cell state, objectives, Turn Meters,
+current AP and reserved reaction AP, Ready-queue state, queued ship orders,
+reserved resources, scheduled actions, reactions, projectiles, active effects,
+hazards, injuries, ship damage, reinforcement state, retreat paths, and
+committed event history.
 
 Saving is allowed only at documented commit boundaries. Loading restores the
 same next authoritative tick and never rerolls an attack, AI choice,
 reinforcement, injury, or ruin layout. Presentation animation and selected UI
-panels are not save state.
+panels are not save state. A loaded battle opens paused so wall-clock time
+cannot advance before the player receives the restored snapshot.
 
 ## Bounds and validation
 
-Runtime limits include actors, zones, links, carried items, active effects,
-scheduled actions, reactions per trigger, projectiles, reinforcements, path
-expansions, visibility checks, AI candidates, event history, and maximum
-encounter duration.
+Runtime limits include ships, continuous-map extent, local space objects,
+spatial-query candidates, actors, personal-board dimensions, hex cells, zones,
+links, AP per activation, Ready actors, queued ship orders, planned personal
+actions, carried items, active effects, scheduled actions, reactions per
+trigger, projectiles, reinforcements, path expansions, visibility checks, AI
+candidates, event history, and maximum encounter duration.
 
 Content loading rejects:
 
 - duplicate or missing encounter, actor, zone, objective, item, effect, and
   localization IDs;
 - disconnected required objectives, illegal placements, missing retreat rules,
-  or a zone graph beyond capacity;
+  or a board, cell set, or zone graph beyond capacity;
 - attacks without skill, range, target, delivery, protection, harm, evidence,
   ammunition or charge, and miss behavior;
 - supernatural actions without access, learned-content, cost, targeting, and
@@ -467,11 +611,14 @@ failed reload leaves the previous definitions available.
 
 The first battle milestone should contain two connected encounters:
 
-1. a small ship engagement with scanning, maneuver, one weapon, module damage,
-   damage control, signaling, disengagement, and an optional boarding route;
-2. a six-zone derelict or ruin expedition with four active crew, limited
-   visibility, one environmental hazard, one hostile group, one ancient
-   defense, one non-combat solution, and an extraction objective.
+1. a small real-time-with-pause engagement on a continuous 2D ship map with
+   scanning, course and thrust control, one weapon, module damage, damage
+   control, signaling, disengagement, queued station orders, and an optional
+   boarding route;
+2. a bounded hex-board derelict or ruin expedition with six tactical zones,
+   four active crew, individual Turn Meters and AP, limited visibility, one
+   environmental hazard, one hostile group, one ancient defense, one
+   non-combat solution, and an extraction objective.
 
 The same crew, equipment, ammunition, injuries, spell resources, Psychic
 Strain, ship damage, knowledge, and faction consequences persist between the
@@ -481,7 +628,9 @@ stabilization, one surrender or retreat, and one damaged object the player
 wanted to preserve.
 
 The milestone succeeds when the same seed and command sequence reproduces the
-same battle, the player can explain every major modifier and injury, and
-eliminating every opponent is not required. Large fleets, armies, seamless
-three-dimensional movement, procedural tactical prose, destructible planets,
-competitive multiplayer, and real-time physics simulation remain deferred.
+same battle regardless of pause duration, every personal actor follows the same
+Turn Meter and AP schedule, the player can explain every major modifier and
+injury, and eliminating every opponent is not required. Large fleets, armies,
+seamless three-dimensional movement, procedural tactical prose, destructible
+planets, competitive multiplayer, and continuous rigid-body space physics
+remain deferred.

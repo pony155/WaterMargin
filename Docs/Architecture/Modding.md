@@ -60,8 +60,8 @@ line and UI configuration eventually produce the same pack-set request.
 
 ## Identity and namespaces
 
-A pack has a globally unique lowercase ID such as
-`mod.starwrights.gravimetry`. Third-party definitions use an owned namespace:
+A pack has a globally unique lowercase ID such as `mod.starwrights`.
+Third-party definitions use that owned namespace:
 
 ```text
 skill.mod.starwrights.gravimetry
@@ -166,9 +166,12 @@ fingerprint <pack-root>
 explain-id <stable-id>
 ```
 
-Exact syntax is deferred until the project exists. Commands are offline,
-noninteractive, deterministic, and return nonzero for errors. Machine-readable
-diagnostics accompany concise console output.
+These command names and positional arguments are the version 1 author-tooling
+contract. Commands are offline, noninteractive, deterministic, and return zero
+only when validation succeeds. Machine-readable diagnostics use the records
+defined in
+[`ContentLimitsAndDiagnostics.md`](ContentLimitsAndDiagnostics.md) and
+accompany concise console output.
 
 A pack report lists definition counts, namespaces, dependencies, references,
 unused localization keys, consumed limits, and semantic fingerprint. Validation

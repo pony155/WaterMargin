@@ -95,43 +95,46 @@ added explicitly to `Spelljammer.slnx`.
 
 ## Milestone 0: freeze version 1 contracts
 
+**Status: Complete.** The final audit is recorded in
+[`Milestone0Review.md`](Milestone0Review.md).
+
 ### Phase M0.1: inventory existing identities
 
 - [x] **M0.1.1** Extract every current Attribute, Skill, Feat, Talent, Access,
   Spell, psychic-technique, combat-context, ship-module, faction, and crisis ID
-  from `Docs/Product` into the reviewed
+  from `Docs/DesignConcept` into the reviewed
   [`ContentIdInventory.md`](ContentIdInventory.md).
-- [ ] **M0.1.2** Mark each ID as base-owned, example-only, deferred, or already
+- [x] **M0.1.2** Mark each ID as base-owned, example-only, deferred, or already
   serialized by the prototype.
-- [ ] **M0.1.3** Find spelling variants and collisions without silently renaming
+- [x] **M0.1.3** Find spelling variants and collisions without silently renaming
   any established ID.
 
 ### Phase M0.2: freeze syntax and version rules
 
-- [ ] **M0.2.1** Specify the stable-ID grammar, maximum UTF-8 byte length,
+- [x] **M0.2.1** Specify the stable-ID grammar, maximum UTF-8 byte length,
   reserved base namespaces, and third-party namespace form.
-- [ ] **M0.2.2** Specify pack, definition, schema, semantic, generator, formula,
+- [x] **M0.2.2** Specify pack, definition, schema, semantic, generator, formula,
   effect, and save version responsibilities.
-- [ ] **M0.2.3** Decide which changes are presentation-only, compatible semantic
+- [x] **M0.2.3** Decide which changes are presentation-only, compatible semantic
   revisions, or migration-requiring breaks.
-- [ ] **M0.2.4** Record ordinal comparison and canonical serialization rules.
+- [x] **M0.2.4** Record ordinal comparison and canonical serialization rules.
 
 ### Phase M0.3: freeze bounds and diagnostics
 
-- [ ] **M0.3.1** Propose initial bounds for packs, files, bytes, JSON depth,
+- [x] **M0.3.1** Propose initial bounds for packs, files, bytes, JSON depth,
   strings, definitions, references, graphs, and diagnostics.
-- [ ] **M0.3.2** Assign stable diagnostic codes for parse, dependency,
+- [x] **M0.3.2** Assign stable diagnostic codes for parse, dependency,
   namespace, reference, semantic, and capacity failures.
-- [ ] **M0.3.3** Define safe diagnostic arguments and rules for hiding absolute
+- [x] **M0.3.3** Define safe diagnostic arguments and rules for hiding absolute
   paths and protected gameplay information.
 
 ### Phase M0.4: freeze fixtures and fingerprints
 
-- [ ] **M0.4.1** Author the smallest valid base manifest and one valid document
+- [x] **M0.4.1** Author the smallest valid base manifest and one valid document
   for Attribute, Skill, Feat, Talent, and Access references.
-- [ ] **M0.4.2** Author one focused invalid fixture for every initial diagnostic.
-- [ ] **M0.4.3** Define canonical semantic bytes and expected fixture hashes.
-- [ ] **M0.4.4** Review all version 1 decisions before loader code begins.
+- [x] **M0.4.2** Author one focused invalid fixture for every initial diagnostic.
+- [x] **M0.4.3** Define canonical semantic bytes and expected fixture hashes.
+- [x] **M0.4.4** Review all version 1 decisions before loader code begins.
 
 Deliverables:
 
@@ -455,15 +458,17 @@ Exit criterion: trained and innate access produce the same permission through
 different inspectable sources, grant no free Skill rank, and replay
 deterministically.
 
-## Milestone 5: fixed-tick encounter slice
+## Milestone 5: dual-tempo fixed-tick encounter slice
 
 Introduce `VoyageWorld` and a bounded command queue while keeping the expedition
-layer as a navigation shell.
+layer as a navigation shell. Ship engagements are real-time with tactical
+pause on a continuous 2D coordinate map; personal encounters use a hex board,
+individual Turn Meters, and Action Points without global rounds.
 
 ### Phase M5.1: establish world time and ownership
 
-- [ ] **M5.1.1** Define fixed tick units, maximum catch-up work, pause behavior,
-  and allowed command-submission boundaries.
+- [ ] **M5.1.1** Define fixed tick units, maximum catch-up work, ship tactical
+  pause, personal Ready pauses, and allowed command-submission boundaries.
 - [ ] **M5.1.2** Create `VoyageWorld` with seed, content fingerprint, tick, and
   explicitly owned random streams.
 - [ ] **M5.1.3** Add a bounded typed command queue with stable ordering and
@@ -472,9 +477,11 @@ layer as a navigation shell.
 
 ### Phase M5.2: add actors, zones, and placement
 
-- [ ] **M5.2.1** Add stable Actor, Team, Zone, Link, Encounter, and Objective IDs.
-- [ ] **M5.2.2** Compile bounded zone graphs with capacity, access, visibility,
-  cover, atmosphere, gravity, and hazard tags.
+- [ ] **M5.2.1** Add stable Actor, Team, Space Object, Personal Board, Cell,
+  Zone, Link, Encounter, and Objective IDs.
+- [ ] **M5.2.2** Compile bounded personal-combat hex boards and zone graphs with
+  capacity, occupancy, access, visibility, cover, atmosphere, gravity, and
+  hazard tags.
 - [ ] **M5.2.3** Validate legal initial placement, connected required
   objectives, and retreat or one-way rules.
 - [ ] **M5.2.4** Add deterministic movement and bounded path search.
@@ -483,8 +490,8 @@ layer as a navigation shell.
 
 - [ ] **M5.3.1** Implement declare, validate, reserve, prepare, commit, and
   recover timing in ticks.
-- [ ] **M5.3.2** Add bounded action schedules, active effects, reactions, and
-  stable equal-tick priority rules.
+- [ ] **M5.3.2** Add bounded Turn Meters, Ready queues, AP budgets, action
+  schedules, active effects, reactions, and stable equal-tick priority rules.
 - [ ] **M5.3.3** Implement allowlisted movement, resource, damage, condition,
   detection, and objective primitives.
 - [ ] **M5.3.4** Prove interruption and failure cannot partially publish or
@@ -494,19 +501,29 @@ layer as a navigation shell.
 
 - [ ] **M5.4.1** Add stable Ship, Frame, Compartment, Module, Network, Station,
   and Resource IDs.
-- [ ] **M5.4.2** Compile one minimal Arcane and one minimal Industrial module
-  package.
+- [ ] **M5.4.2** Compile one minimal Arcane and one minimal Industrial energy
+  package plus common armor, prow, and configurable cannon definitions; ship
+  cannons have no Gunner position or Gunnery Skill requirement.
 - [ ] **M5.4.3** Implement bounded power or aether allocation and crew-station
   ownership.
 - [ ] **M5.4.4** Commit armor, hull, breach, module, network, and exposed-crew
   damage together.
+- [ ] **M5.4.5** Validate and transactionally commit one pre-voyage loadout with
+  armor-section, power, propulsion, ram or figurehead, weapon orientation,
+  ammunition, mass, structure, network, clearance, and module-specific access
+  choices.
 
 ### Phase M5.5: implement a ship engagement
 
-- [ ] **M5.5.1** Add range bands, contact knowledge, maneuver, firing solution,
-  weapon readiness, ammunition or charge, and disengagement state.
-- [ ] **M5.5.2** Implement scan, move, fire, defend, damage-control, signal, and
-  retreat commands.
+- [ ] **M5.5.1** Add real-time-with-pause ship timing, bounded deterministic
+  fixed-point 2D coordinates, heading, velocity, collision shapes, derived
+  range labels, contact knowledge, firing solutions, cannon damage, rate of
+  fire, effective and maximum range, reload time, damage type and area, armor
+  penetration, ammunition or charge, weapon readiness, and disengagement state.
+- [ ] **M5.5.2** Implement bounded queued scan, course, thrust, turn, brake,
+  intercept, fire, ram, defend, damage-control, signal, and retreat orders with
+  explicit cancellation rules; fire orders use ship targeting state without an
+  assigned Gunner.
 - [ ] **M5.5.3** Add one opponent plan with bounded candidates and a documented
   safe fallback.
 - [ ] **M5.5.4** Persist module damage, spent resources, knowledge, witnesses,
@@ -516,8 +533,9 @@ layer as a navigation shell.
 
 - [ ] **M5.6.1** Author a six-zone derelict or ruin with one hazard, hostile
   group, ancient defense, non-combat solution, and extraction objective.
-- [ ] **M5.6.2** Add four active crew with movement, melee, ranged, defense,
-  Spell or psychic, Engineering, and Medicine actions.
+- [ ] **M5.6.2** Add a bounded hex board and four active crew with individual
+  Turn Meters, AP budgets, movement, melee, ranged, defense, Spell or psychic,
+  Engineering, and Medicine actions.
 - [ ] **M5.6.3** Add injury, incapacitation, stabilization, surrender, prisoner,
   retreat, and cleanup rules.
 - [ ] **M5.6.4** Preserve exploration changes and desired objects damaged during
@@ -527,8 +545,8 @@ layer as a navigation shell.
 
 - [ ] **M5.7.1** Project safe world, action, objective, and explanation data to
   immutable UI snapshots.
-- [ ] **M5.7.2** Add pause-and-plan commands without placing WPF objects in
-  simulation state.
+- [ ] **M5.7.2** Add tactical-pause ship ordering and Ready-actor personal
+  planning without placing WPF objects or wall-clock time in simulation state.
 - [ ] **M5.7.3** Record a bounded command/event stream sufficient to reproduce
   the slice.
 - [ ] **M5.7.4** Compare results across different rendering cadence, UI timing,
@@ -536,16 +554,23 @@ layer as a navigation shell.
 
 Deliverables:
 
-- actor, ship, module, zone, encounter, action, effect, and event IDs;
-- explicit tick and deterministic command ordering;
+- actor, ship, space-object, module, personal-board, cell, zone, encounter,
+  action, effect, and event IDs;
+- explicit ticks, deterministic command ordering, Turn Meters, and AP budgets;
+- real-time-with-pause ship commands and non-round-based personal activations;
+- continuous ship positions and movement with no ship-combat grid;
+- a transactional player loadout covering armor, energy, propulsion, prow
+  fitting, cannon configuration, and supporting modules;
 - one ship engagement and connected boarding or ruin encounter from
-  [`../Product/Battle.md`](../Product/Battle.md);
+  [`../DesignConcept/Battle.md`](../DesignConcept/Battle.md);
 - persistent equipment, injuries, module damage, resources, knowledge, and
   retreat results; and
 - read-only presentation snapshots after complete tick commits.
 
 Exit criterion: render cadence, pause duration, UI order, and thread completion
-do not change authoritative results.
+do not change authoritative results; the same personal command stream produces
+the same Ready order, AP expenditure, and action timing, while the same ship
+orders reproduce identical fixed-point trajectories.
 
 ## Milestone 6: content-locked saves
 
@@ -694,8 +719,8 @@ Base-definition patching is separate and cannot use last-file-wins semantics.
 
 Replace the prototype grid only after smaller character and encounter contracts
 are stable. Deliverables follow
-[`../Product/GalaxyMap.md`](../Product/GalaxyMap.md) and
-[`../Product/Factions.md`](../Product/Factions.md): seeded graph generation,
+[`../DesignConcept/GalaxyMap.md`](../DesignConcept/GalaxyMap.md) and
+[`../DesignConcept/Factions.md`](../DesignConcept/Factions.md): seeded graph generation,
 knowledge separation, faction instances, reports, agreements, territory,
 markets, and a complete return voyage.
 
@@ -777,7 +802,7 @@ politics, and failed content or save migration cannot partially replace them.
 Endgame begins only after campaign saves, faction autonomy, strategic fronts,
 and bounded distant simulation exist. Implement one family from omens through
 aftermath before expanding the catalog in
-[`../Product/Endgame_Crisis.md`](../Product/Endgame_Crisis.md).
+[`../DesignConcept/Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md).
 
 ### Phase M9.1: define crisis content
 

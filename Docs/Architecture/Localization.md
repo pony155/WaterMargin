@@ -39,7 +39,7 @@ RTL support remain planned.
 
 | Area | Authority |
 | --- | --- |
-| Product ownership and sandbox direction | [Product vision](../Product/Vision.md) |
+| Product ownership and sandbox direction | [Design concept vision](../DesignConcept/Vision.md) |
 | UI layout, actions, semantics, and managed boundary | [SpriteForge UI system](https://github.com/pony155/SpriteForge/blob/main/Engine/Docs/UISystem.md) |
 | Unicode shaping, font fallback, glyph coverage, and bidi limits | [SpriteForge font system](https://github.com/pony155/SpriteForge/blob/main/Engine/Docs/FontSystem.md) |
 | Stable asset identity and transactional publication | [SpriteForge asset system](https://github.com/pony155/SpriteForge/blob/main/Engine/Docs/AssetSystem.md) |

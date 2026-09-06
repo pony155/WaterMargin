@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "id": "talent.race.elf.aether-sense",
+  "nameKey": "talent.race.elf.aether-sense.name",
+  "descriptionKey": "talent.race.elf.aether-sense.description",
+  "compatibleRaceIds": ["race.elf"],
+  "grantedAccessIds": ["access.magic"],
+  "grantedTechniqueIds": []
+}

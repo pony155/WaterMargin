@@ -7,11 +7,11 @@ Skills, learned Feats, racial Talents, supernatural access, and known
 techniques. They are not implemented; the current simulation has no characters.
 
 Product behavior is defined in
-[`../Product/Attributes.md`](../Product/Attributes.md),
-[`../Product/Skills.md`](../Product/Skills.md),
-[`../Product/Races.md`](../Product/Races.md),
-[`../Product/Spells.md`](../Product/Spells.md), and
-[`../Product/PsychicAbilities.md`](../Product/PsychicAbilities.md).
+[`../DesignConcept/Attributes.md`](../DesignConcept/Attributes.md),
+[`../DesignConcept/Skills.md`](../DesignConcept/Skills.md),
+[`../DesignConcept/Races.md`](../DesignConcept/Races.md),
+[`../DesignConcept/Spells.md`](../DesignConcept/Spells.md), and
+[`../DesignConcept/PsychicAbilities.md`](../DesignConcept/PsychicAbilities.md).
 
 ## Core decision
 
@@ -61,6 +61,10 @@ Definitions describe meaning; state records what happened to one character.
 Character state never copies localized text or complete definitions.
 
 ## Definition examples
+
+The authoritative envelope, fields, ranges, and reference behavior are frozen
+in [`ContentContractsV1.md`](ContentContractsV1.md). The examples below follow
+that contract.
 
 An Attribute document resembles:
 
@@ -113,6 +117,7 @@ provenance:
   "revision": 1,
   "id": "feat.access.magic",
   "nameKey": "feat.access.magic.name",
+  "descriptionKey": "feat.access.magic.description",
   "trainingProjectId": "training.magic.spellcasting",
   "grantedAccessIds": ["access.magic"]
 }
@@ -124,9 +129,10 @@ provenance:
   "revision": 1,
   "id": "talent.race.elf.aether-sense",
   "nameKey": "talent.race.elf.aether-sense.name",
+  "descriptionKey": "talent.race.elf.aether-sense.description",
   "compatibleRaceIds": ["race.elf"],
   "grantedAccessIds": ["access.magic"],
-  "grantedTechniqueIds": ["ability.race.elf.aether-sense"]
+  "grantedTechniqueIds": []
 }
 ```
 
@@ -152,7 +158,7 @@ scoped to one `ContentFingerprint`. Runtime values can then use bounded arrays:
 ```csharp
 public sealed class CharacterCapabilities
 {
-    private readonly ImmutableArray<sbyte> attributeValues;
+    private readonly ImmutableArray<short> attributeValues;
     private readonly ImmutableArray<byte> skillValues;
     private readonly ImmutableArray<ulong> knownFeatBits;
     private readonly ImmutableArray<ulong> knownTalentBits;

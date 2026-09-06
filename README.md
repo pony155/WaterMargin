@@ -53,28 +53,28 @@ Implemented foundations include:
   outcomes testable and debuggable.
 
 These are product goals, not claims that every system is implemented. See
-[`Docs/Product/Vision.md`](Docs/Product/Vision.md) and
-[`Docs/Product/VerticalSlice.md`](Docs/Product/VerticalSlice.md). The planned
+[`Docs/DesignConcept/Vision.md`](Docs/DesignConcept/Vision.md) and
+[`Docs/DesignConcept/VerticalSlice.md`](Docs/DesignConcept/VerticalSlice.md). The planned
 crew races, heritages, physiology, and character-generation boundaries are
-defined in [`Docs/Product/Races.md`](Docs/Product/Races.md). The
+defined in [`Docs/DesignConcept/Races.md`](Docs/DesignConcept/Races.md). The
 classless capability model is split into
-[`Docs/Product/Attributes.md`](Docs/Product/Attributes.md) and
-[`Docs/Product/Skills.md`](Docs/Product/Skills.md). Planned spellcasting rules,
+[`Docs/DesignConcept/Attributes.md`](Docs/DesignConcept/Attributes.md) and
+[`Docs/DesignConcept/Skills.md`](Docs/DesignConcept/Skills.md). Planned spellcasting rules,
 the authored spell catalog, and psychic systems are defined in
-[`Docs/Product/Spells.md`](Docs/Product/Spells.md), and
-[`Docs/Product/PsychicAbilities.md`](Docs/Product/PsychicAbilities.md).
+[`Docs/DesignConcept/Spells.md`](Docs/DesignConcept/Spells.md), and
+[`Docs/DesignConcept/PsychicAbilities.md`](Docs/DesignConcept/PsychicAbilities.md).
 Ship engagements, boarding, ruin expeditions, EVA fighting, injuries, and
 tactical resolution are defined in
-[`Docs/Product/Battle.md`](Docs/Product/Battle.md). Planned ship frames,
+[`Docs/DesignConcept/Battle.md`](Docs/DesignConcept/Battle.md). Planned ship frames,
 modules, networks, damage, and refits are defined in
-[`Docs/Product/Ships.md`](Docs/Product/Ships.md). The versioned procedural galaxy
+[`Docs/DesignConcept/Ships.md`](Docs/DesignConcept/Ships.md). The versioned procedural galaxy
 graph, Starways, system generation, and discovery model are defined in
-[`Docs/Product/GalaxyMap.md`](Docs/Product/GalaxyMap.md). Planned faction
+[`Docs/DesignConcept/GalaxyMap.md`](Docs/DesignConcept/GalaxyMap.md). Planned faction
 membership, standing, diplomacy, territory, laws, markets, and conflict are
-defined in [`Docs/Product/Factions.md`](Docs/Product/Factions.md). Optional
+defined in [`Docs/DesignConcept/Factions.md`](Docs/DesignConcept/Factions.md). Optional
 late-campaign threats, escalation, alternative resolutions, and aftermath are
 defined in
-[`Docs/Product/Endgame_Crisis.md`](Docs/Product/Endgame_Crisis.md).
+[`Docs/DesignConcept/Endgame_Crisis.md`](Docs/DesignConcept/Endgame_Crisis.md).
 
 ## Repository layout
 
@@ -87,7 +87,8 @@ defined in
 | `Content/Localization/` | Authored catalogs and pinned locale-data notices. |
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only deterministic simulation contracts. |
 | `Tests/Spelljammer.Localization.Tests/` | Compile-only localization contracts. |
-| `Docs/Product/` | Current vision and playable-slice scope. |
+| `Tests/Spelljammer.Content.Tests/` | Frozen fixtures for the planned gameplay content loader; no test project yet. |
+| `Docs/DesignConcept/` | Current vision and playable-slice scope. |
 | `Docs/Architecture/` | Implemented and planned subsystem boundaries. |
 | `Docs/Archive/` | Historical explorations; not current product authority. |
 | `Build/` | Focused CMake declarations included by the root project. |
@@ -97,6 +98,11 @@ Planned implementation contracts are documented in
 [`Docs/Architecture/CharacterCapabilities.md`](Docs/Architecture/CharacterCapabilities.md),
 [`Docs/Architecture/Modding.md`](Docs/Architecture/Modding.md), and
 [`Docs/Architecture/ImplementationRoadmap.md`](Docs/Architecture/ImplementationRoadmap.md).
+The frozen version 1 identity, serialization, bounds, and diagnostic contracts
+are in
+[`Docs/Architecture/ContentContractsV1.md`](Docs/Architecture/ContentContractsV1.md)
+and
+[`Docs/Architecture/ContentLimitsAndDiagnostics.md`](Docs/Architecture/ContentLimitsAndDiagnostics.md).
 
 ## Build and run
 

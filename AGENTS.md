@@ -22,7 +22,7 @@ implemented state and label future-facing design as planned.
 
 `Docs/Archive/LargeScaleRtsConcept.md` predates the current sandbox direction.
 Treat it as historical exploration; it is not the authority for new gameplay
-work. Current product direction lives under `Docs/Product`.
+work. Current product direction lives under `Docs/DesignConcept`.
 
 ## Repository and engine boundary
 
@@ -125,7 +125,7 @@ smallest playable vertical slice before broadening the simulation surface.
 | `Content/Localization/` | Authored locale catalogs and pinned locale-data notices. |
 | `Tests/Spelljammer.Localization.Tests/` | Headless localization contracts and corruption/formatting coverage. |
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only determinism, rejection, bounds, and resource-loop contracts. |
-| `Docs/Product/` | Current product direction and playable-slice scope. |
+| `Docs/DesignConcept/` | Current product direction and playable-slice scope. |
 | `Docs/Architecture/` | Implemented and planned subsystem architecture. |
 | `Docs/Archive/` | Historical design material that is not current product authority. |
 | `Build/` | Focused CMake declarations included by the standalone root project. |

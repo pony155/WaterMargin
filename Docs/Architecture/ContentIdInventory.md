@@ -1,20 +1,20 @@
-# Product content ID inventory
+# Design content ID inventory
 
 ## Status
 
 This document is the reviewed inventory produced by roadmap task `M0.1.1`. It
-records stable gameplay IDs explicitly present under `Docs/Product`; it does
-not claim that runtime definitions or loaders exist.
+records stable gameplay IDs explicitly present under `Docs/DesignConcept`; it
+does not claim that runtime definitions or loaders exist.
 
 The inventory is a documentation snapshot, not yet a machine-readable content
-manifest. Ownership and lifecycle labels required by `M0.1.2`, and collision or
-spelling decisions required by `M0.1.3`, remain deliberately unassigned.
+manifest. Ownership and lifecycle classifications, plus collision and spelling
+decisions, are recorded in [`ContentIdReview.md`](ContentIdReview.md).
 
 ## Review method and scope
 
-All Product Markdown files were scanned as UTF-8 for the requested definition
-families. Candidate strings were deduplicated and then reviewed to separate
-gameplay IDs from localization keys and adjacent definition kinds.
+All design-concept Markdown files were scanned as UTF-8 for the requested
+definition families. Candidate strings were deduplicated and then reviewed to
+separate gameplay IDs from localization keys and adjacent definition kinds.
 
 Included categories are Attributes, Skills, learned Feats, racial or Heritage
 Talents, Access gates, Spells, psychic techniques, combat contexts, ship
@@ -30,20 +30,20 @@ inventoried when their definition schemas enter roadmap scope.
 
 | Category | Explicit unique IDs | Primary product source |
 | --- | ---: | --- |
-| Attributes | 7 | [`Attributes.md`](../Product/Attributes.md) |
-| Skills | 14 | [`Skills.md`](../Product/Skills.md), plus one explicit Medicine reference in [`Ships.md`](../Product/Ships.md) |
-| Learned Feats | 2 | [`Skills.md`](../Product/Skills.md) |
-| Talents | 10 | [`Races.md`](../Product/Races.md) |
-| Access gates | 2 | [`Skills.md`](../Product/Skills.md) |
-| Spells | 32 | [`Spells.md`](../Product/Spells.md) |
-| Psychic techniques | 4 | [`PsychicAbilities.md`](../Product/PsychicAbilities.md) |
-| Combat contexts | 6 | [`Battle.md`](../Product/Battle.md) |
-| Ship modules | 32 | [`Ships.md`](../Product/Ships.md) |
-| Factions | 6 | [`Factions.md`](../Product/Factions.md) |
-| Crisis families | 7 | [`Endgame_Crisis.md`](../Product/Endgame_Crisis.md) |
-| Crisis phases | 7 | [`Endgame_Crisis.md`](../Product/Endgame_Crisis.md) |
-| Crisis resolutions | 3 | [`Endgame_Crisis.md`](../Product/Endgame_Crisis.md) |
-| **Total** | **132** | |
+| Attributes | 7 | [`Attributes.md`](../DesignConcept/Attributes.md) |
+| Skills | 29 | [`Skills.md`](../DesignConcept/Skills.md) |
+| Learned Feats | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
+| Talents | 10 | [`Races.md`](../DesignConcept/Races.md) |
+| Access gates | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
+| Spells | 32 | [`Spells.md`](../DesignConcept/Spells.md) |
+| Psychic techniques | 4 | [`PsychicAbilities.md`](../DesignConcept/PsychicAbilities.md) |
+| Combat contexts | 6 | [`Battle.md`](../DesignConcept/Battle.md) |
+| Ship modules | 34 | [`Ships.md`](../DesignConcept/Ships.md) |
+| Factions | 6 | [`Factions.md`](../DesignConcept/Factions.md) |
+| Crisis families | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
+| Crisis phases | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
+| Crisis resolutions | 3 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
+| **Total** | **149** | |
 
 ## Attributes
 
@@ -62,24 +62,34 @@ inventoried when their definition schemas enter roadmap scope.
 | Display label | Stable ID | Explicit source |
 | --- | --- | --- |
 | Alchemy | `skill.alchemy` | Skills |
+| Acrobatics | `skill.acrobatics` | Skills |
 | Ancient Lore | `skill.ancient-lore` | Skills |
 | Archery | `skill.archery` | Skills |
+| Astrogation | `skill.astrogation` | Skills |
+| Athletics | `skill.athletics` | Skills |
+| Command | `skill.command` | Skills |
 | Cooking | `skill.cooking` | Skills |
 | Crafting | `skill.crafting` | Skills |
+| Deception | `skill.deception` | Skills |
+| Defense | `skill.defense` | Skills |
 | Enchantment | `skill.enchantment` | Skills |
 | Engineering | `skill.engineering` | Skills |
+| EVA | `skill.eva` | Skills |
+| Gunnery | `skill.gunnery` | Skills |
+| Insight | `skill.insight` | Skills |
 | Language and Literacy | `skill.language-literacy` | Skills |
 | Magic | `skill.magic` | Skills |
-| Medicine | `skill.medicine` | Ships sickbay example |
+| Medicine | `skill.medicine` | Skills |
 | Melee | `skill.melee` | Skills |
 | Merchant | `skill.merchant` | Skills |
 | Negotiation | `skill.negotiation` | Skills |
+| Piloting | `skill.piloting` | Skills |
 | Psionics | `skill.psionics` | Skills |
-
-The Skill catalog also names the following capabilities without assigning an
-explicit Stable ID: Athletics, Acrobatics, EVA, Stealth, Piloting, Astrogation,
-Sensors, Rigging, Salvage, Gunnery, Defense, Xenology, Command, Insight, and
-Deception. They are not silently converted into inferred IDs by this inventory.
+| Rigging | `skill.rigging` | Skills |
+| Salvage | `skill.salvage` | Skills |
+| Sensors | `skill.sensors` | Skills |
+| Stealth | `skill.stealth` | Skills |
+| Xenology | `skill.xenology` | Skills |
 
 ## Learned Feats
 
@@ -242,6 +252,8 @@ definition kinds and are not counted as psychic technique IDs.
 | Nuclear-Thermal Drive | `module.propulsion.nuclear-thermal-drive` |
 | Propellant Drive | `module.propulsion.propellant-drive` |
 | Vector Vanes | `module.propulsion.vector-vanes` |
+| Ship Figurehead | `module.prow.figurehead` |
+| Prow Ram | `module.prow.ram` |
 | Lore Vault | `module.research.lore-vault` |
 | Salvage Rig | `module.utility.salvage-rig` |
 | Deck Battery | `module.weapon.deck-battery` |
@@ -300,10 +312,9 @@ by this inventory.
 
 ## Review result
 
-The requested categories contain 132 unique explicit gameplay IDs. No duplicate
+The requested categories contain 149 unique explicit gameplay IDs. No duplicate
 ID is assigned to two different labels within these tables. Repeated references
-to the same ID across Product documents were consolidated under one entry.
+to the same ID across design documents were consolidated under one entry.
 
-The missing explicit Skill and Heritage Talent IDs noted above are inputs to
-the later `M0.1.3` spelling and collision review. This task does not resolve or
-mint them.
+The missing Heritage Talent IDs noted above remain future content-authoring
+work. This inventory does not synthesize them from display text.
