@@ -26,6 +26,7 @@ public sealed class EngineViewport : HwndHost
     private uint spriteSheet;
     private int currentFrame;
     private bool isPlaying = true;
+    private bool reducedMotion;
     private long animationStartTicks;
 
     public EngineViewport()
@@ -41,10 +42,32 @@ public sealed class EngineViewport : HwndHost
 
     internal bool IsPlaying => isPlaying;
 
+    internal void SetReducedMotion(bool value)
+    {
+        reducedMotion = value;
+        if (reducedMotion)
+        {
+            isPlaying = false;
+            renderTimer.Stop();
+            SetFrame(0);
+        }
+        else if (renderer != nint.Zero)
+        {
+            renderTimer.Start();
+        }
+
+        RenderScene();
+    }
+
     internal void TogglePlayback()
     {
+        if (reducedMotion)
+        {
+            return;
+        }
+
         isPlaying = !isPlaying;
-        if (isPlaying)
+        if (isPlaying && !reducedMotion)
         {
             animationStartTicks = Environment.TickCount64 -
                 currentFrame * (1000 / FramesPerSecond);
@@ -112,7 +135,10 @@ public sealed class EngineViewport : HwndHost
                 "upload the sprite sheet");
 
             animationStartTicks = Environment.TickCount64;
-            renderTimer.Start();
+            if (!reducedMotion)
+            {
+                renderTimer.Start();
+            }
             RenderScene();
             return new HandleRef(this, childWindow);
         }

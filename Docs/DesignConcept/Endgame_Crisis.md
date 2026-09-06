@@ -10,6 +10,8 @@ galaxy, factions, campaign clock, strategic threats, or endgame state.
 An endgame crisis is optional campaign content for a mature generated galaxy.
 It is not part of the first playable voyage and does not replace ordinary
 exploration, trade, crew survival, or faction conflict.
+Campaign-setting ownership and persistence are defined in
+[`GameSettings.md`](GameSettings.md).
 
 ## Design goals
 

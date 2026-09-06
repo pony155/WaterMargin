@@ -27,15 +27,19 @@ the resulting enums and numbers to player-facing text.
 - A run succeeds by returning to the anchorage with at least eight cargo.
 - Zero hull or zero supplies ends the run.
 
-These constants are compiled prototype rules. Moving them into validated,
-versioned content definitions is planned before saves become a public contract.
+These constants remain compiled prototype rules. The implemented campaign-save
+boundary persists the detailed `VoyageWorld`; replacing this legacy expedition
+layer with content-driven rules remains planned before saves are exposed in the
+public WPF flow.
 
-## Next architecture step
+## Detailed voyage and saves
 
-Introduce a fixed-tick `VoyageWorld` with stable ship, crew, module, and
-encounter identities. Commands should enter a bounded queue and publish a
-read-only snapshot only after a complete tick. The current expedition state can
-then become the strategic navigation layer around the more detailed world.
+The headless fixed-tick `VoyageWorld` now supplies stable ship, crew, module,
+encounter, command, schedule, and event identities. The Milestone 6 persistence
+layer serializes that state through stable IDs and reconstructs it only after
+content preflight. See [`CampaignSaves.md`](CampaignSaves.md). Connecting this
+detailed world and its save controls to the current expedition WPF shell is
+still planned.
 
 The staged plan is defined in
 [`ImplementationRoadmap.md`](ImplementationRoadmap.md). Gameplay content and

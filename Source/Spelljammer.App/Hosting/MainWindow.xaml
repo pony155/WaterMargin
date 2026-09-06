@@ -42,14 +42,20 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.ColumnSpan="3" Margin="0,0,0,20">
-            <TextBlock FontSize="30"
-                       FontWeight="SemiBold"
-                       Text="SPELLJAMMER" />
-            <TextBlock Margin="0,4,0,0"
-                       Foreground="#93A1BE"
-                       Text="A deterministic voyage across a perilous, uncharted void" />
-        </StackPanel>
+        <Grid Grid.ColumnSpan="3" Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock FontSize="30"
+                           FontWeight="SemiBold"
+                           Text="SPELLJAMMER" />
+                <TextBlock Margin="0,4,0,0"
+                           Foreground="#93A1BE"
+                           Text="A deterministic voyage across a perilous, uncharted void" />
+            </StackPanel>
+            <Button x:Name="SettingsButton"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Click="SettingsButton_Click" />
+        </Grid>
 
         <Border Grid.Row="1"
                 Padding="18"

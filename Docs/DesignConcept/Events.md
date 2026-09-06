@@ -16,7 +16,8 @@ using unbounded procedural prose.
 Galaxy routes and travel are defined in [`GalaxyMap.md`](GalaxyMap.md).
 Ship and personal encounter resolution is defined in [`Battle.md`](Battle.md),
 while standing, reports, and agreements are defined in
-[`Factions.md`](Factions.md).
+[`Factions.md`](Factions.md). Campaign-setting ownership and accessibility
+boundaries are defined in [`GameSettings.md`](GameSettings.md).
 
 ## Design goals
 

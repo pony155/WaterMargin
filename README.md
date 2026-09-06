@@ -18,8 +18,12 @@ characters, rules, content, code, artwork, and sound remain original.
 > exists with trained and innate supernatural access, Magic Missile, and
 > consensual Mindlink execution. Milestone 5 adds a headless modular ship
 > engagement and six-zone personal encounter slice, but these are not yet
-> connected to the WPF shell. Crew schedules and relationships, trading,
-> procedural ship interiors, saves, and a full game UI remain planned.
+> connected to the WPF shell. Milestone 6 adds headless content-locked campaign
+> saves, validation, recovery, and migration. A first localized SpriteForge UI
+> game-settings dialog now persists bounded local preferences transactionally,
+> while WPF save controls, campaign-rule settings, crew
+> schedules and relationships, trading, procedural ship interiors, and a full
+> game UI remain planned.
 
 ## Current prototype
 
@@ -46,6 +50,12 @@ Implemented foundations include:
   immutable snapshots and replay logs, continuous ship combat, modular damage,
   personal Turn Meters and Action Points, reactions, injuries, objectives, and
   encounter cleanup;
+- a versioned, bounded campaign-save envelope with content preflight, stable-ID
+  reconstruction, transactional publication, durable replacement and recovery,
+  and deterministic explicit migrations;
+- a versioned local settings profile with strict bounded JSON, durable
+  replacement/recovery, stable diagnostics, and a keyboard-operable localized
+  SpriteForge UI modal;
 - authored equipment, a six-zone Glass Observatory ruin, a Wayfarer ship frame,
   Arcane and Industrial module packages, and two cannon configurations;
 - a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
@@ -73,7 +83,10 @@ Implemented foundations include:
 
 These are product goals, not claims that every system is implemented. See
 [`Docs/DesignConcept/Vision.md`](Docs/DesignConcept/Vision.md) and
-[`Docs/DesignConcept/VerticalSlice.md`](Docs/DesignConcept/VerticalSlice.md). The planned
+[`Docs/DesignConcept/VerticalSlice.md`](Docs/DesignConcept/VerticalSlice.md).
+Player preferences, accessibility, campaign rules, and their persistence
+boundaries are defined in
+[`Docs/DesignConcept/GameSettings.md`](Docs/DesignConcept/GameSettings.md). The planned
 Arcane-Industrial setting, including dieselpunk and atompunk technology, is
 defined in [`Docs/DesignConcept/Setting.md`](Docs/DesignConcept/Setting.md). The planned
 crew races, heritages, physiology, and character-generation boundaries are
@@ -110,6 +123,8 @@ defined in
 | `Source/Spelljammer.App/` | WPF host, expedition presentation, SpriteForge interop, and renderer viewport. |
 | `Source/Spelljammer.Simulation/` | Headless authoritative expedition and character-capability state and commands. |
 | `Source/Spelljammer.Content/` | Pack loading, validation, immutable registries, and semantic fingerprints. |
+| `Source/Spelljammer.Persistence/` | Content-locked campaign saves, validation, recovery, and migrations. |
+| `Source/Spelljammer.Settings/` | Local player preferences, validation, transactional publication, and durable persistence. |
 | `Source/Spelljammer.Localization/` | Game-owned localization runtime and message formatter. |
 | `Tools/Spelljammer.Content.Compiler/` | Offline gameplay-pack validation tool. |
 | `Tools/Spelljammer.Localization.Compiler/` | Source-catalog compiler and validation tools. |
@@ -118,6 +133,8 @@ defined in
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only deterministic simulation contracts. |
 | `Tests/Spelljammer.Localization.Tests/` | Compile-only localization contracts. |
 | `Tests/Spelljammer.Content.Tests/` | Compile-only gameplay content and rollback contracts plus frozen v1 fixtures. |
+| `Tests/Spelljammer.Persistence.Tests/` | Compile-only save, preflight, replacement, recovery, and migration contracts. |
+| `Tests/Spelljammer.Settings.Tests/` | Compile-only settings codec, rollback, recovery, and cleanup contracts. |
 | `Docs/DesignConcept/` | Current vision and playable-slice scope. |
 | `Docs/Architecture/` | Implemented and planned subsystem boundaries. |
 | `Docs/Archive/` | Historical explorations; not current product authority. |
@@ -126,6 +143,8 @@ defined in
 Planned implementation contracts are documented in
 [`Docs/Architecture/ContentPacks.md`](Docs/Architecture/ContentPacks.md),
 [`Docs/Architecture/CharacterCapabilities.md`](Docs/Architecture/CharacterCapabilities.md),
+[`Docs/Architecture/CampaignSaves.md`](Docs/Architecture/CampaignSaves.md),
+[`Docs/Architecture/GameSettings.md`](Docs/Architecture/GameSettings.md),
 [`Docs/Architecture/Modding.md`](Docs/Architecture/Modding.md), and
 [`Docs/Architecture/ImplementationRoadmap.md`](Docs/Architecture/ImplementationRoadmap.md).
 The frozen version 1 identity, serialization, bounds, and diagnostic contracts
@@ -156,7 +175,8 @@ dotnet run --project .\Source\Spelljammer.App\Spelljammer.App.csproj `
 
 Follow SpriteForge's README to configure and install the native engine. The
 current host is Windows-only even though reusable SpriteForge components may
-target other platforms.
+target other platforms. The settings dialog requires SpriteForge UI interop
+version 1 in addition to the existing renderer ABI.
 
 ## Localization
 

@@ -15,9 +15,19 @@ public static class CampaignValidator
         ArgumentNullException.ThrowIfNull(content);
         missingId = null;
         VoyageWorld world = campaign.Voyage;
+        CampaignContentLock expectedLock = CampaignContentLock.Create(content);
         if (Encoding.UTF8.GetByteCount(campaign.GameBuild) is 0 or > CampaignState.MaximumGameBuildBytes ||
+            campaign.ContentLock.BaseContentRevision != expectedLock.BaseContentRevision ||
+            !campaign.ContentLock.Packs.SequenceEqual(expectedLock.Packs) ||
+            campaign.ContentLock.ManifestFingerprint != expectedLock.ManifestFingerprint ||
             campaign.ContentLock.EffectiveFingerprint != content.Fingerprint ||
             campaign.ContentLock.SemanticFingerprint != content.Fingerprint ||
+            campaign.ContentLock.GeneratorVersion != CampaignSaveVersions.WorldGenerator ||
+            campaign.ContentLock.FormulaVersion != CampaignSaveVersions.Formula ||
+            campaign.ContentLock.EffectVersion != CampaignSaveVersions.Effect ||
+            campaign.ContentLock.SaveSchemaVersion != CampaignSaveVersions.SaveSchema ||
+            campaign.ContentLock.AppliedMigrationIds.Length > CampaignSaveLimits.MaximumCollectionEntries ||
+            campaign.ContentLock.AppliedMigrationIds.Distinct().Count() != campaign.ContentLock.AppliedMigrationIds.Length ||
             world.ContentFingerprint != content.Fingerprint || world.Tick < 0 ||
             world.Ships.Count is 0 or > CampaignSaveLimits.MaximumShips ||
             campaign.Characters.Length > CampaignSaveLimits.MaximumCharacters ||
@@ -35,6 +45,7 @@ public static class CampaignValidator
             return false;
         }
 
+        ImmutableHashSet<CharacterId> characterIds = campaign.Characters.Select(value => value.Id).ToImmutableHashSet();
         foreach (CharacterState character in campaign.Characters)
         {
             if (character.ContentFingerprint != content.Fingerprint ||
@@ -47,7 +58,11 @@ public static class CampaignValidator
                 character.TrainingProgress.Count > CharacterCapabilities.MaximumSetEntries ||
                 character.TrainingProgress.Any(value => value.Value < 0 || !content.TryGetTrainingProject(value.Key, out _)) ||
                 character.ActiveEffects.Length > CampaignSaveLimits.MaximumCollectionEntries ||
-                character.Evidence.Length > CampaignSaveLimits.MaximumRetainedEvents)
+                character.Evidence.Length > CampaignSaveLimits.MaximumRetainedEvents ||
+                character.ActiveEffects.Any(value => !characterIds.Contains(value.ActorId) ||
+                    !characterIds.Contains(value.TargetId) || value.EndTick < value.StartTick) ||
+                character.Evidence.Any(value => !characterIds.Contains(value.ActorId) ||
+                    !characterIds.Contains(value.TargetId) || value.Tick < 0))
             {
                 missingId = content.TryGetCharacter(character.Id, out _) ? null : character.Id.Value;
                 return false;
@@ -80,6 +95,12 @@ public static class CampaignValidator
                 return false;
             }
 
+            if (ship.Contacts.Any(value => value.Key != value.Value.ShipId || !world.Ships.ContainsKey(value.Key) ||
+                    value.Value.LastObservedTick < 0 || value.Value.LastObservedTick > world.Tick))
+            {
+                return false;
+            }
+
             foreach (InstalledModuleState module in ship.Modules)
             {
                 if (!content.TryGetShipModule(module.Definition.ModuleId, out _) || module.Integrity < 0 ||
@@ -99,7 +120,8 @@ public static class CampaignValidator
             }
         }
 
-        if (world.PersonalEncounter is PersonalEncounterState encounter && !ValidateEncounter(encounter, content, out missingId))
+        if (world.PersonalEncounter is PersonalEncounterState encounter &&
+            !ValidateEncounter(encounter, characterIds, content, out missingId))
         {
             return false;
         }
@@ -172,6 +194,7 @@ public static class CampaignValidator
 
     private static bool ValidateEncounter(
         PersonalEncounterState encounter,
+        ImmutableHashSet<CharacterId> characterIds,
         GameContentSnapshot content,
         out ContentId? missingId)
     {
@@ -188,7 +211,9 @@ public static class CampaignValidator
 
         foreach (PersonalActorState actor in encounter.Actors.Values)
         {
-            if (!encounter.Board.Cells.ContainsKey(actor.CellId) || actor.TurnMeter is < 0 or > VoyageTime.TurnMeterThreshold ||
+            if (!encounter.Board.Cells.ContainsKey(actor.CellId) ||
+                actor.CharacterId is CharacterId characterId && !characterIds.Contains(characterId) ||
+                actor.TurnMeter is < 0 or > VoyageTime.TurnMeterThreshold ||
                 actor.ActionPoints is < 0 or > VoyageTime.ActionPointsPerActivation || actor.Health < 0 ||
                 actor.Loadout.Slots.Count > PersonalLoadout.MaximumSlots || actor.Injuries.Length > CampaignSaveLimits.MaximumCollectionEntries)
             {

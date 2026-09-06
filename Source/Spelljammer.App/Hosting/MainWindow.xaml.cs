@@ -1,5 +1,7 @@
 using System.Text;
 using System.Windows;
+using Spelljammer.Presentation;
+using Spelljammer.Settings;
 using Spelljammer.Simulation;
 
 namespace Spelljammer;
@@ -8,17 +10,34 @@ public partial class MainWindow : Window
 {
     private const int FrameCount = 4;
     private readonly ExpeditionSimulation simulation = new();
+    private readonly GameSettingsRegistry settings;
+    private readonly string settingsPath;
+    private readonly GameSettingsStrings settingsStrings;
     private ExpeditionState expedition;
     private ulong nextSeed = 0xc0ffeeUL;
 
-    public MainWindow()
+    internal MainWindow(
+        GameSettingsRegistry settings,
+        string settingsPath,
+        GameSettingsDiagnostic startupDiagnostic,
+        GameSettingsStrings settingsStrings)
     {
+        this.settings = settings;
+        this.settingsPath = settingsPath;
+        this.settingsStrings = settingsStrings;
         InitializeComponent();
+        SettingsButton.Content = settingsStrings.Get("settings.button.open");
         expedition = simulation.Create(nextSeed);
         Viewport.FrameChanged += Viewport_FrameChanged;
         Closed += MainWindow_Closed;
         ShowFrame(0);
-        UpdateExpeditionView("The chart is mostly blank. Choose a heading and make the void legible.");
+        ApplySettings(settings.Active);
+        string opening = startupDiagnostic is GameSettingsDiagnostic.None or GameSettingsDiagnostic.Missing
+            ? "The chart is mostly blank. Choose a heading and make the void legible."
+            : settingsStrings.Diagnostic(
+                "settings.status.load-failed",
+                GameSettingsDiagnostics.Stable(startupDiagnostic));
+        UpdateExpeditionView(opening);
     }
 
     private void Apply(ExpeditionCommand command)
@@ -166,6 +185,25 @@ public partial class MainWindow : Window
     {
         Viewport.Restart();
         PlayPauseButton.Content = "Pause drive";
+    }
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        GameSettingsDialog dialog = new(settings, settingsPath, settingsStrings) { Owner = this };
+        if (dialog.ShowDialog() == true)
+        {
+            ApplySettings(settings.Active);
+            EventLabel.Text = settingsStrings.Get("settings.status.saved");
+        }
+    }
+
+    private void ApplySettings(GameSettingsProfile profile)
+    {
+        Viewport.SetReducedMotion(profile.ReducedMotion);
+        PlayPauseButton.IsEnabled = !profile.ReducedMotion;
+        PlayPauseButton.Content = profile.ReducedMotion
+            ? settingsStrings.Get("settings.label.reduced-motion")
+            : Viewport.IsPlaying ? "Pause drive" : "Run drive";
     }
 
     private void MainWindow_Closed(object? sender, EventArgs e)

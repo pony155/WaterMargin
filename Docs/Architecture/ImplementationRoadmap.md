@@ -6,11 +6,11 @@ This document sequences the transition from the compiled expedition prototype
 to data-driven, mod-ready gameplay. Checked tasks describe implemented work;
 unchecked tasks remain planned.
 
-The current headless simulation has immutable expedition state, typed commands,
-deterministic sector derivation, bounded content loading, an eleven-character
-roster, capability training, and the first Spell and psychic-technique paths.
-It does not have fixed-tick `VoyageWorld`, public saves, ship modules, tactical
-battle, factions, or crises.
+The current headless runtime has immutable expedition state, bounded content
+loading, an eleven-character roster, character capabilities, a fixed-tick
+`VoyageWorld`, modular ship and personal encounters, and content-locked campaign
+saves. Those detailed systems and save controls are not yet connected to the
+WPF shell, and local mod configuration, factions, and crises remain planned.
 
 The transition is incremental. The existing 4 × 4 expedition remains buildable
 until a replacement slice satisfies its contracts. New architecture is added
@@ -616,61 +616,61 @@ orders reproduce identical fixed-point trajectories.
 
 ### Phase M6.1: define the save envelope
 
-- [ ] **M6.1.1** Specify magic bytes or document discriminator, save schema,
+- [x] **M6.1.1** Specify magic bytes or document discriminator, save schema,
   game build, generator versions, content lock, payload length, and checksum.
-- [ ] **M6.1.2** Define maximum save bytes, collection counts, nesting, strings,
+- [x] **M6.1.2** Define maximum save bytes, collection counts, nesting, strings,
   and retained history.
-- [ ] **M6.1.3** Add stable diagnostics for corrupt, oversized, unsupported, and
+- [x] **M6.1.3** Add stable diagnostics for corrupt, oversized, unsupported, and
   truncated saves.
-- [ ] **M6.1.4** Keep localization text, WPF state, native pointers, and runtime
+- [x] **M6.1.4** Keep localization text, WPF state, native pointers, and runtime
   dense indices out of the contract.
 
 ### Phase M6.2: serialize a minimal campaign
 
-- [ ] **M6.2.1** Serialize voyage header, seed, tick, content lock, ship,
+- [x] **M6.2.1** Serialize voyage header, seed, tick, content lock, ship,
   characters, and current location through stable IDs.
-- [ ] **M6.2.2** Serialize known definitions, training, resources, injuries,
+- [x] **M6.2.2** Serialize known definitions, training, resources, injuries,
   active effects, and queued work within bounds.
-- [ ] **M6.2.3** Reconstruct runtime indices only after selecting the compatible
+- [x] **M6.2.3** Reconstruct runtime indices only after selecting the compatible
   content snapshot.
-- [ ] **M6.2.4** Verify stable canonical output for identical authoritative
+- [x] **M6.2.4** Verify stable canonical output for identical authoritative
   state.
 
 ### Phase M6.3: implement content preflight
 
-- [ ] **M6.3.1** Compare exact pack IDs, versions, semantic fingerprints,
+- [x] **M6.3.1** Compare exact pack IDs, versions, semantic fingerprints,
   generator, formula, effect, and save versions.
-- [ ] **M6.3.2** Return Exact, Compatible, Migratable, Missing, or Incompatible
+- [x] **M6.3.2** Return Exact, Compatible, Migratable, Missing, or Incompatible
   before decoding full authoritative state.
-- [ ] **M6.3.3** List missing packs and definition IDs without guessing from
+- [x] **M6.3.3** List missing packs and definition IDs without guessing from
   display names.
-- [ ] **M6.3.4** Prevent preflight from altering the active registry or campaign.
+- [x] **M6.3.4** Prevent preflight from altering the active registry or campaign.
 
 ### Phase M6.4: validate and publish loads
 
-- [ ] **M6.4.1** Decode into a temporary bounded representation.
-- [ ] **M6.4.2** Resolve every stable reference and validate invariants, values,
+- [x] **M6.4.1** Decode into a temporary bounded representation.
+- [x] **M6.4.2** Resolve every stable reference and validate invariants, values,
   grants, graphs, schedules, and ownership.
-- [ ] **M6.4.3** Reject partial or unknown state and retain the active campaign.
-- [ ] **M6.4.4** Publish one complete reconstructed campaign only after all
+- [x] **M6.4.3** Reject partial or unknown state and retain the active campaign.
+- [x] **M6.4.4** Publish one complete reconstructed campaign only after all
   validation succeeds.
 
 ### Phase M6.5: implement safe file replacement
 
-- [ ] **M6.5.1** Write a new save to a same-directory temporary artifact.
-- [ ] **M6.5.2** Flush, validate, and replace only the exact target save.
-- [ ] **M6.5.3** Preserve a bounded recovery artifact and define cleanup rules.
-- [ ] **M6.5.4** Cover interrupted write, disk error, invalid replacement, and
+- [x] **M6.5.1** Write a new save to a same-directory temporary artifact.
+- [x] **M6.5.2** Flush, validate, and replace only the exact target save.
+- [x] **M6.5.3** Preserve a bounded recovery artifact and define cleanup rules.
+- [x] **M6.5.4** Cover interrupted write, disk error, invalid replacement, and
   recovery without broad filesystem deletion.
 
 ### Phase M6.6: implement one migration
 
-- [ ] **M6.6.1** Define a migration ID, exact source fingerprint, destination,
+- [x] **M6.6.1** Define a migration ID, exact source fingerprint, destination,
   and deterministic transformation contract.
-- [ ] **M6.6.2** Transform a temporary copy and validate against destination
+- [x] **M6.6.2** Transform a temporary copy and validate against destination
   content.
-- [ ] **M6.6.3** Write a new migrated save without overwriting the source.
-- [ ] **M6.6.4** Cover success, missing path, wrong source, failed transform,
+- [x] **M6.6.3** Write a new migrated save without overwriting the source.
+- [x] **M6.6.4** Cover success, missing path, wrong source, failed transform,
   failed validation, and rollback.
 
 Deliverables:
@@ -767,6 +767,9 @@ instances, reports, agreements, territory, markets, and a complete return
 voyage.
 
 ### Phase M8.1: define galaxy content and settings
+
+Campaign-setting ownership and persistence follow
+[`../DesignConcept/GameSettings.md`](../DesignConcept/GameSettings.md).
 
 - [ ] **M8.1.1** Add versioned Galaxy Settings, Shape, Region, System Archetype,
   Site, Starway, Hazard, Landmark, Travel Event, and Event Choice definitions.
@@ -959,6 +962,7 @@ Report engine, game, content-tool, and CI-owned test status separately.
 | Loader failure publishes partial state | Candidate registry and validate-before-publish transaction |
 | Scope delays the playable voyage | Move one content family at a time and retain the prototype |
 
-The near-term target is Milestone 6, not complete public mod support. Milestone
-5 supplies the headless dual-tempo encounter boundary, deterministic ship and
-personal action state, and authored first-slice encounter content.
+The near-term target is Milestone 7, not unrestricted mod support. Milestone 6
+supplies the versioned content-locked save boundary, stable-ID reconstruction,
+transactional publication, durable replacement and recovery, and explicit
+migrations.

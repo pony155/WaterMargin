@@ -2,14 +2,16 @@
 
 ## Status
 
-This document specifies the planned declarative mod boundary. No gameplay mod
-loader, mod directory, package manager, executable-script host, or mod-aware
-save contract is implemented. Existing localization source files are build
-inputs, not evidence that runtime gameplay mods already work.
+This document specifies the planned declarative mod boundary. The content-locked
+save contract and explicit migration boundary are implemented, but no gameplay
+mod directory, package manager, executable-script host, or user-facing mod
+loader exists. Existing localization source files are build inputs, not
+evidence that runtime gameplay mods already work.
 
 The content pipeline is defined in [`ContentPacks.md`](ContentPacks.md).
 Character definitions and access grants are defined in
-[`CharacterCapabilities.md`](CharacterCapabilities.md).
+[`CharacterCapabilities.md`](CharacterCapabilities.md). The implemented save
+contract is defined in [`CampaignSaves.md`](CampaignSaves.md).
 
 ## Initial scope
 

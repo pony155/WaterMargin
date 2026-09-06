@@ -10,7 +10,8 @@ galaxy representation.
 Optional late-campaign threats that can transform this graph are defined in
 [`Endgame_Crisis.md`](Endgame_Crisis.md).
 Seeded situations that occur while crossing its routes are defined in
-[`Events.md`](Events.md).
+[`Events.md`](Events.md). The ownership and persistence rules for player-facing
+campaign configuration are defined in [`GameSettings.md`](GameSettings.md).
 
 ## Design goals
 

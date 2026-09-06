@@ -10,7 +10,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Spelljammer.Localization\Spelljammer.Localization.csproj" />
+    <ProjectReference Include="..\Spelljammer.Settings\Spelljammer.Settings.csproj" />
     <ProjectReference Include="..\Spelljammer.Simulation\Spelljammer.Simulation.csproj" />
+    <ProjectReference Include="..\..\Tools\Spelljammer.Localization.Compiler\Spelljammer.Localization.Compiler.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+    <EmbeddedResource Include="$(IntermediateOutputPath)Localization\en-US\settings.sfloc"
+                      LogicalName="Spelljammer.Localization.en-US.settings.sfloc" />
   </ItemGroup>
+
+  <Target Name="CompileSettingsLocalizationCatalog"
+          BeforeTargets="CoreCompile"
+          Inputs="$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\settings.sfloc.json"
+          Outputs="$(IntermediateOutputPath)Localization\en-US\settings.sfloc">
+    <MakeDir Directories="$(IntermediateOutputPath)Localization\en-US" />
+    <Exec Command="dotnet &quot;$(MSBuildProjectDirectory)\..\..\Tools\Spelljammer.Localization.Compiler\bin\$(Configuration)\net10.0\Spelljammer.Localization.Compiler.dll&quot; compile &quot;$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\settings.sfloc.json&quot; &quot;$(IntermediateOutputPath)Localization\en-US\settings.sfloc&quot;" />
+  </Target>
 
 </Project>
