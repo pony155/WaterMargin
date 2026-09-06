@@ -372,7 +372,7 @@ iteration, diagnostics, and UI projection see it without a source change.
 ### Phase M3.7: author and prove the base race roster
 
 - [ ] **M3.7.1** Author all eleven base Race definitions and their Race Perk
-  grants, including Eidolon Soul Anchor and Kharuun Trail Sense.
+  grants, including Eidolon Soul Anchor and Tharun Trail Sense.
 - [ ] **M3.7.2** Author one compatible first-slice Heritage and Heritage Perk
   for each Race; defer additional Heritage rows until their Perk IDs are
   explicitly inventoried.

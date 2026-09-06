@@ -10,7 +10,7 @@ only ship-level expedition resources.
 
 - Make every crew member mechanically understandable and narratively distinct.
 - Support humans, elves, half-elves, dwarves, orcs, gnomes, goblins, Somnari,
-  vampires, Eidolons, Kharuun, and future races without hard-coding content
+  Veyr, Eidolons, Tharun, and future races without hard-coding content
   into simulation code.
 - Use classless progression: attributes describe capability, skills improve
   through use and training, and no class limits what a character may learn.
@@ -44,7 +44,7 @@ A persistent character is composed from independent, stable layers:
 | Layer | Examples | Simulation responsibility |
 | --- | --- | --- |
 | Identity | character ID, name seed, pronouns, portrait seed | Persistence and presentation lookup |
-| Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire, Eidolon, Kharuun | Body plan and baseline physiological rules |
+| Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, Veyr, Eidolon, Tharun | Body plan and baseline physiological rules |
 | Heritage | voidborn, deepforge, free-anchorage | Subrace, formative tradition, languages, customs, and starting knowledge |
 | Background | academy graduate, dockhand, caravan guard | Starting skill package and history, never a class |
 | Attributes | Strength, Agility, Willpower, Intelligence, Luck, Charisma, Toughness | Broad capability shared by many actions |
@@ -138,6 +138,14 @@ Physiology**, lets a character select one minor human adaptation and one minor
 elven sense, each at reduced strength. It does not determine heritage or
 guarantee social acceptance.
 
+Half-elves emerged after the First Concord, especially in shared ports,
+diplomatic stations, and mixed settlements. They are not an ancient empire or
+a single people with a common political loyalty. Living across elven long-lived
+traditions and rapidly changing human port cultures, many became interpreters,
+negotiators, navigators, and arbitrators. Their history makes them a natural
+part of the Concord's promise and its unresolved tensions, without assigning
+any individual a social role.
+
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Concord | `heritage.half-elf.concord` | Switches between normal sleep and trance when quarters permit | Neither rest mode is as efficient as its specialist form |
@@ -209,6 +217,14 @@ than assuming one body scale. Gnomes are not inherently inventive or
 scholarly; those qualities come from individual attributes, skills, and
 heritage.
 
+Their homeworld's conductive mineral veins, high-altitude storms, and unstable
+terrain fostered traditions of careful measurement long before spaceflight.
+After elven navigators demonstrated open-space Aether travel, gnome and dwarf
+researchers turned rare resonance craft into calibrated instruments, safe
+couplers, and repeatable shipyard practice. Gnome influence therefore travels
+through observatories, repair stations, calibration guilds, and technical
+standards more often than territorial states.
+
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Coilwhisper | `heritage.gnome.coilwhisper` | Feels subtle vibration, current, and mechanical imbalance through contact | Heavy vibration and electrical surges cause sensory strain |
@@ -226,6 +242,14 @@ penalties in ducts, wreckage, and congested decks. Their lighter frames are
 easier to throw off balance, and standard armor, furniture, and controls may
 require refitting. Goblins are not inherently dishonest, reckless, or crude;
 behavior comes from the individual and their society.
+
+The first recovered couplers, life-support systems, and navigational components
+of the orc-goblin fleets were often restored by goblin workshops. Goblin
+engineers learned to extract usable principles from incomplete precursor
+designs and keep them working with limited materials. Some goblin communities
+are committed partners in the conquest fleets, while others profit from their
+logistics or leave for neutral recovery ports. Their shared claim to precursor
+knowledge is a lasting source of leverage and friction within the alliance.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
@@ -250,42 +274,60 @@ Somnari breathe, eat, and rest normally, but their sleep includes a vivid dream
 phase needed to recover psychic strain. They are not inherently wiser, calmer,
 more truthful, or more intelligent than other races.
 
+On their storm-wreathed homeworld, early Somnari repeatedly dreamed of the same
+unfamiliar skies, lost satellites, and distant catastrophes. Patient records
+and star-chart comparisons eventually proved that some of these impressions
+described real places beyond their world. The dreams were neither Aether magic
+nor infallible prophecy, but a motive to build their first voyages toward
+otherwise unreachable signals. Modern Somnari communities are prominent in
+rescue work, memory archives, trauma care, and anomaly research, while other
+states remain wary of what psychic contact might reveal.
+
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Chorusborn | `heritage.somnari.chorusborn` | Maintains a consensual mindlink among several nearby participants | Crowds and overlapping psychic signals accumulate strain faster |
 | Veilward | `heritage.somnari.veilward` | Shields themself or an assisted ally against psychic intrusion | Dropping the shield to receive beneficial contact takes focus and time |
 | Farwhisper | `heritage.somnari.farwhisper` | Detects directed psychic signals and emotional distress at extended range | Aether storms and ancient sites can create misleading psychic echoes |
 
-### Vampires
+### Veyr
 
-Vampires are an undead race sustained by blood or a setting-specific vital
-essence. Their histories may describe inherited or transformative origins, but
-character creation stores `race.vampire` and one compatible heritage.
+Veyr are living descendants of a once-powerful ancient empire, older than any
+surviving star chart. That empire collapsed in a Great Cataclysm when a civil
+war coincided with a stellar disaster, turning its core worlds, fleets, and
+archives into ruins. The broad history is known, but vaults, contradictory
+lineages, and fragmentary records leave the war's cause, its responsible
+factions, and the exact nature of the stellar calamity unresolved. Character
+creation stores `race.veyr` and one compatible heritage.
 
-All vampires receive the Racial Perk **Unliving Physiology**: they do not
-breathe, resist vacuum and common disease, and can remain active without
-ordinary food. They instead track thirst. Starvation does not silently force
-harmful behavior; it unlocks
-explicit risks, consent policies, restraint options, and command decisions.
-Radiant exposure impairs healing and may cause injury depending on protection.
+Veyr culture is deliberately gothic: sable architecture, high spires, memorial
+gardens, formal mourning, candlelit rites, and elaborate records of ancestry
+and obligation. This is a tradition, not evidence that they are undead or that
+they feed on blood. Veyr breathe, eat, sleep, and receive medical care normally.
+Their Racial Perk, **Dusk Sight**, gives clear low-light vision but makes sudden
+bright flashes and prolonged glare more taxing.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
-| Crimson | `heritage.vampire.crimson` | Converts fresh blood into rapid healing and strength | Thirst rises faster and stored blood spoils without refrigeration |
-| Umbral | `heritage.vampire.umbral` | Conceals presence and sees clearly in near darkness | Direct stellar light is especially dangerous |
-| Ashen | `heritage.vampire.ashen` | Tolerates filtered daylight and long dormant passages | Healing and physical bursts consume more essence |
-
-Ship policy must record how blood stores are acquired and consumed and how
-shortages are handled. Vampirism creates a resource constraint; it does not
-assign morality.
+| Crimson Court | `heritage.veyr.crimson-court` | Reads formal etiquette, obligation, and status in structured social settings | Informal or rapidly changing groups are harder to interpret |
+| Umbral Cloister | `heritage.veyr.umbral-cloister` | Moves and works effectively in low light | Bright flashes and glare cause strain sooner |
+| Ashen Pilgrim | `heritage.veyr.ashen-pilgrim` | Tolerates dust, dry air, and long austere journeys | Comfortable, resource-rich routines provide less effective recovery |
 
 ### Eidolons
 
 Eidolons are an undead spirit race whose identity persists through a crafted
 Soul Anchor and an embodied vessel. Character creation stores `race.eidolon`
-and one compatible Heritage. They are distinct from vampires: a vampire
-maintains an undead body with vital essence, while an Eidolon's spirit operates
-a replaceable or reconstructable form from an external anchor.
+and one compatible Heritage. They are distinct from the living Veyr: an
+Eidolon's spirit operates a replaceable or reconstructable form from an
+external anchor.
+
+Eidolons began with an emergency evacuation from a doomed colony. Its people
+developed Soul Anchors to carry identity through a voyage their bodies could
+not survive, then rebuilt vessels at their destination. The survivors retained
+memory and will but were no longer conventionally alive. Their first political
+tradition, the Anchor Covenant, established that an Eidolon is a person rather
+than property, a disposable tool, or a copy for another's use. Eidolons are now
+scattered across the galaxy, and disputes over anchor custody, continuity of
+identity, and reconstruction rights remain central to their history.
 
 Their Racial Perk, **Soul Anchor**, removes the need to breathe, eat ordinary
 food, or sleep and provides resistance to vacuum and common disease. Activity
@@ -309,29 +351,52 @@ knowledgeable; memories and personality belong to the individual.
 | Huskbound | `heritage.eidolon.huskbound` | A preserved organic vessel fits ordinary armor, tools, and some medical procedures | Decay control consumes preservative supplies and contaminated environments can damage the vessel |
 | Starwisp | `heritage.eidolon.starwisp` | A light semi-material vessel moves precisely in low gravity and through narrow openings | It carries little unaided mass and magical or electrical interference disrupts coordination |
 
-### Kharuun
+### Tharun
 
-Kharuun are a spacefaring jackal-like race with long directional ears, keen
+Tharun are a spacefaring jackal-like race with long directional ears, keen
 chemical senses in atmosphere, and strong spatial memory. Character creation
-stores `race.kharuun` and one compatible Heritage. Their Racial Perk,
+stores `race.tharun` and one compatible Heritage. Their Racial Perk,
 **Trail Sense**, reduces uncertainty when following an already observed
 physical, chemical, thermal, acoustic, or signal trail. It improves how
 Sensors, Xenology, Ancient Lore, and relevant field work use available
 evidence; it never reveals unobserved information and cannot smell through a
 vacuum without a collected sample or instrument.
 
-Kharuun breathe, eat, and sleep normally. Their hearing and scent can be
+Tharun breathe, eat, and sleep normally. Their hearing and scent can be
 overloaded by machinery, fumes, weapons, or unfamiliar atmospheres, so fitted
 helmets and sensory filters matter. Suits, seats, beds, and armor must also
-accommodate muzzle, ears, digitigrade legs, and tail. Kharuun are not
+accommodate muzzle, ears, digitigrade legs, and tail. Tharun are not
 inherently loyal, predatory, nomadic, or suited to a particular profession;
 those qualities come from the character and their communities.
 
+The Tharun homeworld was a dry, seasonally extreme frontier colony of the Veyr
+Empire. For generations, Veyr authorities enslaved Tharun communities to
+extract its water, ores, fuel, and biological resources; maintain frontier
+infrastructure; and serve imperial routes. By the empire's end, systematic
+extraction had left the world depleted and its surviving communities in severe
+scarcity. When civil war and stellar disaster broke the empire, the colony was
+abandoned with damaged shipyards, stranded vessels, and partial technical
+archives. The Tharun reclaimed those remnants, learned to operate and repair
+them, and re-entered space on their own terms because remaining homeworld
+resources could no longer sustain them.
+
+Their older survival practice—following water, weather, and migration trails
+across vast distances—became a starfaring strength: engine traces, signals,
+heat changes, and drifting cargo are all routes that can be read. Tharun did
+not invent Aether travel, but their navigators, search crews, and frontier
+scouts can reconstruct an incomplete route from the marks it leaves. Their
+cultures often treat a route as a shared memory rather than merely a line on a
+map, which supports both commercial service and fierce independence. The
+history of enslavement, extraction, and abandonment created a deep, widespread
+Tharun hatred of Veyr people. Many communities regard every Veyr presence as
+a possible return of imperial power, and Veyr-Tharun contact is often marked
+by hostility, exclusion, reprisals, or open conflict.
+
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
-| Sunwake | `heritage.kharuun.sunwake` | Tolerates heat, dry air, and long periods of measured water rationing | Cold exposure and sudden temperature drops accumulate fatigue faster |
-| Hull-Listener | `heritage.kharuun.hull-listener` | Reads faint vibration and movement through direct contact with a hull or deck | Heavy machinery, impacts, and sustained alarm noise cause sensory strain |
-| Startrail | `heritage.kharuun.startrail` | Retains bearings and correlates weak route traces after partial sensor loss | Featureless space and contradictory interference require more time and can produce false leads |
+| Sunwake | `heritage.tharun.sunwake` | Tolerates heat, dry air, and long periods of measured water rationing | Cold exposure and sudden temperature drops accumulate fatigue faster |
+| Hull-Listener | `heritage.tharun.hull-listener` | Reads faint vibration and movement through direct contact with a hull or deck | Heavy machinery, impacts, and sustained alarm noise cause sensory strain |
+| Startrail | `heritage.tharun.startrail` | Retains bearings and correlates weak route traces after partial sensor loss | Featureless space and contradictory interference require more time and can produce false leads |
 
 ## Racial perks
 
@@ -363,9 +428,9 @@ Every character begins with two Racial Perks:
 | Gnome | Closework | `perk.race.gnome.closework` | None |
 | Goblin | Tight Passage | `perk.race.goblin.tight-passage` | None |
 | Somnari | Mindwake | `perk.race.somnari.mindwake` | `access.psionics` |
-| Vampire | Unliving Physiology | `perk.race.vampire.unliving-physiology` | None by default |
+| Veyr | Dusk Sight | `perk.race.veyr.dusk-sight` | None |
 | Eidolon | Soul Anchor | `perk.race.eidolon.soul-anchor` | None by default |
-| Kharuun | Trail Sense | `perk.race.kharuun.trail-sense` | None |
+| Tharun | Trail Sense | `perk.race.tharun.trail-sense` | None |
 
 Heritage Perks use IDs such as `perk.heritage.dwarf.cometdelver`. A Racial Perk
 definition owns its explicit effects, costs, requirements, and
@@ -449,12 +514,12 @@ rules, unknown modifiers, and unbounded generation tables before publication.
 ## First playable character scope
 
 The first crew-enabled vertical slice should use eleven authored characters:
-one human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire, Eidolon,
-and Kharuun. Each needs a race, heritage, background, attributes, skills, two
+one human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, Veyr, Eidolon,
+and Tharun. Each needs a race, heritage, background, attributes, skills, two
 Racial Perks, and compatible quarters. The two Racial Perks are racial feats:
 one granted by Race and one by Heritage. The Elf must exercise innate
 magical access and the Somnari must exercise innate psychic access. The
-Eidolon's anchor logistics and the Kharuun's evidence-bounded tracking must
+Eidolon's anchor logistics and the Tharun's evidence-bounded tracking must
 each change at least one voyage decision. At least one character without
 either access Racial Perk must demonstrate earning an access Feat through
 documented training. Ship jobs and schedules are a separate future crew-system

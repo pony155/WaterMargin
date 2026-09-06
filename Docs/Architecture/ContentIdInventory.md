@@ -117,8 +117,8 @@ inventoried when their definition schemas enter roadmap scope.
 | Versatility | `perk.race.human.versatility` |
 | Second Wind | `perk.race.orc.second-wind` |
 | Mindwake | `perk.race.somnari.mindwake` |
-| Unliving Physiology | `perk.race.vampire.unliving-physiology` |
-| Trail Sense | `perk.race.kharuun.trail-sense` |
+| Dusk Sight | `perk.race.veyr.dusk-sight` |
+| Trail Sense | `perk.race.tharun.trail-sense` |
 
 Heritage tables describe additional Heritage Perks without spelling out a
 stable Perk ID for each row. Only the explicit Cometdelver example is listed

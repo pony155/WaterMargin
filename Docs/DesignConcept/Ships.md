@@ -238,7 +238,7 @@ installed instances commit together or the original ship remains unchanged.
 | Galley | `module.habitat.galley` | Turns provisions into safe meals for compatible diets | Cooking; Chef |
 | Sickbay | `module.habitat.sickbay` | Supports diagnosis, surgery, quarantine, recovery, and medical storage | Medicine; Doctor or Medic |
 | Common Room | `module.habitat.common-room` | Supports recreation, meetings, belonging, and conflict mediation | Insight or Negotiation; Steward or First Mate |
-| Provision Locker | `module.habitat.provision-locker` | Preserves food, blood, medicine, and other tagged consumables | Cooking, Medicine, or Alchemy |
+| Provision Locker | `module.habitat.provision-locker` | Preserves food, medicine, and other tagged consumables | Cooking, Medicine, or Alchemy |
 
 ### Work, research, and cargo
 

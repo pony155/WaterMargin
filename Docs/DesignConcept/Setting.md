@@ -101,6 +101,18 @@ may support those fleets, profit from them, or pursue their own interests. The
 precursor civilization remains unknown; its legacy is a source of exploration,
 danger, and disagreement, not an authority that explains every modern system.
 
+Other peoples entered the wider galaxy through their own histories: gnome and
+dwarf researchers made Aether coupling measurable; Somnari followed recurring
+psychic impressions toward distant signals; the gothic Veyr, descendants of an
+ancient empire broken by civil war and stellar disaster, built refuge and trade
+routes around their fragmentary past; Eidolons began as survivors of a Soul
+Anchor evacuation; and Tharun reclaimed Veyr colonial shipyards after the
+empire enslaved them and stripped their world of resources, turning planetary
+trail-reading into star-route navigation. That legacy fuels enduring
+Veyr-Tharun hostility. Half-elves arose in the mixed settlements of the First
+Concord rather than from a separate ancient state. See [`Races.md`](Races.md)
+for these histories and their individual limits.
+
 A caster uses the surrounding Aether as a focus medium, while a ship couples to
 it through physical resonators, conduits, and accumulators. **Aether charge**
 is not stored Aether; it is the usable Arcane energy that a device has captured

@@ -39,7 +39,7 @@ economic concerns. The setting baseline is in [`Setting.md`](Setting.md).
 
 A faction is an organization, polity, movement, guild, fleet, faith, company,
 or alliance. It is not a race. Humans, elves, half-elves, dwarves, orcs,
-gnomes, goblins, Somnari, vampires, Eidolons, Kharuun, and future races may
+gnomes, goblins, Somnari, Veyr, Eidolons, Tharun, and future races may
 belong to the same faction. Members of one race may support rival factions or
 none at all.
 
@@ -185,8 +185,8 @@ records identify claims, controllers, enforcement reach, disputes, and the
 source and confidence of the player's knowledge.
 
 Relevant laws may govern docking, tariffs, salvage, relic removal, weapons,
-reactor fuel, aether use, enchantment, psychic contact, feeding and blood
-stores, quarantine, prisoners, and environmental protection. The interface
+reactor fuel, aether use, enchantment, psychic contact, medical stores,
+quarantine, prisoners, and environmental protection. The interface
 shows applicable known rules before the player commits an action when their
 crew could reasonably know them.
 
