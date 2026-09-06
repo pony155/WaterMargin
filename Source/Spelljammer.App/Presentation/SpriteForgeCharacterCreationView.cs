@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Spelljammer.Interop;
 using Spelljammer.Localization;
 
@@ -19,21 +20,26 @@ internal sealed class CharacterCreationCompletedEventArgs(CharacterCreationSelec
 
 internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisposable
 {
-    internal const double LogicalWidth = 1100;
-    internal const double LogicalHeight = 680;
-    private const uint ElementCapacity = 32;
-    private const uint ActionCapacity = 16;
+    internal const double LogicalWidth = 1600;
+    internal const double LogicalHeight = 900;
+    private const uint ElementCapacity = 64;
+    private const uint ActionCapacity = 32;
     private const uint NonEditableTextCapacity = 1;
 
     private static readonly ulong RootKey = StableKey("spelljammer.creation.root");
     private static readonly ulong ModalKey = StableKey("spelljammer.creation.modal");
+    private static readonly ulong HeaderPanelKey = StableKey("spelljammer.creation.header-panel");
+    private static readonly ulong HeaderRuleKey = StableKey("spelljammer.creation.header-rule");
     private static readonly ulong TitleKey = StableKey("spelljammer.creation.title");
     private static readonly ulong IntroductionKey = StableKey("spelljammer.creation.introduction");
-    private static readonly ulong PreviousKey = StableKey("spelljammer.creation.previous");
+    private static readonly ulong SelectionCounterKey = StableKey("spelljammer.creation.selection-counter");
+    private static readonly ulong RosterPanelKey = StableKey("spelljammer.creation.roster-panel");
+    private static readonly ulong RosterHeadingKey = StableKey("spelljammer.creation.roster-heading");
+    private static readonly ulong PreviewPanelKey = StableKey("spelljammer.creation.preview-panel");
     private static readonly ulong PortraitKey = StableKey("spelljammer.creation.portrait");
     private static readonly ulong CaptainKey = StableKey("spelljammer.creation.captain");
-    private static readonly ulong NextKey = StableKey("spelljammer.creation.next");
     private static readonly ulong DetailPanelKey = StableKey("spelljammer.creation.details");
+    private static readonly ulong DetailHeadingKey = StableKey("spelljammer.creation.details-heading");
     private static readonly ulong RaceLabelKey = StableKey("spelljammer.creation.race-label");
     private static readonly ulong RaceValueKey = StableKey("spelljammer.creation.race-value");
     private static readonly ulong HeritageLabelKey = StableKey("spelljammer.creation.heritage-label");
@@ -43,23 +49,22 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
     private static readonly ulong SummaryKey = StableKey("spelljammer.creation.summary");
     private static readonly ulong SeedLabelKey = StableKey("spelljammer.creation.seed-label");
     private static readonly ulong SeedValueKey = StableKey("spelljammer.creation.seed-value");
+    private static readonly ulong FooterPanelKey = StableKey("spelljammer.creation.footer-panel");
     private static readonly ulong StatusKey = StableKey("spelljammer.creation.status");
     private static readonly ulong BackKey = StableKey("spelljammer.creation.back");
     private static readonly ulong RerollKey = StableKey("spelljammer.creation.reroll");
     private static readonly ulong ConfirmKey = StableKey("spelljammer.creation.confirm");
     private static readonly ulong CancelAction = StableKey("spelljammer.creation.action.cancel");
+    private static readonly ulong[] CaptainChoiceKeys =
+        CharacterCreationChoices.All.Select((_, index) =>
+            StableKey($"spelljammer.creation.captain-choice.{index}")).ToArray();
 
-    private readonly ulong[] elementKeys =
-    [
-        ModalKey, TitleKey, IntroductionKey, PreviousKey, PortraitKey, CaptainKey, NextKey,
-        DetailPanelKey, RaceLabelKey, RaceValueKey, HeritageLabelKey, HeritageValueKey,
-        BackgroundLabelKey, BackgroundValueKey, SummaryKey, SeedLabelKey, SeedValueKey,
-        StatusKey, BackKey, RerollKey, ConfirmKey,
-    ];
+    private readonly ulong[] elementKeys;
     private readonly Dictionary<ulong, EngineUiElementSnapshot> snapshots = [];
     private readonly EngineUiPresentationCommand[] presentation = new EngineUiPresentationCommand[ElementCapacity];
     private readonly EngineUiAction[] actions = new EngineUiAction[ActionCapacity];
     private readonly GameText strings;
+    private readonly BitmapSource background;
     private nint context;
     private ulong document;
     private ulong revision;
@@ -73,6 +78,16 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         this.strings = strings;
         choiceIndex = initial is null ? 0 : FindChoiceIndex(initial.Choice.CharacterId);
         seed = initial?.Seed ?? NewSeed();
+        background = LoadBackground();
+        elementKeys =
+        [
+            ModalKey, HeaderPanelKey, HeaderRuleKey, TitleKey, IntroductionKey, SelectionCounterKey,
+            RosterPanelKey, RosterHeadingKey, PreviewPanelKey, PortraitKey, CaptainKey,
+            DetailPanelKey, DetailHeadingKey, RaceLabelKey, RaceValueKey, HeritageLabelKey,
+            HeritageValueKey, BackgroundLabelKey, BackgroundValueKey, SummaryKey, SeedLabelKey,
+            SeedValueKey, FooterPanelKey, StatusKey, BackKey, RerollKey, ConfirmKey,
+            .. CaptainChoiceKeys,
+        ];
         Focusable = true;
         SnapsToDevicePixels = true;
         CreateNativeDocument();
@@ -92,7 +107,7 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
     protected override void OnRender(DrawingContext drawingContext)
     {
         base.OnRender(drawingContext);
-        drawingContext.DrawRectangle(Brush("#090D18"), null, new Rect(RenderSize));
+        DrawBackdrop(drawingContext);
         if (context == nint.Zero)
         {
             return;
@@ -112,43 +127,69 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
                 continue;
             }
 
-            drawingContext.DrawRectangle(
-                ToBrush(command.Color),
-                null,
-                ScaleAndClip(command));
+            drawingContext.DrawRectangle(ToBrush(command.Color), null, ScaleAndClip(command));
         }
 
         CharacterCreationChoice choice = CurrentChoice;
         string captain = strings.Get($"creation.captain.{choice.TextId}.name");
         string race = strings.Get($"creation.race.{choice.TextId}.name");
         string heritage = strings.Get($"creation.heritage.{choice.TextId}.name");
-        string background = strings.Get("creation.background.expedition-veteran.name");
+        string characterBackground = strings.Get("creation.background.expedition-veteran.name");
 
+        DrawRosterSelection(drawingContext);
         DrawPortrait(drawingContext, StringInfo.GetNextTextElement(captain));
         strings.BeginFrame();
-        DrawText(drawingContext, TitleKey, strings.Get("creation.title"), 32, "#F2E9D8", false);
-        DrawText(drawingContext, IntroductionKey, strings.Get("creation.introduction"), 14, "#93A1BE", false);
-        DrawText(drawingContext, PreviousKey, strings.Get("creation.button.previous"), 15, "#F2E9D8", true);
-        DrawText(drawingContext, CaptainKey, captain, 24, "#F2E9D8", true);
-        DrawText(drawingContext, NextKey, strings.Get("creation.button.next"), 15, "#F2E9D8", true);
-        DrawText(drawingContext, RaceLabelKey, strings.Get("creation.label.race"), 13, "#D7AF70", false);
-        DrawText(drawingContext, RaceValueKey, race, 18, "#F2E9D8", false);
-        DrawText(drawingContext, HeritageLabelKey, strings.Get("creation.label.heritage"), 13, "#D7AF70", false);
-        DrawText(drawingContext, HeritageValueKey, heritage, 18, "#F2E9D8", false);
-        DrawText(drawingContext, BackgroundLabelKey, strings.Get("creation.label.background"), 13, "#D7AF70", false);
-        DrawText(drawingContext, BackgroundValueKey, background, 18, "#F2E9D8", false);
+        DrawText(drawingContext, TitleKey, strings.Get("creation.title"), 31, "#F2E9D8",
+            TextAlignment.Left, FontWeights.SemiBold);
+        DrawText(drawingContext, IntroductionKey, strings.Get("creation.introduction"), 13, "#93A1BE",
+            TextAlignment.Left, FontWeights.Normal);
+        DrawText(drawingContext, SelectionCounterKey,
+            string.Format(strings.Culture, "{0:00} / {1:00}", choiceIndex + 1, CharacterCreationChoices.All.Count),
+            15, "#D7AF70", TextAlignment.Right, FontWeights.SemiBold);
+        DrawText(drawingContext, RosterHeadingKey, strings.Get("creation.accessibility.screen"), 15, "#D7AF70",
+            TextAlignment.Left, FontWeights.SemiBold);
+        for (int index = 0; index < CharacterCreationChoices.All.Count; ++index)
+        {
+            string name = strings.Get($"creation.captain.{CharacterCreationChoices.All[index].TextId}.name");
+            DrawText(drawingContext, CaptainChoiceKeys[index], name, 13, "#F2E9D8",
+                TextAlignment.Left, index == choiceIndex ? FontWeights.SemiBold : FontWeights.Normal, 18);
+        }
+
+        DrawText(drawingContext, CaptainKey, captain, 25, "#F2E9D8",
+            TextAlignment.Center, FontWeights.SemiBold);
+        DrawText(drawingContext, DetailHeadingKey, strings.Get("creation.accessibility.details"), 18, "#F2E9D8",
+            TextAlignment.Left, FontWeights.SemiBold);
+        DrawText(drawingContext, RaceLabelKey, strings.Get("creation.label.race"), 12, "#D7AF70",
+            TextAlignment.Left, FontWeights.SemiBold);
+        DrawText(drawingContext, RaceValueKey, race, 19, "#F2E9D8",
+            TextAlignment.Left, FontWeights.Normal);
+        DrawText(drawingContext, HeritageLabelKey, strings.Get("creation.label.heritage"), 12, "#D7AF70",
+            TextAlignment.Left, FontWeights.SemiBold);
+        DrawText(drawingContext, HeritageValueKey, heritage, 19, "#F2E9D8",
+            TextAlignment.Left, FontWeights.Normal);
+        DrawText(drawingContext, BackgroundLabelKey, strings.Get("creation.label.background"), 12, "#D7AF70",
+            TextAlignment.Left, FontWeights.SemiBold);
+        DrawText(drawingContext, BackgroundValueKey, characterBackground, 19, "#F2E9D8",
+            TextAlignment.Left, FontWeights.Normal);
         DrawText(drawingContext, SummaryKey, strings.Format(
             "creation.summary",
             LocalizationArgument.Text("race", race),
             LocalizationArgument.Text("heritage", heritage),
-            LocalizationArgument.Text("background", background)), 14, "#B8C7DF", false);
-        DrawText(drawingContext, SeedLabelKey, strings.Get("creation.label.seed"), 13, "#D7AF70", false);
+            LocalizationArgument.Text("background", characterBackground)),
+            14, "#B8C7DF", TextAlignment.Left, FontWeights.Normal);
+        DrawText(drawingContext, SeedLabelKey, strings.Get("creation.label.seed"), 12, "#D7AF70",
+            TextAlignment.Left, FontWeights.SemiBold);
         DrawText(drawingContext, SeedValueKey, strings.Format(
-            "creation.value.seed", LocalizationArgument.Unsigned("seed", seed)), 15, "#80DED9", false);
-        DrawText(drawingContext, StatusKey, strings.Get("creation.status.ready"), 13, "#93A1BE", false);
-        DrawText(drawingContext, BackKey, strings.Get("creation.button.back"), 14, "#F2E9D8", true);
-        DrawText(drawingContext, RerollKey, strings.Get("creation.button.reroll"), 14, "#F2E9D8", true);
-        DrawText(drawingContext, ConfirmKey, strings.Get("creation.button.confirm"), 14, "#F2E9D8", true);
+            "creation.value.seed", LocalizationArgument.Unsigned("seed", seed)),
+            16, "#80DED9", TextAlignment.Left, FontWeights.SemiBold);
+        DrawText(drawingContext, RerollKey, strings.Get("creation.button.reroll"), 13, "#F2E9D8",
+            TextAlignment.Center, FontWeights.SemiBold);
+        DrawText(drawingContext, StatusKey, strings.Get("creation.status.ready"), 13, "#93A1BE",
+            TextAlignment.Center, FontWeights.Normal);
+        DrawText(drawingContext, BackKey, strings.Get("creation.button.back"), 14, "#F2E9D8",
+            TextAlignment.Center, FontWeights.SemiBold);
+        DrawText(drawingContext, ConfirmKey, strings.Get("creation.button.confirm"), 14, "#F2E9D8",
+            TextAlignment.Center, FontWeights.SemiBold);
 
         foreach (EngineUiElementSnapshot snapshot in snapshots.Values.Where(value => value.IsFocused))
         {
@@ -205,6 +246,7 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
             Type = EngineUiInputType.Navigation,
             Navigation = navigation,
             Sequence = ++inputSequence,
+            Source = EngineInputDeviceKind.Keyboard,
             InsideViewport = 1,
         }]);
         e.Handled = true;
@@ -250,12 +292,12 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
             MaximumActions = ActionCapacity,
             Theme = new EngineUiTheme
             {
-                Panel = Color(0.067f, 0.094f, 0.153f),
-                Button = Color(0.157f, 0.216f, 0.333f),
-                ButtonHovered = Color(0.239f, 0.333f, 0.471f),
-                ButtonPressed = Color(0.090f, 0.125f, 0.196f),
-                ButtonFocused = Color(0.251f, 0.392f, 0.490f),
-                ButtonDisabled = Color(0.075f, 0.090f, 0.125f),
+                Panel = Color(0.040f, 0.059f, 0.098f, 0.96f),
+                Button = Color(0.105f, 0.145f, 0.216f, 0.96f),
+                ButtonHovered = Color(0.180f, 0.259f, 0.353f, 0.98f),
+                ButtonPressed = Color(0.067f, 0.098f, 0.157f),
+                ButtonFocused = Color(0.180f, 0.306f, 0.384f),
+                ButtonDisabled = Color(0.055f, 0.067f, 0.094f),
             },
         };
         ThrowIfFailed(SpriteForgeNative.SpriteForge_CreateUIContext(
@@ -301,41 +343,66 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         string captain = strings.Get($"creation.captain.{choice.TextId}.name");
         string race = strings.Get($"creation.race.{choice.TextId}.name");
         string heritage = strings.Get($"creation.heritage.{choice.TextId}.name");
-        string background = strings.Get("creation.background.expedition-veteran.name");
+        string characterBackground = strings.Get("creation.background.expedition-veteran.name");
         string summary = strings.Format(
             "creation.summary",
             LocalizationArgument.Text("race", race),
             LocalizationArgument.Text("heritage", heritage),
-            LocalizationArgument.Text("background", background));
-        return
+            LocalizationArgument.Text("background", characterBackground));
+
+        List<EngineUiElementDescription> elements =
         [
-            Element(ModalKey, RootKey, 20, 20, 1060, 640, EngineUiBehavior.None,
-                strings.Get("creation.accessibility.screen"), names, modal: true, dismissAction: CancelAction),
-            Text(TitleKey, 56, 44, 988, 42, strings.Get("creation.title"), names),
-            Text(IntroductionKey, 56, 90, 988, 42, strings.Get("creation.introduction"), names),
-            Button(PreviousKey, 58, 176, 128, 54, 0, strings.Get("creation.button.previous"), names),
-            Element(PortraitKey, ModalKey, 210, 148, 286, 252, EngineUiBehavior.None,
-                captain, names, customColor: true, color: Color(0.045f, 0.071f, 0.122f)),
-            Text(CaptainKey, 210, 410, 286, 48, captain, names),
-            Button(NextKey, 518, 176, 128, 54, 1, strings.Get("creation.button.next"), names),
-            Element(DetailPanelKey, ModalKey, 674, 148, 368, 310, EngineUiBehavior.None,
-                strings.Get("creation.accessibility.details"), names,
-                customColor: true, color: Color(0.045f, 0.071f, 0.122f)),
-            Text(RaceLabelKey, 704, 174, 300, 22, strings.Get("creation.label.race"), names),
-            Text(RaceValueKey, 704, 196, 300, 34, race, names),
-            Text(HeritageLabelKey, 704, 238, 300, 22, strings.Get("creation.label.heritage"), names),
-            Text(HeritageValueKey, 704, 260, 300, 34, heritage, names),
-            Text(BackgroundLabelKey, 704, 302, 300, 22, strings.Get("creation.label.background"), names),
-            Text(BackgroundValueKey, 704, 324, 300, 34, background, names),
-            Text(SummaryKey, 704, 372, 300, 68, summary, names),
-            Text(SeedLabelKey, 58, 486, 150, 26, strings.Get("creation.label.seed"), names),
-            Text(SeedValueKey, 210, 486, 430, 26,
+            Element(ModalKey, RootKey, 0, 0, 1600, 900, EngineUiBehavior.None,
+                strings.Get("creation.accessibility.screen"), names, modal: true, dismissAction: CancelAction,
+                customColor: true, color: Color(0.018f, 0.027f, 0.047f, 0.88f)),
+            Panel(HeaderPanelKey, 0, 0, 1600, 124, strings.Get("creation.accessibility.screen"), names,
+                Color(0.025f, 0.039f, 0.065f, 0.96f)),
+            Text(TitleKey, 54, 22, 920, 48, strings.Get("creation.title"), names),
+            Text(IntroductionKey, 54, 70, 1040, 30, strings.Get("creation.introduction"), names),
+            Text(SelectionCounterKey, 1350, 38, 194, 34,
+                string.Format(strings.Culture, "{0:00} / {1:00}", choiceIndex + 1,
+                    CharacterCreationChoices.All.Count), names),
+            Panel(HeaderRuleKey, 54, 112, 1492, 2, strings.Get("creation.accessibility.screen"), names,
+                Color(0.843f, 0.686f, 0.439f)),
+            Panel(RosterPanelKey, 42, 142, 360, 650, strings.Get("creation.accessibility.screen"), names,
+                Color(0.025f, 0.041f, 0.071f, 0.98f)),
+            Text(RosterHeadingKey, 64, 158, 316, 34, strings.Get("creation.accessibility.screen"), names),
+            Panel(PreviewPanelKey, 426, 142, 570, 650, captain, names,
+                Color(0.021f, 0.035f, 0.062f, 0.97f)),
+            Element(PortraitKey, ModalKey, 456, 172, 510, 452, EngineUiBehavior.None,
+                captain, names, customColor: true, color: Color(0.035f, 0.059f, 0.102f, 0.96f)),
+            Text(CaptainKey, 456, 638, 510, 54, captain, names),
+            Panel(DetailPanelKey, 1020, 142, 538, 650, strings.Get("creation.accessibility.details"), names,
+                Color(0.025f, 0.041f, 0.071f, 0.98f)),
+            Text(DetailHeadingKey, 1052, 164, 474, 38,
+                strings.Get("creation.accessibility.details"), names),
+            Text(RaceLabelKey, 1052, 222, 474, 22, strings.Get("creation.label.race"), names),
+            Text(RaceValueKey, 1052, 244, 474, 38, race, names),
+            Text(HeritageLabelKey, 1052, 302, 474, 22, strings.Get("creation.label.heritage"), names),
+            Text(HeritageValueKey, 1052, 324, 474, 38, heritage, names),
+            Text(BackgroundLabelKey, 1052, 382, 474, 22,
+                strings.Get("creation.label.background"), names),
+            Text(BackgroundValueKey, 1052, 404, 474, 38, characterBackground, names),
+            Text(SummaryKey, 1052, 466, 474, 82, summary, names),
+            Text(SeedLabelKey, 1052, 568, 180, 24, strings.Get("creation.label.seed"), names),
+            Text(SeedValueKey, 1052, 594, 474, 34,
                 strings.Format("creation.value.seed", LocalizationArgument.Unsigned("seed", seed)), names),
-            Text(StatusKey, 58, 530, 984, 34, strings.Get("creation.status.ready"), names),
-            Button(BackKey, 566, 584, 136, 48, 3, strings.Get("creation.button.back"), names),
-            Button(RerollKey, 720, 584, 136, 48, 2, strings.Get("creation.button.reroll"), names),
-            Button(ConfirmKey, 874, 584, 168, 48, 4, strings.Get("creation.button.confirm"), names),
+            Button(RerollKey, 1052, 646, 210, 46, 20, strings.Get("creation.button.reroll"), names),
+            Panel(FooterPanelKey, 0, 808, 1600, 92, strings.Get("creation.accessibility.screen"), names,
+                Color(0.025f, 0.039f, 0.065f, 0.98f)),
+            Button(BackKey, 42, 828, 180, 52, 21, strings.Get("creation.button.back"), names),
+            Text(StatusKey, 250, 830, 900, 48, strings.Get("creation.status.ready"), names),
+            Button(ConfirmKey, 1330, 828, 228, 52, 22, strings.Get("creation.button.confirm"), names),
         ];
+
+        for (int index = 0; index < CharacterCreationChoices.All.Count; ++index)
+        {
+            string name = strings.Get($"creation.captain.{CharacterCreationChoices.All[index].TextId}.name");
+            elements.Add(Button(CaptainChoiceKeys[index], 64, 202 + index * 49, 316, 42,
+                index, name, names, selected: index == choiceIndex));
+        }
+
+        return [.. elements];
     }
 
     private static EngineUiElementDescription Text(
@@ -343,9 +410,17 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         Element(key, ModalKey, x, y, width, height, EngineUiBehavior.None, name, names,
             kind: EngineUiElementKind.Text, customColor: true, color: Color(0, 0, 0, 0));
 
+    private static EngineUiElementDescription Panel(
+        ulong key, float x, float y, float width, float height, string name, List<nint> names,
+        EngineUiColor color) =>
+        Element(key, ModalKey, x, y, width, height, EngineUiBehavior.None, name, names,
+            customColor: true, color: color);
+
     private static EngineUiElementDescription Button(
-        ulong key, float x, float y, float width, float height, int tabOrder, string name, List<nint> names) =>
-        Element(key, ModalKey, x, y, width, height, EngineUiBehavior.Button, name, names, tabOrder: tabOrder);
+        ulong key, float x, float y, float width, float height, int tabOrder, string name,
+        List<nint> names, bool selected = false) =>
+        Element(key, ModalKey, x, y, width, height, EngineUiBehavior.Button, name, names,
+            tabOrder: tabOrder, selected: selected);
 
     private static EngineUiElementDescription Element(
         ulong key,
@@ -362,7 +437,8 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         ulong dismissAction = 0,
         EngineUiElementKind kind = EngineUiElementKind.Container,
         bool customColor = false,
-        EngineUiColor color = default)
+        EngineUiColor color = default,
+        bool selected = false)
     {
         byte[] encoded = Encoding.UTF8.GetBytes(accessibleName);
         nint name = Marshal.StringToCoTaskMemUTF8(accessibleName);
@@ -394,6 +470,7 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
             HitTestable = interactive ? 1u : 0u,
             Modal = modal ? 1u : 0u,
             Focusable = interactive ? 1u : 0u,
+            Selected = selected ? 1u : 0u,
             CustomColor = customColor ? 1u : 0u,
             TextMaximumBytes = NonEditableTextCapacity,
             Color = color,
@@ -437,16 +514,11 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         for (int index = 0; index < actionCount; ++index)
         {
             EngineUiAction action = actions[index];
-            if (action.Source == PreviousKey)
+            int selectedIndex = Array.IndexOf(CaptainChoiceKeys, action.Source);
+            if (selectedIndex >= 0)
             {
-                choiceIndex = (choiceIndex + CharacterCreationChoices.All.Count - 1) %
-                    CharacterCreationChoices.All.Count;
-                Recreate(PreviousKey);
-            }
-            else if (action.Source == NextKey)
-            {
-                choiceIndex = (choiceIndex + 1) % CharacterCreationChoices.All.Count;
-                Recreate(NextKey);
+                choiceIndex = selectedIndex;
+                Recreate(action.Source);
             }
             else if (action.Source == RerollKey)
             {
@@ -497,6 +569,32 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         }
     }
 
+    private void DrawBackdrop(DrawingContext drawingContext)
+    {
+        double imageScale = Math.Max(ActualWidth / background.PixelWidth, ActualHeight / background.PixelHeight);
+        double imageWidth = background.PixelWidth * imageScale;
+        double imageHeight = background.PixelHeight * imageScale;
+        drawingContext.DrawImage(background, new Rect(
+            (ActualWidth - imageWidth) / 2,
+            (ActualHeight - imageHeight) / 2,
+            imageWidth,
+            imageHeight));
+        drawingContext.DrawRectangle(Brush("#D90A0E19"), null, new Rect(RenderSize));
+    }
+
+    private void DrawRosterSelection(DrawingContext drawingContext)
+    {
+        if (!snapshots.TryGetValue(CaptainChoiceKeys[choiceIndex], out EngineUiElementSnapshot snapshot))
+        {
+            return;
+        }
+
+        Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
+        drawingContext.DrawRectangle(Brush("#66456274"), new Pen(Brush("#D7AF70"), 1), bounds);
+        drawingContext.DrawRectangle(Brush("#D7AF70"), null,
+            new Rect(bounds.X, bounds.Y, Math.Max(4, 5 * ActualWidth / LogicalWidth), bounds.Height));
+    }
+
     private void DrawPortrait(DrawingContext drawingContext, string monogram)
     {
         if (!snapshots.TryGetValue(PortraitKey, out EngineUiElementSnapshot snapshot))
@@ -505,15 +603,22 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         }
 
         Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
-        double radius = Math.Min(bounds.Width, bounds.Height) * 0.32;
-        Point center = new(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
-        drawingContext.DrawEllipse(Brush("#203451"), new Pen(Brush("#D7AF70"), 3), center, radius, radius);
+        Point center = new(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height * 0.48);
+        double radius = Math.Min(bounds.Width, bounds.Height) * 0.31;
+        RadialGradientBrush aura = new(
+            System.Windows.Media.Color.FromArgb(180, 55, 105, 130),
+            System.Windows.Media.Color.FromArgb(0, 9, 16, 29));
+        aura.Freeze();
+        drawingContext.DrawEllipse(aura, new Pen(Brush("#48677B"), 2), center, radius * 1.28, radius * 1.28);
+        drawingContext.DrawEllipse(Brush("#152A43"), new Pen(Brush("#D7AF70"), 3), center, radius, radius);
+        drawingContext.DrawEllipse(null, new Pen(Brush("#80DED9"), 1), center, radius * 0.83, radius * 0.83);
+
         FormattedText formatted = new(
             monogram,
             strings.Culture,
             FlowDirection.LeftToRight,
-            new Typeface("Segoe UI"),
-            72 * ActualHeight / LogicalHeight,
+            new Typeface("Segoe UI Light"),
+            126 * ActualHeight / LogicalHeight,
             Brush("#80DED9"),
             VisualTreeHelper.GetDpi(this).PixelsPerDip);
         drawingContext.DrawText(formatted, new Point(
@@ -527,30 +632,33 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
         string text,
         double fontSize,
         string color,
-        bool centered)
+        TextAlignment alignment,
+        FontWeight weight,
+        double horizontalInset = 0)
     {
         if (!snapshots.TryGetValue(key, out EngineUiElementSnapshot snapshot))
         {
             return;
         }
 
+        Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
+        double inset = horizontalInset * ActualWidth / LogicalWidth;
         FormattedText formatted = new(
             text,
             strings.Culture,
             FlowDirection.LeftToRight,
-            new Typeface(centered ? "Segoe UI Semibold" : "Segoe UI"),
+            new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, weight, FontStretches.Normal),
             fontSize * ActualHeight / LogicalHeight,
             Brush(color),
             VisualTreeHelper.GetDpi(this).PixelsPerDip)
         {
-            MaxTextWidth = Math.Max(1, snapshot.Width * ActualWidth / LogicalWidth),
-            MaxTextHeight = Math.Max(1, snapshot.Height * ActualHeight / LogicalHeight),
-            TextAlignment = centered ? TextAlignment.Center : TextAlignment.Left,
+            MaxTextWidth = Math.Max(1, bounds.Width - inset * 2),
+            MaxTextHeight = Math.Max(1, bounds.Height),
+            TextAlignment = alignment,
             Trimming = TextTrimming.CharacterEllipsis,
         };
-        Rect bounds = Scale(snapshot.X, snapshot.Y, snapshot.Width, snapshot.Height);
         double y = bounds.Y + Math.Max(0, (bounds.Height - formatted.Height) / 2);
-        drawingContext.DrawText(formatted, new Point(bounds.X, y));
+        drawingContext.DrawText(formatted, new Point(bounds.X + inset, y));
     }
 
     private Rect Scale(float x, float y, float width, float height) => new(
@@ -569,6 +677,17 @@ internal sealed class SpriteForgeCharacterCreationView : FrameworkElement, IDisp
 
         return logical.IsEmpty ? new Rect() : Scale(
             (float)logical.X, (float)logical.Y, (float)logical.Width, (float)logical.Height);
+    }
+
+    private static BitmapSource LoadBackground()
+    {
+        BitmapImage image = new();
+        image.BeginInit();
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        image.UriSource = new Uri("pack://application:,,,/Assets/UI/MainMenu/Background.png", UriKind.Absolute);
+        image.EndInit();
+        image.Freeze();
+        return image;
     }
 
     private static ulong NewSeed()

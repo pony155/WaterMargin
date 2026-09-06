@@ -56,14 +56,17 @@ republishes the catalogs and rebuilds the retained menu document.
 
 New Game and Game Settings add modal overlays to the existing main-window
 visual tree; neither creates a second operating-system window or taskbar entry.
-Character creation cycles through the 11 authored first-voyage captain
-templates and records an explicit rerollable voyage seed. Confirm currently
-returns the selection to the host and reports it on the main menu; campaign
-construction, persistence, and launch remain planned. Quit Game emits a copied
-stable action and requests ordinary application shutdown. Closing the
-operating-system window has the same shutdown result. Native UI documents are
-destroyed on their owner thread when the window unloads.
+Character creation visually replaces the complete client area with a 1600x900
+dossier. Its persistent left roster directly selects any of the 11 authored
+first-voyage captain templates, while the preview and detail panels expose the
+current lineage, heritage, Background, summary, and explicit rerollable voyage
+seed. Confirm currently returns the selection to the host and reports it on the
+main menu; campaign construction, persistence, and launch remain planned. Quit
+Game emits a copied stable action and requests ordinary application shutdown.
+Closing the operating-system window has the same shutdown result. Native UI
+documents are destroyed on their owner thread when the window unloads.
 
 The base content manifest does not yet declare a general runtime asset root.
-This one background has an explicit build link; generalized pack asset loading,
-hot reload, and mod-provided presentation assets remain planned.
+The main menu and character-creation dossier share this explicitly linked
+backdrop; generalized pack asset loading, hot reload, and mod-provided
+presentation assets remain planned.

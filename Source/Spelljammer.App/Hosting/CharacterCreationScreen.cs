@@ -1,4 +1,3 @@
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Spelljammer.Presentation;
@@ -12,18 +11,14 @@ internal sealed class CharacterCreationScreen : Grid, IDisposable
 
     internal CharacterCreationScreen(GameText strings, CharacterCreationSelection? initial)
     {
-        Background = new SolidColorBrush(Color.FromArgb(224, 3, 6, 14));
+        Background = Brushes.Black;
         creationView = new SpriteForgeCharacterCreationView(strings, initial);
         creationView.Completed += CreationView_Completed;
         creationView.CancelRequested += CreationView_CancelRequested;
         Children.Add(new Viewbox
         {
             Child = creationView,
-            Stretch = Stretch.Uniform,
-            StretchDirection = StretchDirection.DownOnly,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(20),
+            Stretch = Stretch.Fill,
         });
     }
 
