@@ -3,9 +3,10 @@
 ## Status
 
 This document freezes the decisions required by roadmap phase M0.2 and the
-version 1 fixtures. The loader is not implemented. Changes to these decisions
-before M1 require updating fixtures and expected fingerprints together; changes
-after a public save contract require the compatibility rules below.
+version 1 fixtures. The Milestone 1 loader implements these contracts. Changes
+to these decisions require updating the implementation, fixtures, and expected
+fingerprints together; changes after a public save contract also require the
+compatibility rules below.
 
 The terms MUST, MUST NOT, SHOULD, and MAY describe normative requirements.
 
@@ -232,7 +233,10 @@ canonical byte contract is named `spelljammer-semantic-v1`:
 - UTF-8 without BOM and exactly one final LF;
 - no insignificant whitespace;
 - object properties sorted by bytewise ordinal property name;
-- definitions sorted by Stable ID;
+- definition kinds use the frozen canonical order Access, Attribute, Feat,
+  Race, Skill, Perk, and Training Project, with definitions sorted by Stable
+  ID within each kind (this ordering reproduces the reviewed M0 canonical
+  fixture);
 - packs retained in resolved load order;
 - set-like arrays deduplicated during validation and sorted ordinally;
 - sequence arrays retain validated authored order;

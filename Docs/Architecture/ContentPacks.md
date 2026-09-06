@@ -2,10 +2,13 @@
 
 ## Status
 
-This document specifies the planned gameplay content pipeline. It is not
-implemented. Today, `Spelljammer.Simulation` compiles prototype sector kinds,
-commands, and balance constants directly into C#. Localization uses authored
-catalogs, but gameplay definitions do not yet have an equivalent loader.
+This document specifies the gameplay content pipeline. The Milestone 1
+foundation is implemented: explicit-root discovery, strict source validation,
+deterministic ordering, immutable candidate compilation, semantic
+fingerprinting, transactional publication, and offline validation are
+available. Base Attributes and Skills remain compiled prototype data until
+Milestone 2 authors the production base pack. The current expedition behavior
+is unchanged.
 
 The first implementation moves character Attributes and Skills into a built-in
 base pack without changing the expedition prototype. Later systems reuse the

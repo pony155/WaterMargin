@@ -162,69 +162,69 @@ Add `Spelljammer.Content` without changing expedition behavior.
 
 ### Phase M1.1: scaffold projects and ownership
 
-- [ ] **M1.1.1** Create `Source/Spelljammer.Content` targeting the repository's
+- [x] **M1.1.1** Create `Source/Spelljammer.Content` targeting the repository's
   existing .NET baseline with nullable references and warnings as errors.
-- [ ] **M1.1.2** Reference Simulation from Content without adding the reverse
+- [x] **M1.1.2** Reference Simulation from Content without adding the reverse
   reference.
-- [ ] **M1.1.3** Add `Tests/Spelljammer.Content.Tests` and the future compiler
+- [x] **M1.1.3** Add `Tests/Spelljammer.Content.Tests` and the future compiler
   project to `Spelljammer.slnx` with minimal buildable entry points.
-- [ ] **M1.1.4** Document public namespaces and reject filesystem work inside
+- [x] **M1.1.4** Document public namespaces and reject filesystem work inside
   Simulation.
 
 ### Phase M1.2: implement IDs and diagnostics
 
-- [ ] **M1.2.1** Implement a shared validated `ContentId` core and focused typed
+- [x] **M1.2.1** Implement a shared validated `ContentId` core and focused typed
   wrappers needed by the first schemas.
-- [ ] **M1.2.2** Make default IDs invalid and comparison ordinal.
-- [ ] **M1.2.3** Implement bounded structured diagnostics with stable codes,
+- [x] **M1.2.2** Make default IDs invalid and comparison ordinal.
+- [x] **M1.2.3** Implement bounded structured diagnostics with stable codes,
   severity, pack, relative path, definition ID, and property path.
-- [ ] **M1.2.4** Add compile-only contracts for valid, invalid, default, maximum-
+- [x] **M1.2.4** Add compile-only contracts for valid, invalid, default, maximum-
   length, and culture-independent IDs.
 
 ### Phase M1.3: parse and validate manifests
 
-- [ ] **M1.3.1** Implement strict UTF-8 reading with byte and JSON-depth limits.
-- [ ] **M1.3.2** Reject duplicate properties, unknown required schema versions,
+- [x] **M1.3.1** Implement strict UTF-8 reading with byte and JSON-depth limits.
+- [x] **M1.3.2** Reject duplicate properties, unknown required schema versions,
   invalid numeric values, absolute paths, and traversal segments.
-- [ ] **M1.3.3** Parse the version 1 manifest into a temporary DTO.
-- [ ] **M1.3.4** Validate pack ID, semantic version, game range, roots,
+- [x] **M1.3.3** Parse the version 1 manifest into a temporary DTO.
+- [x] **M1.3.4** Validate pack ID, semantic version, game range, roots,
   dependencies, `loadAfter`, and namespace claims.
 
 ### Phase M1.4: discover and order packs
 
-- [ ] **M1.4.1** Accept only explicit configured roots and resolve each once.
-- [ ] **M1.4.2** Read at most one bounded manifest from each root.
-- [ ] **M1.4.3** Build the bounded dependency graph and reject missing nodes,
+- [x] **M1.4.1** Accept only explicit configured roots and resolve each once.
+- [x] **M1.4.2** Read at most one bounded manifest from each root.
+- [x] **M1.4.3** Build the bounded dependency graph and reject missing nodes,
   incompatible ranges, duplicate pack IDs, and cycles.
-- [ ] **M1.4.4** Produce deterministic topological order with ordinal pack-ID
+- [x] **M1.4.4** Produce deterministic topological order with ordinal pack-ID
   tie-breaking.
 
 ### Phase M1.5: build the candidate pipeline
 
-- [ ] **M1.5.1** Enumerate normalized relative definition paths in ordinal order.
-- [ ] **M1.5.2** Parse minimal generic source envelopes without exposing them to
+- [x] **M1.5.1** Enumerate normalized relative definition paths in ordinal order.
+- [x] **M1.5.2** Parse minimal generic source envelopes without exposing them to
   Simulation.
-- [ ] **M1.5.3** Validate definition-kind and namespace ownership and reject
+- [x] **M1.5.3** Validate definition-kind and namespace ownership and reject
   duplicate stable IDs.
-- [ ] **M1.5.4** Add explicit Link, Validate, and Compile stages with bounded
+- [x] **M1.5.4** Add explicit Link, Validate, and Compile stages with bounded
   work and stage-specific diagnostics.
 
 ### Phase M1.6: compile, fingerprint, and publish
 
-- [ ] **M1.6.1** Create an immutable minimal `GameContentSnapshot`.
-- [ ] **M1.6.2** Canonicalize semantic content and calculate its fingerprint.
-- [ ] **M1.6.3** Add a registry owner that publishes one complete snapshot only
+- [x] **M1.6.1** Create an immutable minimal `GameContentSnapshot`.
+- [x] **M1.6.2** Canonicalize semantic content and calculate its fingerprint.
+- [x] **M1.6.3** Add a registry owner that publishes one complete snapshot only
   after successful validation.
-- [ ] **M1.6.4** Verify failed replacement preserves the prior snapshot and its
+- [x] **M1.6.4** Verify failed replacement preserves the prior snapshot and its
   fingerprint.
 
 ### Phase M1.7: expose offline validation
 
-- [ ] **M1.7.1** Add a noninteractive compiler command for one pack root.
-- [ ] **M1.7.2** Emit concise text diagnostics and a bounded machine-readable
+- [x] **M1.7.1** Add a noninteractive compiler command for one pack root.
+- [x] **M1.7.2** Emit concise text diagnostics and a bounded machine-readable
   form.
-- [ ] **M1.7.3** Return stable nonzero exit status for invalid content.
-- [ ] **M1.7.4** Confirm the tool performs no network access or source rewrite.
+- [x] **M1.7.3** Return stable nonzero exit status for invalid content.
+- [x] **M1.7.4** Confirm the tool performs no network access or source rewrite.
 
 Deliverables:
 

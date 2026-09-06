@@ -2,10 +2,10 @@
 
 ## Status
 
-This document freezes roadmap phase M0.3. It defines initial loader limits,
-content-caused diagnostic codes, and safe diagnostic fields. The loader is not
-implemented, and the values must be measured during M1; they remain hard bounds
-until a reviewed contract revision replaces them.
+This document freezes roadmap phase M0.3. It defines the initial loader limits,
+content-caused diagnostic codes, and safe diagnostic fields implemented by the
+Milestone 1 content foundation. They remain hard bounds until a reviewed
+contract revision replaces them.
 
 ## Initial limits
 

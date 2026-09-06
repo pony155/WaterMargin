@@ -29,6 +29,9 @@ Implemented foundations include:
 - a headless `Spelljammer.Simulation` project with immutable expedition state,
   typed commands, stable sector identities, explicit rejection reasons, bounded
   maps, and seed-derived hazards and rewards;
+- a bounded gameplay-content foundation with validated stable IDs, strict JSON
+  pack loading, deterministic dependency ordering, immutable snapshots,
+  canonical SHA-256 fingerprints, and transactional publication;
 - a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
 - a child Win32 viewport rendered through SpriteForge's native D3D12 sprite
   renderer and a narrow managed/native interop layer;
@@ -90,12 +93,14 @@ defined in
 | --- | --- |
 | `Source/Spelljammer.App/` | WPF host, expedition presentation, SpriteForge interop, and renderer viewport. |
 | `Source/Spelljammer.Simulation/` | Headless authoritative space-expedition state and commands. |
+| `Source/Spelljammer.Content/` | Pack loading, validation, immutable registries, and semantic fingerprints. |
 | `Source/Spelljammer.Localization/` | Game-owned localization runtime and message formatter. |
+| `Tools/Spelljammer.Content.Compiler/` | Offline gameplay-pack validation tool. |
 | `Tools/Spelljammer.Localization.Compiler/` | Source-catalog compiler and validation tools. |
 | `Content/Localization/` | Authored catalogs and pinned locale-data notices. |
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only deterministic simulation contracts. |
 | `Tests/Spelljammer.Localization.Tests/` | Compile-only localization contracts. |
-| `Tests/Spelljammer.Content.Tests/` | Frozen fixtures for the planned gameplay content loader; no test project yet. |
+| `Tests/Spelljammer.Content.Tests/` | Compile-only gameplay content and rollback contracts plus frozen v1 fixtures. |
 | `Docs/DesignConcept/` | Current vision and playable-slice scope. |
 | `Docs/Architecture/` | Implemented and planned subsystem boundaries. |
 | `Docs/Archive/` | Historical explorations; not current product authority. |
@@ -149,6 +154,13 @@ dotnet run --project .\Tools\Spelljammer.Localization.Compiler\Spelljammer.Local
 
 See [`Source/Spelljammer.Localization/README.md`](Source/Spelljammer.Localization/README.md)
 for catalog syntax and runtime behavior.
+
+Validate one gameplay content pack without modifying its source:
+
+```powershell
+dotnet run --project .\Tools\Spelljammer.Content.Compiler\Spelljammer.Content.Compiler.csproj -- `
+    validate .\Tests\Spelljammer.Content.Tests\Fixtures\Milestone0\valid\base
+```
 
 ## Contributing
 

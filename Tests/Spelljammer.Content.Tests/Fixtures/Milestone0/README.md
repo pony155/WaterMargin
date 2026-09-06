@@ -10,7 +10,7 @@ All content references resolve. Runtime primitive IDs used by the Skill are the
 version 1 built-ins listed in `ContentContractsV1.md`.
 
 `invalid/cases.json` defines virtual-file-system cases layered over
-`valid/base`. A future test harness must apply each case independently:
+`valid/base`. The content contract target applies each case independently:
 
 - `removeFiles` removes relative paths from the base layer;
 - `writeText` replaces or adds a file with the exact UTF-8 string value;
