@@ -26,7 +26,7 @@ while standing, reports, and agreements are defined in
   and campaign state.
 - Give the player meaningful choices such as investigate, assist, evade,
   negotiate, repair, exploit, conceal, or continue the voyage.
-- Allow Attributes, Skills, Talents, Feats, equipment, ship modules, supplies,
+- Allow Attributes, Skills, Racial Perks, Feats, equipment, ship modules, supplies,
   and learned information to create additional approaches rather than one
   mandatory answer.
 - Persist injuries, damage, cargo, discoveries, obligations, witnesses,
@@ -71,7 +71,7 @@ An event definition can require or modify weight from:
 - installed modules, armor coverage, current Energy Shield Value and raised
   state, damage, faults, heat, signature, fuel, air, provisions, medicine,
   spare parts, cargo, and free capacity;
-- crew count, positions, Skills, access Feats, racial Talents, injuries,
+- crew count, positions, Skills, access Feats, Racial Perks, injuries,
   fatigue, needs, and current duties;
 - known factions, agreements, warrants, standing, witnesses, rumors, charts,
   scripts, Ancient Lore, and discovered sites;
@@ -126,7 +126,7 @@ Each choice declares:
 - facts required for the choice to be visible and facts required for it to be
   enabled;
 - required ship capability, module, item, position authority, Skill, Feat,
-  Talent, known language, script, spell, or psychic technique;
+  Racial Perk, known language, script, spell, or psychic technique;
 - immediate costs, reservations, duration, exposure, and cancellation rules;
 - contextual Attribute and Skill approaches rather than a character class;
 - deterministic outcome bands and the information the player may preview;
@@ -270,7 +270,7 @@ Content validation rejects:
 
 - duplicate or invalid Event and choice IDs;
 - missing localization, condition, check, effect, encounter, faction, route,
-  item, module, Skill, Feat, Talent, spell, or psychic references;
+  item, module, Skill, Feat, Racial Perk, spell, or psychic references;
 - negative or excessive weights, costs, delays, cooldowns, or occurrence counts;
 - events with no reachable resolution or no safe response when one is required;
 - choice costs without atomic reservation and rollback rules;

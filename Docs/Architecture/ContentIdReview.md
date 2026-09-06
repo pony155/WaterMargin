@@ -3,7 +3,7 @@
 ## Status
 
 This document completes roadmap tasks `M0.1.2` and `M0.1.3`. It classifies the
-163 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
+174 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
 the spelling and collision review performed before version 1 loader work.
 
 No gameplay content loader or public save format exists yet. Classification is
@@ -28,13 +28,14 @@ precedence over base ownership until content authoring promotes it explicitly.
 
 Every ID in an inventory section inherits the classification below unless an
 exception is listed. This grouping marks every inventoried ID without copying a
-second 163-row table that could drift from the canonical inventory.
+second 174-row table that could drift from the canonical inventory.
 
 | Inventory group | Count | Ownership | Earliest registry | Delivery note |
 | --- | ---: | --- | --- | --- |
 | Attributes | 7 | Base-owned | M2 | All seven are required base definitions |
 | Skills | 29 | Base-owned | M2 | All 29 are required base definitions |
-| Talents | 12 | Base-owned | M3/M4 | Registry begins in M3; supernatural grants become executable in M4 |
+| Racial Perks | 12 | Base-owned | M3/M4 | Registry begins in M3; supernatural grants become executable in M4 |
+| Equipment | 8 | Base-owned | M5 | Initial weapons, armor, tools, medical gear, and Arcane focus |
 | Learned Feats | 2 | Base-owned | M4 | Both are required access paths |
 | Access gates | 2 | Base-owned | M4 | Both are required access definitions |
 | Spells | 32 | Base-owned | M4 | Four are first-slice; 28 are deferred catalog content |
@@ -43,6 +44,7 @@ second 163-row table that could drift from the canonical inventory.
 | Travel events | 8 | Base-owned | M8 | Four first-voyage events and four deferred events |
 | Travel-event choices | 3 | Base-owned | M8 | All three belong to the first Coolant Leak event |
 | Ship modules | 35 | Base-owned | M5 | Registry begins in M5; individual catalog delivery is phased |
+| Ship weapon configurations | 3 | Base-owned | M5 | Aether and Diesel are first-slice; Atomic is deferred atompunk content |
 | Factions | 6 | Base-owned | M8 | Initial voyage selects three; remaining roster is deferred |
 | Crisis families | 7 | Base-owned | M9 | All endgame content is deferred beyond the first voyage |
 | Crisis phases | 7 | Base-owned | M9 | Shared M9 phase vocabulary |
@@ -125,6 +127,10 @@ content. This first set supports energy-package, armor, Energy Shield, prow,
 weapon, habitat, care, cargo, and utility customization without requiring the
 full catalog.
 
+The first M5 weapon slice includes `ship.weapon.arcane.aether-cannon` and
+`ship.weapon.industrial.diesel-shell-cannon`. The Atomic Shell Cannon remains
+base-owned deferred atompunk content.
+
 The initial M8 faction candidate set is the Free Anchorage Compact, Horizon
 Salvagers' Union, Meridian Foundry League, and Lumenwake Covenant; a campaign
 uses the first two plus one of the latter pair. Pilgrim Garden Fleet and Quiet
@@ -158,14 +164,14 @@ These are new explicit IDs derived directly from unique existing Skill labels;
 no prior ID was renamed. `skill.medicine` already existed in the Ships sickbay
 example and was moved into the authoritative Skill table without changing it.
 
-Heritage rows still describe Talents whose individual Talent IDs are not
+Heritage rows still describe Perks whose individual Perk IDs are not
 authored. They are not required by the M0 fixture or M2 Attribute/Skill loader;
 M3 content authoring must assign and review them before the base character pack
 is complete.
 
 ## Collision review
 
-The 163 inventoried IDs are unique. No one ID maps to two different display
+The 174 inventoried IDs are unique. No one ID maps to two different display
 labels, and ordinal comparison produces no case-only collision.
 
 The following similar forms are intentional:
@@ -175,7 +181,7 @@ The following similar forms are intentional:
 | `skill.magic`, `feat.access.magic`, `access.magic` | Separate competence, learned grant source, and effective capability gate |
 | `skill.psionics`, `feat.access.psionics`, `access.psionics` | Same three-layer distinction for psychic use |
 | `spell.*` and `psychic.*` techniques | Preserve established domains; document kind validates the more specific prefix |
-| `talent.race.*` and `talent.heritage.*` | Preserve grant provenance in identity |
+| `perk.race.*` and `perk.heritage.*` | Preserve grant provenance in identity |
 | `crisis.<family>`, `crisis.phase.*`, and nested resolution IDs | Preserve separate family, phase, and resolution definition kinds |
 | Hyphenated names such as `half-elf` and `nuclear-thermal-drive` | Hyphens are canonical within one segment; underscores are forbidden |
 
@@ -188,7 +194,7 @@ Illustrative third-party IDs previously used a pack ID that looked more
 specific than their shared namespace. Version 1 resolves this by using a pack
 ID of the form `mod.<namespace>`, for example `mod.starwrights`, with definitions
 such as `skill.mod.starwrights.gravimetry`. These examples are not base IDs and
-are excluded from the 163 count.
+are excluded from the 174 count.
 
 ## Review conclusion
 

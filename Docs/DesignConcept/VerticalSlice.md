@@ -59,7 +59,7 @@ vertical slice.
   WPF, renderer handles, native pointers, wall-clock time, or localized strings.
 - The host translates player intent into typed commands and presents committed
   snapshots rather than directly mutating state.
-- Race and Heritage definitions grant validated racial Talent IDs.
+- Race and Heritage definitions grant validated Racial Perk IDs.
 - Generated results are pure functions of versioned definitions, seed, and
   command history.
 - Commands have stable, inspectable rejection reasons and never partially

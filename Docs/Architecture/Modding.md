@@ -15,7 +15,7 @@ Character definitions and access grants are defined in
 
 The first mod release supports local declarative packs that add validated:
 
-- Races, Heritage, Talents, learned Feats, and Backgrounds;
+- Races, Heritage, Perks, learned Feats, and Backgrounds;
 - Skills after every consumer supports a dynamic Skill registry;
 - spells, psychic abilities, combat techniques, recipes, and enchantments;
 - items, weapons, armor, ship frames, and ship modules;
@@ -129,7 +129,7 @@ Preflight returns one result:
 | Missing content | Required packs or definitions are unavailable |
 | Incompatible | Versions, schemas, IDs, or semantics cannot be reconciled |
 
-Missing content never silently deletes Skills, Talents, Feats, items, ships,
+Missing content never silently deletes Skills, Perks, Feats, items, ships,
 sites, factions, active effects, or other state. Diagnostics name the missing
 pack and definition IDs; the original save remains unchanged.
 
@@ -214,6 +214,6 @@ CI-owned tests cover:
 - a base-only campaign remaining identical with no mods enabled.
 
 The first public milestone is complete when one additive test pack adds a Race,
-Talent, Feat, Spell, item, encounter, and localization; starts and saves a
+Perk, Feat, Spell, item, encounter, and localization; starts and saves a
 deterministic campaign; reloads with the exact pack set; and fails safely when
 the pack is absent.

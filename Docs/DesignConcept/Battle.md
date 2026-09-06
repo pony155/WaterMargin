@@ -20,7 +20,7 @@ retreat remain valid before and during combat.
 - Let ship layout, ruin structure, cover, atmosphere, gravity, visibility,
   hazards, and objectives matter as much as raw damage.
 - Make crew attributes, skills, equipment, positions, learned techniques,
-  access Feats, and racial Talents produce understandable tactical options.
+  access Feats, and Racial Perks produce understandable tactical options.
 - Connect ship-to-ship fire, module damage, boarding, internal defense, and
   disengagement without discarding consequences between scales.
 - Support Arcane, Industrial, and hybrid equipment without making one path the
@@ -91,8 +91,8 @@ command-time models over that shared clock.
 ### Ship combat: real-time with tactical pause
 
 Ship engagements advance continuously while unpaused. Navigation, weapons,
-defenses, sensors, heat, power, aether flow, crew stations, damage control,
-hazards, and opposing ships may all progress during the same ticks.
+defenses, sensors, Power or Aether, damage control, hazards, and opposing ships
+may all progress during the same ticks.
 
 Ship position, heading, velocity, and maneuver state use deterministic
 fixed-point values on a bounded continuous 2D map. A spatial index may divide
@@ -279,17 +279,16 @@ turns.
 
 The tactical state tracks:
 
-- fixed-point position, heading, velocity, acceleration or thrust commitment,
-  collision shape, exact relative vectors, and escape route;
+- fixed-point position, heading, velocity, movement commitment, collision
+  shape, exact relative vectors, and escape route;
 - sensor contact and identification confidence;
 - available firing arcs, weapon damage, rate of fire, effective and maximum
   range, reload state, damage type and area, armor penetration, ammunition,
-  heat, and charge;
+  or Aether charge;
 - Energy Shield maximum and current Shield Value, Recharge Rate, Energy
   Consumption Rate, and raised or lowered state;
-- power and aether allocation across propulsion, defense, weapons, sensors, and
-  damaged networks;
-- exposed or protected modules and compartments;
+- energy allocation across propulsion, defense, weapons, and sensors;
+- Hull, Armor Value, and simple module condition;
 - nearby terrain such as debris, ruins, stations, storms, and gravity hazards;
   and
 - boarding alignment, docking locks, tethers, breaches, and separation risk.
@@ -304,39 +303,40 @@ Positions grant responsibility and authority, not automatic skill ranks.
 
 Typical ship actions include scan, identify, set course, apply thrust, turn,
 brake, intercept, match velocity, hold formation, evade, fire, ram, raise or
-lower shields, brace, vent heat, reroute power, repair, jam, signal, negotiate,
+lower shields, brace, reroute power, repair, jam, signal, negotiate,
 launch boarding, repel boarding, rescue, disengage, and surrender.
 
 Weapons target a ship, visible module, exposed compartment, projectile, or
 declared area according to their tags. Precision targeting requires sufficient
 knowledge and firing solution. Damage can breach hull, disable modules, ignite
-cargo, injure crew, cut networks, change maneuver capability, or force
-evacuation.
+cargo, injure crew, interrupt a resource supply, change maneuver capability,
+or force evacuation.
 
 A legal cannon order requires a ready, undamaged-enough installed weapon, a
-target or area inside its firing arc and range, and its declared ammunition or
-charge. Rate of fire schedules shots; reload time controls when the cannon can
-fire again. Damage, damage type, damage area, and armor penetration resolve
-against the target's protection. Cannon resolution does not add a recoil stat
-or wait for an assigned Gunner.
+target or area inside its firing arc and range, and its declared resource. An
+Aether Energy Cannon reserves Aether charge from the ship network; a Diesel
+Shell Cannon or Atomic Shell Cannon reserves one physical shell through its
+magazine and logistics route. Rate of fire schedules shots; reload time controls
+when the cannon can fire again. Damage, damage type, damage area, and armor
+penetration resolve against the target's protection. Cannon resolution does not
+add a recoil stat or wait for an assigned Gunner.
 
 Ship attack damage crosses three explicit defensive layers:
 
 1. If the whole-ship Energy Shield is raised and powered for the tick, subtract
    damage from its current Shield Value. Excess damage continues.
-2. Apply remaining damage to the struck armor section. Armor protection and the
-   weapon's armor penetration determine how much passes through and how much
-   armor integrity is lost.
-3. Commit penetrating damage to hull structure, compartments, modules, cargo,
-   networks, or exposed crew according to the hit location and damage area.
+2. Apply remaining damage to the ship's Armor Value. Armor penetration
+   determines how much passes through.
+3. Commit penetrating damage to Hull or one selected visible module. A damaged
+   module uses its simple Damaged or Disabled state.
 
 Current Shield Value is a finite state value, not bonus armor. While the shield
 is raised and receives its full Energy Consumption Rate, each fixed tick adds
 its Recharge Rate up to the maximum Shield Value. Those are its only combat
 statistics. Lowering a shield stops both consumption and replenishment and
 never repairs armor. Ward Projectors resolve only their declared magical,
-psychic, or environmental
-effects and do not silently substitute for an Energy Shield.
+psychic, or environmental effects and do not silently substitute for an Energy
+Shield.
 
 A ram requires a compatible installed prow module, a legal collision course,
 and sufficient relative velocity. Impact resolves damage and impulse for both
@@ -345,7 +345,7 @@ A figurehead is visual customization unless an installed enchantment, ward,
 sensor, or command effect gives it explicit mechanics and resource demands.
 Cannon and other weapon modules retain their installed orientation, firing arc,
 damage profile, rate of fire, range, reload state, damage area, armor
-penetration, ammunition route, heat, and individual damage state.
+penetration, resource type, and simple condition.
 
 Disengagement is a contest of position, propulsion, detection, terrain, and
 pursuit commitment. A faster ship does not automatically escape if trapped at
@@ -420,7 +420,7 @@ because they left the local battle graph.
 
 Projectile recoil, hull penetration, suit puncture, and loose equipment use
 explicit tags. Magic and Psionics still require their access Feats or innate
-Talents and do not ignore vacuum, range, line of effect, or Psychic Strain.
+Racial Perks and do not ignore vacuum, range, line of effect, or Psychic Strain.
 
 ## Settlement and surface conflicts
 
@@ -441,7 +441,13 @@ scale. Personal weapons can declare skill, grip, range, delivery, damage type,
 penetration, recoil, ammunition or charge, preparation, action time, recovery,
 noise, trace, and valid targets. Ship cannons instead declare damage, rate of
 fire, effective and maximum range, firing arc, reload time, damage type, damage
-area, armor penetration, ammunition or charge, heat, trace, and valid targets.
+area, armor penetration, and physical ammunition or Aether charge.
+
+Ship cannon definitions also declare one cannon family. Arcane Aether Energy
+Cannons spend Aether charge; Industrial Diesel Shell and Atomic Shell Cannons
+spend physical ammunition. The family changes resource availability, reload
+failure, damage-control risk, and loadout planning, not the shared targeting or
+damage sequence.
 
 - Melee covers unarmed attacks and handheld close-combat weapons.
 - Archery covers bows, crossbows, and unusual string-launched weapons.
@@ -458,17 +464,16 @@ aimed shot, controlled burst, shield another, or fighting withdrawal. They are
 learned separately from skills when their definition requires it. A high skill
 improves execution but does not automatically grant every technique.
 
-Armor declares coverage, protection, seals, mass, movement effects, power,
-damage, and environmental compatibility. Protection trades mobility, noise,
-heat, fatigue, perception, cost, or maintenance instead of being a simple
-always-better number.
+Ship armor declares one Armor Value and Slot Cost. Personal armor remains a
+separate tactical item system. Ship armor is intentionally a simple defense
+layer rather than a mass, coverage, heat, or maintenance simulation.
 
 ## Magic, Psionics, and enchantment
 
 A character cannot cast because combat started. Spellcasting requires
 `access.magic`, the known spell, sufficient resources, a legal target, and the
-normal phases in [`Spells.md`](Spells.md). Casting can be interrupted, traced,
-countered, or sustained across ticks.
+simple cast flow in [`Spells.md`](Spells.md). Only channeled or ritual spells
+can be interrupted or sustained across ticks.
 
 Psychic techniques require `access.psionics` and follow consent, resistance,
 privacy, information, and Psychic Strain rules in
@@ -502,10 +507,9 @@ under explicit rules. Death-causing effects, bleed-out deadlines, stabilization,
 and coup-de-grace actions are visible and do not arise from hidden narrative
 fiat.
 
-Ships resolve harm through finite current Shield Value, sectional armor, hull
-structure, compartments, modules, networks, fires, breaches, and crew exposure
-as defined in [`Ships.md`](Ships.md). Character and ship damage commit together
-when one attack affects both.
+Ships resolve harm through finite current Shield Value, Armor Value, Hull, and
+simple module condition as defined in [`Ships.md`](Ships.md). Character and
+ship damage commit together when one attack affects both.
 
 ## Morale, surrender, and prisoners
 
@@ -586,8 +590,8 @@ An authored encounter definition resembles:
 Persistent battle state stores definition revisions, encounter seed and random
 streams, tick, participants, teams, knowledge, continuous ship positions,
 headings and velocities, current Energy Shield value and raised state,
-sectional armor, personal zone and cell state, objectives, Turn Meters, current
-AP and reserved reaction AP, Ready-queue state, queued ship
+Armor Value, Hull, module condition, personal zone and cell state, objectives,
+Turn Meters, current AP and reserved reaction AP, Ready-queue state, queued ship
 orders, reserved resources, scheduled actions, reactions, projectiles, active
 effects, hazards, injuries, ship damage, reinforcement state, retreat paths,
 and committed event history.
@@ -601,8 +605,8 @@ cannot advance before the player receives the restored snapshot.
 ## Bounds and validation
 
 Runtime limits include ships, continuous-map extent, local space objects,
-spatial-query candidates, armor sections per ship, actors,
-personal-board dimensions, hex cells, zones, links, AP per activation, Ready
+spatial-query candidates, modules per ship, actors, personal-board dimensions,
+hex cells, zones, links, AP per activation, Ready
 actors, queued ship orders, planned personal actions, carried items, active
 effects, scheduled actions, reactions per trigger, projectiles, reinforcements,
 path expansions, visibility checks, AI candidates, event history, and maximum

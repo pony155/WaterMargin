@@ -26,6 +26,15 @@ Faction behavior during optional late-campaign threats is defined in
 - Use stable IDs and versioned data for saves, generation, localization, and
   eventual modding.
 
+## Arcane-Industrial civilization
+
+The galaxy is technologically advanced: Arcane craft and dieselpunk-to-atompunk
+industry coexist in ports, fleets, markets, and law. Factions differ in how
+they regulate, finance, and deploy these tools—not in whether advanced
+technology or magic exists at all. Aether crystals, reactor material, fuel,
+enchantments, spare parts, and skilled labor are all normal political and
+economic concerns. The setting baseline is in [`Setting.md`](Setting.md).
+
 ## Race, culture, and faction
 
 A faction is an organization, polity, movement, guild, fleet, faith, company,

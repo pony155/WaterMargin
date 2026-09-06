@@ -9,7 +9,7 @@ catalogs, but gameplay definitions do not yet have an equivalent loader.
 
 The first implementation moves character Attributes and Skills into a built-in
 base pack without changing the expedition prototype. Later systems reuse the
-pipeline for Races, Heritage, Talents, Feats, techniques, spells, items, ships,
+pipeline for Races, Heritage, Perks, Feats, techniques, spells, items, ships,
 encounters, factions, and crises.
 
 ## Decisions
@@ -70,7 +70,7 @@ Content/
         Attributes/
         Skills/
         Feats/
-        Talents/
+        Perks/
         Races/
         Heritage/
         Spells/
@@ -126,7 +126,7 @@ Established core IDs remain valid:
 attribute.strength
 skill.engineering
 feat.access.magic
-talent.race.elf.aether-sense
+perk.race.elf.aether-sense
 access.psionics
 spell.warding.brace-ward
 combat.context.ruin
@@ -194,7 +194,7 @@ public sealed class GameContentSnapshot
     public required ImmutableArray<AttributeDefinition> Attributes { get; init; }
     public required ImmutableArray<SkillDefinition> Skills { get; init; }
     public required ImmutableArray<FeatDefinition> Feats { get; init; }
-    public required ImmutableArray<TalentDefinition> Talents { get; init; }
+    public required ImmutableArray<PerkDefinition> Perks { get; init; }
 }
 ```
 

@@ -141,8 +141,8 @@ Initial semantic fields are:
 | Skill | `minimum`, `maximum`, `progressionCurveId`, `actionTags` |
 | Access | `tags` |
 | Feat | `trainingProjectId`, `grantedAccessIds` |
-| Talent | `compatibleRaceIds`, `grantedAccessIds`, `grantedTechniqueIds` |
-| Race | `grantedTalentIds` |
+| Perk | `compatibleRaceIds`, `grantedAccessIds`, `grantedTechniqueIds` |
+| Race | `grantedPerkIds` |
 | Training Project | `requiredSkillIds`, `workUnits`, `grantedFeatIds` |
 
 Version 1 recognizes these exact first-level directories under a definition
@@ -154,7 +154,7 @@ root:
 | `Skills` | `Skill` | `skill.` |
 | `Access` | `Access` | `access.` |
 | `Feats` | `Feat` | `feat.` |
-| `Talents` | `Talent` | `talent.` |
+| `Perks` | `Perk` | `perk.` |
 | `Races` | `Race` | `race.` |
 | `TrainingProjects` | `TrainingProject` | `training.` |
 
@@ -163,9 +163,9 @@ that disagrees with its directory produces `CONTENT_KIND_MISMATCH`. Additional
 kinds require a later schema-contract revision before the loader accepts them.
 
 The M0 valid fixture includes the Race and Training Project support definitions
-needed to resolve the required Feat and Talent references.
+needed to resolve the required Feat and Perk references.
 
-A Race that grants a Talent MUST be listed by that Talent's
+A Race that grants a Perk MUST be listed by that Perk's
 `compatibleRaceIds`. Both documents can be structurally valid and fully linked
 while violating this cross-definition rule; that failure is
 `CONTENT_SEMANTIC_INVALID`.

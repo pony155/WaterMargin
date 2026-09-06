@@ -55,11 +55,17 @@ Implemented foundations include:
 These are product goals, not claims that every system is implemented. See
 [`Docs/DesignConcept/Vision.md`](Docs/DesignConcept/Vision.md) and
 [`Docs/DesignConcept/VerticalSlice.md`](Docs/DesignConcept/VerticalSlice.md). The planned
+Arcane-Industrial setting, including dieselpunk and atompunk technology, is
+defined in [`Docs/DesignConcept/Setting.md`](Docs/DesignConcept/Setting.md). The planned
 crew races, heritages, physiology, and character-generation boundaries are
 defined in [`Docs/DesignConcept/Races.md`](Docs/DesignConcept/Races.md). The
 classless capability model is split into
 [`Docs/DesignConcept/Attributes.md`](Docs/DesignConcept/Attributes.md) and
-[`Docs/DesignConcept/Skills.md`](Docs/DesignConcept/Skills.md). Planned spellcasting rules,
+[`Docs/DesignConcept/Skills.md`](Docs/DesignConcept/Skills.md); Perk and Racial
+Perk rules are defined in [`Docs/DesignConcept/Perks.md`](Docs/DesignConcept/Perks.md).
+Planned personal weapons, armor, tools, and relics are defined in
+[`Docs/DesignConcept/Equipments.md`](Docs/DesignConcept/Equipments.md).
+Planned spellcasting rules,
 the authored spell catalog, and psychic systems are defined in
 [`Docs/DesignConcept/Spells.md`](Docs/DesignConcept/Spells.md), and
 [`Docs/DesignConcept/PsychicAbilities.md`](Docs/DesignConcept/PsychicAbilities.md).

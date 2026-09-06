@@ -3,7 +3,7 @@
 ## Status
 
 This document specifies planned data and runtime contracts for Attributes,
-Skills, learned Feats, racial Talents, supernatural access, and known
+Skills, learned Feats, Racial Perks, supernatural access, and known
 techniques. They are not implemented; the current simulation has no characters.
 
 Product behavior is defined in
@@ -38,7 +38,7 @@ boundaries:
 public readonly record struct AttributeId(string Value);
 public readonly record struct SkillId(string Value);
 public readonly record struct FeatId(string Value);
-public readonly record struct TalentId(string Value);
+public readonly record struct PerkId(string Value);
 public readonly record struct AccessId(string Value);
 public readonly record struct TechniqueId(string Value);
 ```
@@ -53,7 +53,7 @@ construction so malformed IDs cannot travel through the simulation.
 | Attribute | ID, keys, bounds, tags, generation rule | Value by Attribute ID |
 | Skill | ID, keys, range, progression curve, action tags | Value and bounded practice by Skill ID |
 | Feat | ID, keys, training project, grants | Learned Feat IDs and provenance |
-| Talent | ID, keys, Race/Heritage compatibility, grants | Talent IDs granted by Race and Heritage |
+| Perk | ID, keys, Race/Heritage compatibility, grants | Perk IDs granted by Race and Heritage |
 | Access | Stable capability gate | Effective grants with their sources |
 | Technique | ID, prerequisites, costs, and effects | Known IDs and learning projects |
 
@@ -106,9 +106,9 @@ Skills do not own one permanent governing Attribute. Each action definition
 declares allowed Attribute approaches, its recommended approach, Skill,
 technique, equipment, target, cost, and circumstance requirements.
 
-## Feats, Talents, and access
+## Feats, Perks, and access
 
-A trained Feat and racial Talent can grant the same capability with different
+A trained Feat and Racial Perk can grant the same capability with different
 provenance:
 
 ```json
@@ -127,9 +127,9 @@ provenance:
 {
   "schemaVersion": 1,
   "revision": 1,
-  "id": "talent.race.elf.aether-sense",
-  "nameKey": "talent.race.elf.aether-sense.name",
-  "descriptionKey": "talent.race.elf.aether-sense.description",
+  "id": "perk.race.elf.aether-sense",
+  "nameKey": "perk.race.elf.aether-sense.name",
+  "descriptionKey": "perk.race.elf.aether-sense.description",
   "compatibleRaceIds": ["race.elf"],
   "grantedAccessIds": ["access.magic"],
   "grantedTechniqueIds": []
@@ -161,7 +161,7 @@ public sealed class CharacterCapabilities
     private readonly ImmutableArray<short> attributeValues;
     private readonly ImmutableArray<byte> skillValues;
     private readonly ImmutableArray<ulong> knownFeatBits;
-    private readonly ImmutableArray<ulong> knownTalentBits;
+    private readonly ImmutableArray<ulong> knownPerkBits;
     private readonly ImmutableArray<ulong> knownTechniqueBits;
 }
 ```
@@ -172,7 +172,7 @@ cross a save, command-log, mod, or public serialization boundary.
 
 Persistent stable ID/value pairs are translated to indices only after the exact
 compatible snapshot is selected. Unknown IDs, duplicates, out-of-range values,
-missing required Attributes, and incompatible Talents reject validation or
+missing required Attributes, and incompatible Perks reject validation or
 enter an explicit migration.
 
 ## Character state
@@ -194,9 +194,9 @@ public sealed class CharacterState
 Mutation occurs through accepted commands at a fixed-tick commit boundary. UI
 receives a read-only snapshot and never edits these collections directly.
 
-Race and Heritage grant Talent IDs during validated creation. Background can
+Race and Heritage grant Perk IDs during validated creation. Background can
 grant initial Skills and documented pre-campaign training. Crew position grants
-responsibility and authority, not personal Skills, Feats, or Talents.
+responsibility and authority, not personal Skills, Feats, or Perks.
 
 ## Action eligibility and resolution
 
@@ -228,7 +228,7 @@ Skill practice and Feat training are separate state machines.
   progress cap, and completion grants.
 - Partial Feat training never provides partial supernatural access.
 - Completion validates and commits the learned Feat and access source together.
-- Race and Heritage Talents come from creation or an explicit transformation,
+- Race and Heritage Perks come from creation or an explicit transformation,
   never ordinary practice.
 - Trivial repetition cannot generate unbounded progress.
 
@@ -269,15 +269,15 @@ Serialized capabilities use stable IDs:
     "skill.engineering": 12
   },
   "learnedFeatIds": [],
-  "talentIds": [
-    "talent.race.elf.aether-sense",
-    "talent.heritage.elf.dawnweave"
+  "perkIds": [
+    "perk.race.elf.aether-sense",
+    "perk.heritage.elf.dawnweave"
   ],
   "knownTechniqueIds": ["spell.warding.brace-ward"]
 }
 ```
 
-`access.magic` is reconstructed from the Talent instead of copied as an
+`access.magic` is reconstructed from the Perk instead of copied as an
 unexplained flag. A cached derived value may be retained for diagnostics, but
 load validation recomputes and compares it.
 
@@ -303,7 +303,7 @@ or effect IDs, invalid grants, missing compatibility, grant cycles, and
 technique requirements that cannot be satisfied.
 
 Characters reject missing Attributes, unknown state IDs, duplicate Feats or
-Talents, incompatible racial grants, out-of-range values, access without
+Perks, incompatible racial grants, out-of-range values, access without
 provenance, unbounded training, and known techniques beyond capacity.
 
 CI-owned tests cover:

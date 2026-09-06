@@ -4,8 +4,8 @@
 
 This document defines the planned classless skill, language, script, and lore
 systems. They are not implemented yet. Broad capability is defined in
-[`Attributes.md`](Attributes.md), while race, heritage, identity, and crew
-positions are defined in [`Races.md`](Races.md). Spellcasting rules and the
+[`Attributes.md`](Attributes.md), while race, heritage, identity, background,
+and Racial Perks are defined in [`Races.md`](Races.md). Spellcasting rules and the
 authored spell catalog are defined in [`Spells.md`](Spells.md), and psychic
 techniques are expanded in
 [`PsychicAbilities.md`](PsychicAbilities.md). Combat actions and tactical
@@ -27,10 +27,10 @@ player-facing range is 0–100. A character can be an excellent pilot and novice
 navigator, or a skilled doctor who later learns swordplay, without selecting or
 changing a class.
 
-Talents and learned Feats are not skills. Talents are racial feats granted by
-Race and Heritage; learned Feats are discrete capabilities earned through
+Racial Perks and learned Feats are not skills. Racial Perks are racial feats
+granted by Race and Heritage; learned Feats are discrete capabilities earned through
 training. Neither has a 0–100 rating or improves through repeated use. See
-[`Races.md`](Races.md) for Talent rules.
+[`Races.md`](Races.md) and [`Perks.md`](Perks.md) for Racial Perk rules.
 
 ## Ability access feats
 
@@ -48,16 +48,16 @@ facilities, time, cost, practice tasks, safety rules, and completion check. It
 awards the Feat atomically; partial training remains project progress and never
 temporarily unlocks the ability.
 
-A racial or Heritage Talent may explicitly grant the same access ID. This is
+A Race or Heritage Racial Perk may explicitly grant the same access ID. This is
 innate access and substitutes for the corresponding learned Feat. It does not
 grant free skill ranks, unrelated techniques, or immunity to costs and failure.
-The initial examples are the Elf **Aether Sense** Talent for `access.magic` and
-the Somnari **Mindwake** Talent for `access.psionics`.
+The initial examples are the Elf **Aether Sense** Racial Perk for `access.magic` and
+the Somnari **Mindwake** Racial Perk for `access.psionics`.
 
 Access, knowledge, and competence are separate checks:
 
 1. the character has the required access ID from a learned Feat or racial
-   Talent;
+   Racial Perk;
 2. the character knows the specific spell or psychic technique; and
 3. the character meets its skill, resource, target, equipment, and contextual
    requirements.
@@ -65,7 +65,7 @@ Access, knowledge, and competence are separate checks:
 Without access, a character can study theory, identify evidence, assist an
 authorized practitioner, and make allowed knowledge checks, but cannot cast a
 spell or initiate a psychic technique. A focus item, spellbook, psychic
-implement, crew position, or high skill rating never bypasses the access gate.
+implement, or high skill rating never bypasses the access gate.
 
 ## Skill catalog
 
@@ -129,20 +129,20 @@ validated before the old effect is retired.
 
 Merchant determines what cargo is worth, where demand exists, and which risks
 or obligations hide in a deal. Negotiation determines whether the parties can
-reach acceptable terms. Merchant is a learned skill rather than a class or crew
-position; a Doctor, Chef, Captain, or deckhand may study it. Negotiation cannot
+reach acceptable terms. Merchant is a learned skill rather than a class; any
+character may study it. Negotiation cannot
 force consent, erase faction policy, or make an impossible agreement valid.
 
 Every character may pursue Spellcasting Training, but only a character with
-`access.magic` may cast a known spell. Casting may consume stamina, focus,
-reagents, stored charge, or another resource defined by the spell. Armor, Race,
-Heritage, or Background may alter those costs but never creates a hidden class
-restriction. Detailed spell definitions, casting phases, resources,
-disciplines, and counterplay are specified in [`Spells.md`](Spells.md).
+`access.magic` may cast a known spell. Personal casting uses a simple Focus
+cost; ship spells use Aether from their required Arcane module. Armor, Race,
+Heritage, or Background may alter an explicit effect but never creates a hidden
+class restriction. The short casting flow, visible spell values, and
+counterplay are specified in [`Spells.md`](Spells.md).
 
 Every character may pursue Psionic Training, but only a character with
 `access.psionics` may initiate a known psychic technique. The Somnari Mindwake
-Talent supplies innate access to basic psychic contact, not free skill ranks or
+Racial Perk supplies innate access to basic psychic contact, not free skill ranks or
 unrestricted mind reading. Failed or resisted psychic actions may create
 strain, distorted impressions, or detectable psychic feedback.
 Consent, resistance, Psychic Strain, information boundaries, and technique
@@ -176,7 +176,7 @@ must preserve enough information to reproduce the outcome.
   teacher, facility, discovery, or dangerous field experience.
 - Techniques can require skill thresholds, attributes, equipment, discoveries,
   or circumstances—not class levels. Casting and psychic techniques also
-  require their explicit access ID from a learned Feat or innate Talent.
+  require their explicit access ID from a learned Feat or innate Racial Perk.
 - Practice awards are deterministic, capped per committed action, and included
   in the authoritative command result.
 - Enemies and encounters do not automatically scale to a global character

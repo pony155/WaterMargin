@@ -5,7 +5,7 @@
 This document defines the planned psychic-technique, contact, consent,
 resistance, strain, information, hazard, learning, and persistence systems.
 They are not implemented yet. `skill.psionics`, `feat.access.psionics`, and the
-Somnari Mindwake Talent exist only in product design; the current voyage
+Somnari Mindwake Racial Perk exists only in product design; the current voyage
 prototype has no characters or psychic actions.
 
 ## Core boundary
@@ -36,8 +36,8 @@ or safe psychic facility can support that bounded training project. An unusual
 experience or psychic implement may begin or modify training, but cannot
 silently bypass it.
 
-A Race or Heritage Talent may instead grant `access.psionics` innately. The
-Somnari Race Talent **Mindwake** does so and also grants basic psychic sensing
+A Race or Heritage Racial Perk may instead grant `access.psionics` innately. The
+Somnari Race Perk **Mindwake** does so and also grants basic psychic sensing
 and a consensual short-range mindlink. It grants neither free Psionics ranks
 nor unrestricted access to another mind.
 
@@ -45,7 +45,7 @@ Each technique is learned separately and stored by stable ID. Psionics skill
 measures control and practice; it does not automatically reveal every psychic
 ability. Access, technique knowledge, and competence are validated separately;
 a high skill rating, crew position, or psychic implement is never sufficient
-without a learned Feat or explicit innate Talent.
+without a learned Feat or explicit innate Racial Perk.
 
 ## Consent and mental privacy
 
@@ -245,7 +245,7 @@ facility, time, and safety requirements.
 
 Psionic Training and technique learning are separate projects. A character may
 complete them in either order, but cannot initiate the technique until both
-`access.psionics` and its known-technique ID are present. An innate Talent
+`access.psionics` and its known-technique ID are present. An innate Racial Perk
 replaces only the access project unless it explicitly grants a named technique.
 
 Receiving a psychic impression does not automatically teach the technique that
@@ -305,7 +305,7 @@ The first crew encounter milestone needs four techniques:
 Mindwake gives a Somnari innate psychic access, Mindlink, and basic psychic
 detection. Other characters need Psionic Training plus the learned Mindlink
 technique; the remaining techniques require learning for everyone unless an
-explicit Talent says otherwise. The slice exercises one trained access path,
+explicit Racial Perk says otherwise. The slice exercises one trained access path,
 one innate access path, one consensual link, one resisted hostile contact, one
 shield, one strain threshold, one ambiguous impression, and one recovery
 period.

@@ -8,19 +8,20 @@ prototype stores only aggregate Hull, Fuel, Supplies, and Cargo values; those
 values must not be described as a finished modular-ship simulation.
 Ship engagements, boarding transitions, and shipboard combat are defined in
 [`Battle.md`](Battle.md).
+The wider Arcane-Industrial setting baseline is defined in
+[`Setting.md`](Setting.md).
 
 ## Design goals
 
 - Make the ship a persistent home whose layout, capabilities, damage, and scars
   record the campaign.
-- Make every installed module create useful choices about space, mass, power,
-  heat, crew time, maintenance, and risk.
+- Make every installed module create one clear choice about slots, energy,
+  cargo, combat, or voyage capability rather than simulate machinery in detail.
 - Support two viable upgrade paths—Arcane and Industrial—without making either
   a universal best choice.
-- Let crew attributes, skills, positions, and duties affect module operation
+- Let crew attributes, skills, and assignments affect module operation
   without creating classes or class-locked stations.
-- Make failures local, inspectable, and capable of bounded cascades through
-  explicit connections.
+- Make failures local, inspectable, and simple to repair or work around.
 - Keep definitions data-driven and use stable IDs for saves, scenarios,
   balancing, and eventual modding.
 - Resolve ship engagements in real time with tactical pause: pausing allows
@@ -36,48 +37,65 @@ A ship consists of distinct persistent layers:
 
 | Layer | Responsibility |
 | --- | --- |
-| Frame | Exterior shape, structural limits, mount zones, baseline hull, and maximum mass |
+| Frame | Exterior shape, Hull Value, module slots, weapon slots, armor slots, and cargo capacity |
 | Compartments | Interior spaces, access paths, atmosphere zones, hazards, and room capacity |
 | Modules | Installed capabilities such as propulsion, life support, workshops, weapons, armor, energy shields, and wards |
-| Networks | Explicit power, atmosphere, heat, fuel, aether, control, and logistics connections |
+| Networks | Simple Power, Aether, supplies, and atmosphere availability checks |
 | Cargo | Bounded stored goods that are not permanently installed |
 | Crew stations | Places where assigned duties operate or assist modules |
-| Ship state | Damage, faults, modifications, contents, history, and active policies |
+| Ship state | Hull, armor, shield, energy, cargo, module condition, modifications, and history |
 
-A frame defines named interior, armor, power-core, propulsion, prow, and weapon
-mounts with size, orientation, structural-load, and access limits. A room is
-navigable ship space. A module is installed equipment that occupies one or
-more mounting cells inside a compartment or one compatible exterior mount.
-Not every room is a module, and portable cargo does not become a module until a
-validated installation command commits it.
+A frame defines named interior, propulsion, prow, and weapon slots plus a
+single Armor Value. A room is navigable ship space. A module occupies one or
+more slots; cargo remains cargo until a validated installation command commits
+it. Exact mass distribution, structural-load arithmetic, and compartment-level
+network routing are deferred unless a later feature creates a player-visible
+choice that cannot be expressed with slots and tags.
+
+## Simple-stat rule
+
+Ships and modules favor readable choices over engineering simulation. The
+standard ship HUD shows only Hull Value, Armor Value, current Shield Value,
+available energy, cargo capacity, and occupied slots. A normal module has at
+most four visible numeric fields:
+
+1. Slot Cost;
+2. Integrity;
+3. one energy value (output, consumption, or storage); and
+4. one primary effect value where needed.
+
+Use tags and discrete states rather than extra numbers. A module is Intact,
+Damaged, or Disabled; its effect either works, works at a declared reduced
+level, or does not work. The deliberate exceptions are Energy Shields, with
+their three documented values, and ship cannons, with the combat fields the
+player explicitly inspects. Heat, noise, signature, vibration, exact plumbing,
+and detailed wear are not core ship statistics in the first playable game.
 
 ## Module contract
 
 Every module definition declares:
 
 - a stable definition ID and localized presentation keys;
-- footprint, mass, mount tags, orientation rules, and access requirements;
-- network ports and bounded input, output, storage, and throughput values;
-- supported operating modes and transition costs;
-- crew stations and recommended skills when that module requires an operator;
-- produced capabilities, resource conversions, heat, noise, and signature;
-- integrity, armor, fault, breach, and repair rules;
-- compatible upgrades, enchantments, ammunition, and cargo tags; and
-- explicit incompatibilities and any unique-installation limit.
+- Slot Cost and compatible slot tags;
+- at most one energy input, output, or storage value;
+- one primary effect and its tags;
+- Integrity plus simple Damaged and Disabled behavior; and
+- path compatibility, resource type, and any unique-installation limit.
 
-Armor modules additionally declare coverage, protection, and damage-type
-responses. Ship cannon modules declare hardpoint size, firing arc, damage,
+Armor modules additionally declare Armor Value and Slot Cost. Ship cannon
+configurations declare firing arc, damage,
 rate of fire, effective and maximum range, reload time, damage type, damage
-area, armor penetration, and ammunition or supply paths. Cannons do not declare
-recoil or require a Gunner, crew station, or Gunnery Skill check.
+area, armor penetration, and a resource path. An Arcane cannon consumes Aether
+charge; an Industrial cannon consumes physical ammunition. Cannons do not
+declare recoil or require a Gunner, crew station, or Gunnery Skill check.
 Energy-shield modules declare exactly three combat statistics: maximum Shield
 Value, Recharge Rate per fixed tick, and Energy Consumption Rate per fixed
 tick. An Energy Shield is distinct from a Ward Projector: shields intercept
 ordinary ship attacks, while wards counter declared magical, psychic, and
 environmental effects.
-Propulsion and power modules declare startup, shutdown, thrust, storage, fuel,
-cooling, and backbone requirements. Prow modules declare collision clearance,
-structural load, and whether they obstruct another prow fitting.
+Propulsion modules declare Speed and Energy Consumption. Power modules declare
+Energy Output or Storage. Prow modules declare one special effect such as Ram
+or Figurehead. Additional simulation values require an explicit design review.
 
 Module definitions use IDs in the form `module.<category>.<name>`. Installed
 instances receive separate stable IDs so two cargo holds can share one
@@ -92,8 +110,8 @@ crew's culture, morality, faction, or available character skills.
 
 | Upgrade path | Stable ID | Energy and progression | Strengths | Costs and risks |
 | --- | --- | --- | --- | --- |
-| Arcane | `ship.path.arcane` | Aether crystals, ambient currents, runic conduits, and increasingly powerful enchantments | Low mass, flexible routing, quiet operation, strong wards, and unusual utility effects | Rare reagents, skilled magical maintenance, aether interference, psychic feedback, and dispelling |
-| Industrial | `ship.path.industrial` | Dieselpunk compression engines and propellant machinery that advance into atompunk reactors and nuclear-thermal drives | Common early parts, field repair, high sustained output, heavy armor, and reliable physical weapons | Greater mass, heat, noise, vibration, fuel use, coolant demand, exhaust at early tiers, radiation at advanced tiers, and frequent maintenance |
+| Arcane | `ship.path.arcane` | Aether crystals, ambient currents, runic conduits, and enchantments | Flexible energy use, wards, and energy weapons | Aether interference and scarce charge sources |
+| Industrial | `ship.path.industrial` | Dieselpunk machinery advancing into atompunk reactors and drives | Reliable power, armor, and physical ammunition | Fuel or advanced-ammunition supply and larger slot cost |
 
 ### Arcane progression
 
@@ -104,10 +122,11 @@ enchantment capacity. Magic and Enchantment provide the main specialist work,
 while Engineering remains important for the physical housings, controls, and
 connections.
 
-Arcane failures include crystal fractures, unstable bindings, aether leaks,
-spell interference, psychic echoes, and effects that reveal the ship to
-supernatural detection. Arcane energy is not limitless: crystals, reagents,
-stored charge, heat capacity, and crew attention remain bounded resources.
+Arcane failures are represented by a damaged generator, empty stored charge, or
+aether interference. Arcane energy is not limitless: crystals, reagents, and
+stored charge remain bounded resources.
+Arcane weapons use that stored charge through Aether Energy Cannons rather than
+physical shells.
 
 ### Industrial progression
 
@@ -117,16 +136,21 @@ upgrades introduce atompunk reactors, shielded turbine halls, radiothermal
 generators, and nuclear-thermal propulsion. Engineering, Crafting, and Rigging
 provide its main specialist work.
 
-Dieselpunk failures include leaks, seized bearings, fuel fires, coolant loss,
-smoke, vibration, and exhaust or oxidizer problems. Combustion systems must
-carry both fuel and an explicit oxidizer where the surrounding environment
-cannot support combustion.
+Dieselpunk failures are represented by a damaged generator, depleted fuel, or a
+disabled drive. Fuel includes any required oxidizer without tracking a separate
+combustion simulation.
 
 Atompunk systems replace much of that fuel demand with long-lived reactor fuel
-and high sustained output. They introduce reactor trips, radiation exposure,
-shielding mass, coolant loops, contaminated parts, and containment breaches.
-Atomic propulsion still consumes reaction mass, and shutdown reactors retain
-decay heat that must be removed.
+and higher Energy Output. Their failure state is a disabled reactor requiring
+an anchorage repair or a specific recovery event; coolant, decay heat, and
+radiation are narrative or event tags rather than continuous ship statistics.
+
+Industrial weapons remain ammunition weapons at both tiers. Dieselpunk ships
+use conventional diesel-shell cannon ammunition; atompunk ships use sealed
+atomic-shell ammunition with advanced penetrators or shaped charges. Atomic
+shells are not automatically nuclear warheads: nuclear payloads, if added,
+must be separate high-consequence content with explicit safety and political
+rules.
 
 ### Commitment and hybrid ships
 
@@ -136,10 +160,9 @@ Changing paths is possible, but it is a major shipyard refit rather than a free
 respec.
 
 Common habitat, cargo, command, and work modules can be built for either
-backbone. An off-path module requires a compatible converter or isolated local
-generator, adding mass, footprint, heat, maintenance, and a bounded conversion
-loss. Hybrid ships are therefore supported as deliberate specialist builds,
-but cannot collect both paths' strongest benefits without paying visible costs.
+backbone. An off-path module requires a compatible converter and one extra Slot
+Cost. Hybrid ships are deliberate specialist builds, but cannot collect both
+paths' strongest benefits without a visible slot tradeoff.
 
 ## Player ship customization
 
@@ -151,27 +174,25 @@ installed upgrade; it never permits arbitrary editing of combat statistics.
 
 | System | Mount and choices | Important consequences |
 | --- | --- | --- |
-| Armor | Install plating on compatible frame sections and choose protected arcs, material, thickness, and enchantments | Mass, maneuverability, coverage gaps, repair material, heat, and protection by damage type |
+| Armor | Spend armor slots on plating or an armor upgrade | Armor Value and slot use |
 | Energy shield | Install one shield module and connect a compatible energy feed | Shield Value, Recharge Rate, and Energy Consumption Rate |
-| Power | Choose an Arcane or Industrial core, storage, distribution, cooling, and optional converters | Available energy media, peak and sustained output, failure modes, signature, fuel, and maintenance |
-| Propulsion | Fit path-compatible main drives and maneuvering systems | Acceleration, turning, braking, propellant or aether use, heat, noise, and escape capability |
-| Prow | Install a ram, figurehead, sensor fitting, boarding device, or leave the mount clear | Collision capability, forward mass, clearance, identity, morale, enchantment capacity, and docking restrictions |
-| Weapons | Fit cannon or other weapon modules to hardpoints, then set orientation and ammunition supply | Damage, rate of fire, effective and maximum range, firing arc, reload time, damage type and area, armor penetration, ammunition, heat, and magazine risk |
+| Power | Choose an Arcane or Industrial core, optional storage, and converters | Energy Output, storage, and resource type |
+| Propulsion | Fit one path-compatible drive | Speed and Energy Consumption |
+| Prow | Install a ram, figurehead, sensor fitting, boarding device, or leave the slot clear | One declared special effect |
+| Weapons | Fit a Deck Battery to a hardpoint and select an Arcane or Industrial cannon configuration | Shared cannon statistics plus either Aether charge demand or physical-ammunition logistics |
 | Support | Configure cargo, habitat, medical, workshop, sensor, ward, and utility modules | Voyage endurance, recovery options, information, salvage, spare capacity, and survivability |
 
 Installed modules have persistent instance IDs. Two ships can use the same
 module definition in different locations, and two instances on one ship can
-have different orientation, ammunition, damage, enchantments, faults, and
-repair history. Cosmetic paint and an unpowered figurehead carving do not alter
+have different slot placement, ammunition, Integrity, upgrades, and repair
+history. Cosmetic paint and an unpowered figurehead carving do not alter
 gameplay fingerprints; a figurehead enchantment, ward, sensor, or morale effect
 must be an explicit gameplay definition.
 
-The refit preview reports displaced cargo, disconnected networks, uncovered
-arcs, overloaded structure, blocked firing or docking clearance, insufficient
-crew access, and resulting mass, power, heat, thrust, and signature before the
-player confirms. Installation is transactional: all removals, relocations,
-connections, costs, and installed instances commit together or the original
-ship remains unchanged.
+The refit preview reports Slot Cost, cargo displacement, incompatible energy
+type, missing ammunition, and blocked weapon or prow slots before the player
+confirms. Installation is transactional: all removals, relocations, costs, and
+installed instances commit together or the original ship remains unchanged.
 
 ## Planned module catalog
 
@@ -192,11 +213,11 @@ ship remains unchanged.
 | Aether Dynamo | `module.power.aether-dynamo` | Arcane | Converts crystals or gathered currents into ship power and aether charge | Magic, Enchantment, or Engineering; Ship Mage or Engineer |
 | Crystal Accumulator | `module.power.crystal-accumulator` | Arcane | Stores bounded aether charge for peak demand and emergency operation | Enchantment; Artificer |
 | Runic Distributor | `module.power.runic-distributor` | Arcane | Routes and prioritizes aether while isolating unstable branches | Enchantment or Engineering; Artificer |
-| Diesel Generator | `module.power.diesel-generator` | Industrial—Dieselpunk | Produces mechanical and electrical power from fuel and oxidizer with cooling and exhaust demands | Engineering; Engineer |
+| Diesel Generator | `module.power.diesel-generator` | Industrial—Dieselpunk | Produces Power from fuel | Engineering; Engineer |
 | Propellant Drive | `module.propulsion.propellant-drive` | Industrial—Dieselpunk | Produces sustained thrust by consuming power and stored propellant | Piloting or Engineering; Pilot or Engineer |
 | Flywheel Bank | `module.power.flywheel-bank` | Industrial—Dieselpunk | Stores bounded mechanical energy for peak demand and emergency operation | Engineering or Crafting; Engineer |
-| Atomic Reactor | `module.power.atomic-reactor` | Industrial—Atompunk | Provides high sustained power from reactor fuel while requiring shielding, control rods, and cooling | Engineering; Chief Engineer |
-| Nuclear-Thermal Drive | `module.propulsion.nuclear-thermal-drive` | Industrial—Atompunk | Heats stored reaction mass for efficient high-output thrust | Piloting or Engineering; Pilot or Chief Engineer |
+| Atomic Reactor | `module.power.atomic-reactor` | Industrial—Atompunk | Provides high Power from reactor fuel | Engineering; Chief Engineer |
+| Nuclear-Thermal Drive | `module.propulsion.nuclear-thermal-drive` | Industrial—Atompunk | Provides high Speed by consuming reactor power and reaction mass | Piloting or Engineering; Pilot or Chief Engineer |
 | Vector Vanes | `module.propulsion.vector-vanes` | Either | Provides docking, evasion, and close maneuver control through a path-compatible drive | Piloting or Engineering; Pilot |
 
 ### Habitat and care
@@ -225,12 +246,12 @@ ship remains unchanged.
 
 | Module | Stable ID | Function | Typical skill or position |
 | --- | --- | --- | --- |
-| Reinforced Plating | `module.defense.reinforced-plating` | Adds localized protection at the cost of mass and maneuverability | Engineering |
+| Reinforced Plating | `module.defense.reinforced-plating` | Adds Armor Value by using armor slots | Engineering |
 | Energy Shield | `module.defense.energy-shield` | Uses power or aether to provide a whole-ship Shield Value that absorbs damage and replenishes at its Recharge Rate | No dedicated Skill or crew position requirement |
 | Ward Projector | `module.defense.ward-projector` | Sustains a bounded defense against magical, psychic, or environmental threats | Magic, Psionics, or Enchantment; Warden |
 | Prow Ram | `module.prow.ram` | Reinforces a compatible prow for deliberate collision attacks while transmitting impact risk into the frame | Piloting or Engineering; Pilot |
 | Ship Figurehead | `module.prow.figurehead` | Provides a customizable prow fitting that can host declared enchantments, wards, sensors, or command effects | Crafting or Enchantment; Artificer |
-| Deck Battery | `module.weapon.deck-battery` | Mounts configurable cannon or other tagged ship weapons with declared damage, rate of fire, range, reload, damage type and area, armor penetration, arc, and ammunition | No Skill or crew position requirement |
+| Deck Battery | `module.weapon.deck-battery` | Mounts one configured Aether Energy, Diesel Shell, or Atomic Shell Cannon with declared damage, rate of fire, range, reload, damage type and area, armor penetration, arc, and resource path | No Skill or crew position requirement |
 | Boarding Lock | `module.contact.boarding-lock` | Controls docking, boarding, quarantine seals, and ship-to-ship access | Engineering or Defense; Master-at-Arms |
 | Signal Lantern | `module.contact.signal-lantern` | Sends identification, negotiation, warning, and distress signals | Language and Literacy or Negotiation; Envoy |
 | Psychic Resonator | `module.contact.psychic-resonator` | Amplifies permitted mindlinks and detects nearby psychic signaling | Psionics; Mindwarden or Envoy |
@@ -239,31 +260,44 @@ The catalog is a design vocabulary, not a promise that every module belongs in
 the first playable voyage. New definitions should create new system
 interactions rather than duplicate an existing module with larger numbers.
 
+### Ship cannon families
+
+Each Deck Battery selects exactly one compatible cannon configuration. All
+three families use the shared ship-cannon fields; their resource source and
+failure consequences are different.
+
+| Cannon family | Stable ID | Resource path | Role and risk |
+| --- | --- | --- | --- |
+| Aether Energy Cannon | `ship.weapon.arcane.aether-cannon` | Aether network and stored Aether charge | A magical energy cannon. It needs no physical ammunition, but it cannot fire when its charge request is unmet and is vulnerable to aether interference. |
+| Diesel Shell Cannon | `ship.weapon.industrial.diesel-shell-cannon` | Logistics path from a magazine of physical shells | A dieselpunk cannon using manufacturable shells and propellant. It remains usable during Aether disruption, but spends ammunition. |
+| Atomic Shell Cannon | `ship.weapon.industrial.atomic-shell-cannon` | Logistics path from sealed advanced shells; optional Industrial power for its loader | An atompunk ammunition cannon using high-density penetrators or shaped-charge shells. Its advanced ammunition is costly but has no extra subsystem to manage. |
+
+An Aether Energy Cannon's `reloadTime` is its charge-cycle time. An Industrial
+cannon's `reloadTime` is its shell-handling cycle. Neither changes the common
+combat fields or introduces a recoil statistic, a Gunner post, or a Gunnery
+Skill requirement.
+
 ## Networks and allocation
 
-Modules exchange resources only through declared network ports:
+Modules use a small set of resource checks rather than a simulated pipe graph:
 
 | Network | Carries | Example failure |
 | --- | --- | --- |
-| Power | Industrial mechanical or electrical energy | An overloaded branch sheds lower-priority modules |
-| Atmosphere | Air, pressure, filtration, and environmental mixture | A breach isolates a compartment and reduces habitable capacity |
-| Heat | Produced heat and cooling capacity | Excess heat degrades output and raises fire risk |
-| Fuel | Tagged crystals, combustible or reactor fuel, propellant, oxidizer, coolant, and bounded delivery rates | A damaged line limits drive or generator output |
-| Aether | Arcane energy, magical charge, wards, and supernatural interference | Feedback destabilizes an enchantment or reveals the ship |
-| Control | Commands, sensors, and automation | A severed route forces local manual operation |
-| Logistics | Physical access for crew, parts, ammunition, and cargo | A blocked passage delays work and evacuation |
+| Power | Industrial energy | An active module is unpowered for the tick |
+| Aether | Arcane energy and magical charge | An Arcane module cannot use its effect or fire |
+| Supplies | Fuel, shells, spare parts, and provisions | A drive, cannon, or repair has no required supply |
+| Atmosphere | Air and pressure for crew spaces | A compartment is unsafe for crew |
 
-Arcane backbones primarily distribute Aether; Industrial backbones distribute
-Power. A module declares which energy media it accepts. Converters bridge the
-two networks only at their declared capacity and efficiency, so an Industrial
-ship cannot power a ward for free and an Arcane ship cannot operate heavy
-machinery without suitable conversion or an enchanted variant.
+Arcane backbones provide Aether; Industrial backbones provide Power. A module
+declares which it accepts. A converter occupies one extra slot and lets an
+off-path module operate, so an Industrial ship cannot power a ward for free and
+an Arcane ship cannot operate heavy machinery without an enchanted variant.
 
-The player assigns priorities rather than directly distributing every unit each
-tick. The authoritative simulation resolves supply in a stable order, records
-every unmet request, and exposes which producer, connection, capacity, policy,
-or priority blocked a module. Allocation and module updates occur on the fixed
-simulation tick and never depend on UI or rendering cadence.
+The player assigns a simple priority order rather than directly distributing
+every unit each tick. The authoritative simulation powers modules in that
+stable order until Energy Output is spent, then records which module did not
+receive energy. Allocation and module updates occur on the fixed simulation
+tick and never depend on UI or rendering cadence.
 
 When raised, an Energy Shield requests its fixed Energy Consumption Rate every
 simulation tick. A fully supplied shield protects the entire ship and restores
@@ -276,11 +310,10 @@ needs an explicit compatible converter.
 
 ## Operation and crew
 
-Each installed module has a requested mode and a committed operating state.
-Typical modes are Offline, Standby, and Active; condition is tracked separately
-as Intact, Damaged, Disabled, or Breached. A module becomes operational only
-when its dependencies, connections, crew access, and resource requests are
-satisfied.
+Each installed module is On or Off and is Intact, Damaged, or Disabled. A
+module becomes operational when it has its required energy or supply and is
+not Disabled. There is no separate standby state, detailed connection damage,
+or cascading-fault simulation in the first playable game.
 
 Crew positions provide responsibility and authority, while duties describe the
 actual work performed at a station. Skills and contextual attributes determine
@@ -303,25 +336,18 @@ Examples include:
 
 ## Damage, repair, and refit
 
-Damage targets explicit compartments, modules, connections, or the frame. It
-reduces integrity and may add a named fault such as jammed, leaking, shorted,
-contaminated, irradiated, misaligned, containment-breached, fuel-starved, or
-aether-unstable.
-Faults declare their effects and possible propagation; damage does not produce
-an unbounded hidden cascade.
+Damage targets the Hull or a visible module. It reduces Integrity and may make
+the target Damaged or Disabled. Named faults, individual leaking pipes, and
+cascading failures are deferred until they add a distinct player decision.
 
-Emergency work can isolate a network, suppress a fault, patch integrity, or
-restore limited output. Complete repair may require Engineering diagnosis,
-Crafting parts, Enchantment work, a suitable facility, and downtime. The UI
-shows the required resources, expected time, risk, and resulting limitations
-before the repair command is committed.
+Emergency work can restore an Intact or Damaged module to its previous state by
+spending the declared repair resource and time. The UI shows that cost and the
+result before the repair command is committed.
 
 Installation, removal, and replacement are transactional. The simulation
-validates frame capacity, footprint, mass, access, network compatibility,
-cargo displacement, armor coverage, shield energy demand, firing arcs, cannon
-hardpoint size, collision loads, prow and docking clearance,
-module-specific crew access, and unique limits before changing the working
-configuration. Failed validation leaves the previous ship intact.
+validates available slots, cargo displacement, energy type, Shield Energy
+Consumption, cannon resource type, and unique limits before changing the
+working configuration. Failed validation leaves the previous ship intact.
 Major refits normally require an anchorage or shipyard; explicitly tagged field
 modules may be swapped during a voyage.
 
@@ -334,15 +360,11 @@ An authored module definition resembles:
   "schemaVersion": 1,
   "id": "module.habitat.sickbay",
   "nameKey": "ship.module.habitat.sickbay.name",
-  "footprint": 2,
-  "mass": 8,
+  "slotCost": 2,
   "mountTags": ["interior", "pressurized"],
   "compatiblePathIds": ["ship.path.arcane", "ship.path.industrial"],
   "recommendedSkillIds": ["skill.medicine"],
-  "ports": [
-    { "network": "power", "direction": "input", "capacity": 2 },
-    { "network": "atmosphere", "direction": "input", "capacity": 1 }
-  ],
+  "energyConsumption": 2,
   "capabilityTags": ["treatment", "surgery", "quarantine"]
 }
 ```
@@ -359,19 +381,18 @@ All three values use bounded integer units. Current Shield Value and raised or
 lowered state belong to the installed module instance; the three authored
 statistics remain on its definition.
 
-Persistent ship state stores its primary path ID and backbone revision.
+Persistent ship state stores primary path ID and revision, Hull Value, Armor
+Value, cargo, occupied slots, and available energy.
 
-Persistent module state stores instance ID, definition ID and revision,
-location, orientation, integrity, requested mode, faults, contents, installed
-upgrades, enchantments, current Shield Value where applicable, and bounded
-history references. Saves never store a localized path or module name as
-identity.
+Persistent module state stores instance ID, definition ID and revision, slot,
+Integrity, On or Off state, contents, installed upgrades, current Shield Value
+where applicable, and bounded history references. Saves never store a localized
+path or module name as identity.
 
 Definition loading rejects duplicate or missing IDs, unknown path references,
-invalid footprints, negative or excessive capacities, incompatible ports,
-invalid Shield Value, Recharge Rate, or Energy Consumption Rate, impossible
-dependency cycles, unknown skills or tags, and unbounded fault propagation
-before publishing a replacement catalog.
+invalid Slot Cost, negative energy values, invalid Shield Value, Recharge Rate,
+or Energy Consumption Rate, incompatible path or resource tags, and unknown
+tags before publishing a replacement catalog.
 
 ## First playable ship scope
 
@@ -388,22 +409,22 @@ modules, and a choice between two fixed energy packages:
 | Workshop | Engineering repair and replacement parts |
 | Signal Lantern | Contact, negotiation, warnings, and distress calls |
 | Reinforced Plating and Energy Shield | Passive armor behind a powered, depleting, and recharging defense layer |
-| Deck Battery | One configurable cannon mount and its ammunition flow |
+| Deck Battery | One configurable cannon mount using Aether charge or physical ammunition |
 | Prow Ram or Ship Figurehead | One visible loadout choice with a mechanical or customizable identity tradeoff |
 
 | Energy package | Starting modules | Slice tradeoff |
 | --- | --- | --- |
-| Arcane | Flux Sail, Aether Dynamo, Crystal Accumulator, and Ward Projector | Lower mass and supernatural defense against scarce reagents and aether instability |
-| Industrial | Propellant Drive, Diesel Generator, and Flywheel Bank | Durable repairable dieselpunk output against greater mass, fuel, coolant, heat, and noise |
+| Arcane | Flux Sail, Aether Dynamo, Crystal Accumulator, and Ward Projector | Flexible Aether use against scarce charge and interference |
+| Industrial | Propellant Drive, Diesel Generator, and Flywheel Bank | Reliable Power against fuel use and larger slot cost |
 
 The player selects one energy package, one armor arrangement, one Energy Shield
-module, one prow fitting, and one weapon configuration before departure. The
+module, one prow fitting, and one cannon configuration before departure. The
 slice needs shield depletion and replenishment, damage overflowing into armor,
-one energy-allocation decision, one path-specific module fault, one
-crew-operated repair, and one choice where cargo, protection, firepower, or
-maneuverability competes for limited capacity. The fault must expose the
-affected module, network, and repair path. Full hybrid construction, changing
-paths during a voyage, atompunk Industrial upgrades, multiple frames,
+one Aether-charge or physical-ammunition decision, one damaged or disabled
+module, one crew-operated repair, and one choice where cargo, protection,
+firepower, or maneuverability competes for limited capacity. Damage must expose
+the affected module and repair path. Full hybrid construction,
+changing paths during a voyage, atompunk Industrial upgrades, multiple frames,
 structural frame editing, large equipment catalogs, module manufacturing, and
 unrestricted shipyards remain deferred until that loop is deterministic and
 readable.

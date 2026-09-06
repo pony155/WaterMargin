@@ -11,7 +11,7 @@ implements these reviewed contracts.
 
 | Concern | Authoritative artifact | Frozen result |
 | --- | --- | --- |
-| Existing gameplay identities | [`ContentIdInventory.md`](ContentIdInventory.md) | 163 unique explicit IDs |
+| Existing gameplay identities | [`ContentIdInventory.md`](ContentIdInventory.md) | 174 unique explicit IDs |
 | Ownership, delivery, spelling, collisions | [`ContentIdReview.md`](ContentIdReview.md) | Base, example, deferred, and prototype status assigned |
 | Stable IDs and namespaces | [`ContentContractsV1.md`](ContentContractsV1.md) | ASCII grammar, 127-byte maximum, base and mod ownership |
 | Source documents and ordering | [`ContentContractsV1.md`](ContentContractsV1.md) | Strict UTF-8 JSON, exact manifest, directories, deterministic pack order |
@@ -39,10 +39,10 @@ implements these reviewed contracts.
   paths, source documents, secrets, stack traces, and unobserved simulation
   information.
 - The valid fixture resolves Attribute, Skill, Access, training, Feat, Race,
-  and Talent references. Its canonical file is 1,195 bytes, contains no BOM or
+  and Perk references. Its canonical file is 1,187 bytes, contains no BOM or
   CR, and ends with exactly one LF.
 - The valid fixture SHA-256 is
-  `c7a01738165a8e0cca70ac40969f3158841bd72036c562663db72a3291adc892`.
+  `bdf1737ce9b11c9b4bc9440918ad3247f4b800bcd9eecaef2d9547b00fe8f202`.
 - The invalid fixture contains 24 cases and its expected-primary-code set is
   identical to the 24-code initial diagnostic registry.
 
@@ -54,7 +54,7 @@ archive installation, and public save migration execution remain later work.
 Their absence is an explicit rejection or product-scope decision, not an
 unresolved requirement for the M1 loader.
 
-Future content kinds beyond Attribute, Skill, Access, Feat, Talent, Race, and
+Future content kinds beyond Attribute, Skill, Access, Feat, Perk, Race, and
 Training Project require a reviewed schema-contract revision before being
 accepted. M1 begins with the common Stable ID and diagnostic primitives, then
 implements manifest parsing and the transactional immutable registry against

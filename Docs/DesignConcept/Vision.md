@@ -20,6 +20,15 @@ community, and the freedom of a systemic sandbox. The current design and
 assets remain original; adopting the working name does not import another
 setting's lore, cosmology, rules, creatures, visual designs, text, or assets.
 
+## Arcane-Industrial Age
+
+The setting is an advanced age in which trained Arcane magic exists beside
+mature dieselpunk and atompunk space technology. Shipyards, reactors, engines,
+wards, enchantments, sensors, armor, and interstellar markets are ordinary
+parts of civilization. The player chooses how much of either tradition their
+ship uses; neither is a universal upgrade path or a moral identity. See
+[`Setting.md`](Setting.md) for the shared setting baseline.
+
 ## Player fantasy
 
 The player is the master of a small independent vessel, not a chosen savior.
@@ -36,6 +45,8 @@ of each voyage. The ship gradually becomes a record of those choices.
   strategic commitment.
 - **Systemic voyage stories:** crew, ship, environment, factions, resources,
   and encounters interact to create outcomes rather than follow a fixed plot.
+- **Arcane and industrial futures:** aether, diesel machinery, and atompunk
+  power create distinct but compatible tools, economies, and risks.
 - **Classless characters:** attributes describe capability and independently
   trained skills determine what a character can do; duties never lock future
   progression.

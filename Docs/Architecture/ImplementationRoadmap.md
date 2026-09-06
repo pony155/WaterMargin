@@ -46,7 +46,7 @@ Base Attribute and Skill data
   ↓
 Character creation, state, actions, and training
   ↓
-Feat/Talent access, Spells, and Psychic abilities
+Feat/Perk access, Spells, and Psychic abilities
   ↓
 Ship modules, encounters, and Battle
   ↓
@@ -101,7 +101,7 @@ added explicitly to `Spelljammer.slnx`.
 
 ### Phase M0.1: inventory existing identities
 
-- [x] **M0.1.1** Extract every current Attribute, Skill, Feat, Talent, Access,
+- [x] **M0.1.1** Extract every current Attribute, Skill, Feat, Perk, Access,
   Spell, psychic-technique, combat-context, ship-module, faction, crisis,
   authored travel-event, and event-choice ID from `Docs/DesignConcept` into the
   reviewed
@@ -133,7 +133,7 @@ added explicitly to `Spelljammer.slnx`.
 ### Phase M0.4: freeze fixtures and fingerprints
 
 - [x] **M0.4.1** Author the smallest valid base manifest and one valid document
-  for Attribute, Skill, Feat, Talent, and Access references.
+  for Attribute, Skill, Feat, Perk, and Access references.
 - [x] **M0.4.2** Author one focused invalid fixture for every initial diagnostic.
 - [x] **M0.4.3** Define canonical semantic bytes and expected fixture hashes.
 - [x] **M0.4.4** Review all version 1 decisions before loader code begins.
@@ -154,7 +154,7 @@ Exit criteria:
   [`Modding.md`](Modding.md) contain no unresolved decision needed by the first
   loader;
 - IDs match current product documents; and
-- fixtures cover an Attribute, Skill, Feat, Talent, and their references.
+- fixtures cover an Attribute, Skill, Feat, Perk, and their references.
 
 ## Milestone 1: content foundation
 
@@ -316,17 +316,17 @@ iteration, diagnostics, and UI projection see it without a source change.
 ### Phase M3.1: add character definition kinds
 
 - [ ] **M3.1.1** Add typed IDs and schemas for Character, Race, Heritage,
-  Background, Talent, Feat, Access, Technique, and Training Project.
+  Background, Perk, Feat, Access, Technique, and Training Project.
 - [ ] **M3.1.2** Implement compatibility and grant-reference linking.
 - [ ] **M3.1.3** Add minimal base definitions for one Race, Heritage,
-  Background, and their Talent grants.
+  Background, and their Perk grants.
 - [ ] **M3.1.4** Reject incompatible Heritage, missing grant, and grant cycles.
 
 ### Phase M3.2: implement generic capability storage
 
 - [ ] **M3.2.1** Add bounded immutable Attribute and Skill value storage indexed
   by the compiled registry.
-- [ ] **M3.2.2** Add bounded Feat, Talent, Technique, and grant-source sets.
+- [ ] **M3.2.2** Add bounded Feat, Perk, Technique, and grant-source sets.
 - [ ] **M3.2.3** Implement typed lookup that returns explicit missing-definition
   failures rather than default values.
 - [ ] **M3.2.4** Produce a read-only character capability snapshot.
@@ -337,7 +337,7 @@ iteration, diagnostics, and UI projection see it without a source change.
   scenario, definition IDs, and explicit seed.
 - [ ] **M3.3.2** Allocate Attribute and Skill values through bounded authored
   rules and owned random streams.
-- [ ] **M3.3.3** Grant Race and Heritage Talents with provenance.
+- [ ] **M3.3.3** Grant Race and Heritage Perks with provenance.
 - [ ] **M3.3.4** Validate the complete character before assigning its stable ID
   and publishing state.
 
@@ -371,10 +371,10 @@ iteration, diagnostics, and UI projection see it without a source change.
 
 ### Phase M3.7: author and prove the base race roster
 
-- [ ] **M3.7.1** Author all eleven base Race definitions and their Race Talent
+- [ ] **M3.7.1** Author all eleven base Race definitions and their Race Perk
   grants, including Eidolon Soul Anchor and Kharuun Trail Sense.
-- [ ] **M3.7.2** Author one compatible first-slice Heritage and Heritage Talent
-  for each Race; defer additional Heritage rows until their Talent IDs are
+- [ ] **M3.7.2** Author one compatible first-slice Heritage and Heritage Perk
+  for each Race; defer additional Heritage rows until their Perk IDs are
   explicitly inventoried.
 - [ ] **M3.7.3** Author one deterministic first-slice character per Race with
   attributes, skills, background, position, language, script, and equipment.
@@ -386,10 +386,10 @@ iteration, diagnostics, and UI projection see it without a source change.
 
 Deliverables:
 
-- character, Race, Heritage, Background, Attribute, Skill, Feat, Talent,
+- character, Race, Heritage, Background, Attribute, Skill, Feat, Perk,
   Access, and Technique ID types;
 - immutable definition and character-state snapshots;
-- data-authored Race, Heritage, Background, Talent, and training definitions;
+- data-authored Race, Heritage, Background, Perk, and training definitions;
 - deterministic creation with validated grants;
 - generic capability lookup and action eligibility;
 - bounded Skill practice and training projects;
@@ -428,7 +428,7 @@ reveal unobserved information.
 
 ### Phase M4.3: implement innate access
 
-- [ ] **M4.3.1** Add Elf Aether Sense and Somnari Mindwake Talent definitions.
+- [ ] **M4.3.1** Add Elf Aether Sense and Somnari Mindwake Perk definitions.
 - [ ] **M4.3.2** Grant innate access during deterministic character creation.
 - [ ] **M4.3.3** Grant only named racial abilities, never free Skill ranks or an
   entire technique catalog.
@@ -505,6 +505,10 @@ individual Turn Meters, and Action Points without global rounds.
 - [ ] **M5.2.3** Validate legal initial placement, connected required
   objectives, and retreat or one-way rules.
 - [ ] **M5.2.4** Add deterministic movement and bounded path search.
+- [ ] **M5.2.5** Add data-authored Equipment definitions and bounded personal
+  loadouts: Main hand, Off hand, Body, Utility, and Relic slots; each item uses
+  the Ready, Depleted, or Damaged state model from
+  [`../DesignConcept/Equipments.md`](../DesignConcept/Equipments.md).
 
 ### Phase M5.3: add scheduled actions and effects
 
@@ -519,21 +523,24 @@ individual Turn Meters, and Action Points without global rounds.
 
 ### Phase M5.4: add ship and module state
 
-- [ ] **M5.4.1** Add stable Ship, Frame, Compartment, Module, Network, Station,
-  and Resource IDs.
+- [ ] **M5.4.1** Add stable Ship, Frame, Compartment, Module, Ship Weapon
+  Configuration, Network, Station, and Resource IDs; revise the content schema
+  contract before loading the new weapon-configuration kind. Freeze the small
+  stat budget: Hull, Armor, Shield, energy, cargo, slots, and each module's
+  single primary effect.
 - [ ] **M5.4.2** Compile one minimal Arcane and one minimal Industrial energy
-  package plus common sectional armor, Energy Shield, prow, and configurable
-  cannon definitions; ship cannons have no Gunner position or Gunnery Skill
-  requirement.
-- [ ] **M5.4.3** Implement bounded power or aether allocation and crew-station
-  ownership, including the shield's fixed Energy Consumption Rate while raised.
-- [ ] **M5.4.4** Resolve finite current Shield Value, damage overflow, armor
-  protection and penetration, hull, breach, module, network, and exposed-crew
-  damage in one atomic commit.
+  package plus common armor, Energy Shield, prow, and configurable
+  cannon definitions. Author an Aether Energy Cannon and Diesel Shell Cannon
+  for the first slice, then defer the Atomic Shell Cannon; ship cannons have no
+  Gunner position or Gunnery Skill requirement.
+- [ ] **M5.4.3** Implement a bounded priority order for Power or Aether,
+  including the shield's fixed Energy Consumption Rate while raised.
+- [ ] **M5.4.4** Resolve finite current Shield Value, Armor Value mitigation,
+  damage overflow, Hull damage, and selected-module condition in one atomic
+  commit.
 - [ ] **M5.4.5** Validate and transactionally commit one pre-voyage loadout with
-  armor-section, Energy Shield energy feed, power, propulsion, ram or
-  figurehead, weapon orientation, ammunition, mass, structure, network,
-  clearance, and module-specific access choices.
+  available slots, Armor Value, Energy Shield energy feed, power, propulsion,
+  prow effect, cannon resource type, and cargo displacement.
 
 ### Phase M5.5: implement a ship engagement
 
@@ -541,9 +548,9 @@ individual Turn Meters, and Action Points without global rounds.
   fixed-point 2D coordinates, heading, velocity, collision shapes, derived
   range labels, contact knowledge, firing solutions, cannon damage, rate of
   fire, effective and maximum range, reload time, damage type and area, armor
-  penetration, ammunition or charge, weapon readiness, maximum and current
-  Shield Value, Recharge Rate, Energy Consumption Rate, raised state, and
-  disengagement state.
+  penetration, Aether charge or physical ammunition, weapon readiness, maximum
+  and current Shield Value, Recharge Rate, Energy Consumption Rate, raised
+  state, and disengagement state.
 - [ ] **M5.5.2** Implement bounded queued scan, course, thrust, turn, brake,
   intercept, fire, ram, raise or lower shield, defend, damage-control, signal,
   and retreat orders with explicit cancellation rules;
@@ -718,7 +725,7 @@ original data.
 
 ### Phase M7.6: complete the additive test pack
 
-- [ ] **M7.6.1** Add a test Race, Heritage, Talent, trained Feat, Spell, item,
+- [ ] **M7.6.1** Add a test Race, Heritage, Perk, trained Feat, Spell, item,
   encounter, and localization entries under one namespace.
 - [ ] **M7.6.2** Start a deterministic campaign with base plus test pack.
 - [ ] **M7.6.3** Exercise at least one granted ability and persist its state.

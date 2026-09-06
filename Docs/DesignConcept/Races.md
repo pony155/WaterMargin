@@ -46,11 +46,10 @@ A persistent character is composed from independent, stable layers:
 | Identity | character ID, name seed, pronouns, portrait seed | Persistence and presentation lookup |
 | Race | human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire, Eidolon, Kharuun | Body plan and baseline physiological rules |
 | Heritage | voidborn, deepforge, free-anchorage | Subrace, formative tradition, languages, customs, and starting knowledge |
+| Background | academy graduate, dockhand, caravan guard | Starting skill package and history, never a class |
 | Attributes | Strength, Agility, Willpower, Intelligence, Luck, Charisma, Toughness | Broad capability shared by many actions |
 | Skills | piloting, engineering, merchant, negotiation, language and literacy | Learned competence that improves independently |
-| Background | academy graduate, dockhand, caravan guard | Starting skill package and history, never a class |
-| Position | doctor, chef, navigator, engineer | Ongoing responsibility, authority, pay, and expected duties |
-| Talents | Versatility, Aether Sense, Braced Stance | Racial feats granted by Race and Heritage |
+| Racial Perks | Versatility, Aether Sense, Braced Stance | Racial feats granted by Race and Heritage |
 
 No translated name or description becomes gameplay identity. Definitions use
 canonical lowercase ASCII IDs; localized keys provide player-facing names.
@@ -80,12 +79,12 @@ better.
 ### Humans
 
 Humans are widespread generalists whose settlements survive through social and
-technical adaptation. Their Race Talent is **Versatility**: one starting
+technical adaptation. Their Racial Perk is **Versatility**: one starting
 aptitude may be reassigned during recruitment. Their bodies have no extreme
 environmental adaptation and depend on ordinary atmosphere, food, sleep, and
 medical support.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Hearthworld | `heritage.human.hearthworld` | Faster recovery in comfortable gravity and atmosphere | Suffers acclimation penalties sooner in extreme environments |
 | Voidborn | `heritage.human.voidborn` | Lower food use and better low-gravity movement | Reduced tolerance for high gravity and heavy recoil |
@@ -94,14 +93,14 @@ medical support.
 ### Elves
 
 Elves are long-lived beings whose nervous systems sense patterns in light and
-the void's aetheric currents. Their Race Talent, **Aether Sense**, can reveal
+the void's aetheric currents. Their Racial Perk, **Aether Sense**, can reveal
 weak anomalies or unstable routes before ordinary instruments, but intense
 interference causes sensory strain. Aether Sense grants innate `access.magic`,
 allowing an Elf to learn and cast spells without the Spellcasting Training
 Feat; it provides no free Magic ranks or spells. Elves enter a short trance
 instead of normal sleep; they still need safe downtime.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Dawnweave | `heritage.elf.dawnweave` | Gains focus in strong natural or stellar light | Darkness increases fatigue unless quarters provide tuned lighting |
 | Gloamroot | `heritage.elf.gloamroot` | Excellent low-light sight and reduced sensory signature | Bright or rapidly changing light causes strain |
@@ -110,12 +109,12 @@ instead of normal sleep; they still need safe downtime.
 ### Half-elves
 
 Half-elves are a first-class race in the initial content model, representing
-characters with both human and elven parentage. Their Race Talent, **Blended
+characters with both human and elven parentage. Their Racial Perk, **Blended
 Physiology**, lets a character select one minor human adaptation and one minor
 elven sense, each at reduced strength. It does not determine heritage or
 guarantee social acceptance.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Concord | `heritage.half-elf.concord` | Switches between normal sleep and trance when quarters permit | Neither rest mode is as efficient as its specialist form |
 | Starling | `heritage.half-elf.starling` | Adapts quickly to changing gravity and duty schedules | Needs more recovery after repeated schedule changes |
@@ -127,12 +126,12 @@ for half-elves must remain valid through an explicit migration.
 ### Dwarves
 
 Dwarves are compact, dense-bodied people adapted to confined habitats and
-demanding physical environments. Their Race Talent, **Braced Stance**, reduces
+demanding physical environments. Their Racial Perk, **Braced Stance**, reduces
 forced movement and work interruption. Their mass raises acceleration costs,
 and cramped does not mean weightless: ship layout and rescue equipment must
 support them.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Deepforge | `heritage.dwarf.deepforge` | Exceptional high-gravity and heat tolerance | Low gravity reduces precision until acclimated |
 | Cometdelver | `heritage.dwarf.cometdelver` | Detects structural weakness and valuable mineral seams | Requires more calories during heavy work |
@@ -140,13 +139,13 @@ support them.
 
 ### Orcs
 
-Orcs are powerfully built and recover well from exertion. Their Race Talent,
+Orcs are powerfully built and recover well from exertion. Their Racial Perk,
 **Second Wind**, allows
 a controlled burst of work or combat stamina followed by a visible recovery
 debt. Orcs are not inherently violent, unintelligent, or hostile; individuals
 and communities determine their values and behavior.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Redwake | `heritage.orc.redwake` | Sustains strenuous labor and emergency damage control | Higher food and oxygen consumption while exerting |
 | Stormborn | `heritage.orc.stormborn` | Better resistance to electrical and aether-storm injury | Medical recovery uses more conductive supplies |
@@ -155,14 +154,14 @@ and communities determine their values and behavior.
 ### Gnomes
 
 Gnomes are small-bodied people with extremely sensitive touch and fine spatial
-judgment. Their Race Talent, **Closework**, reduces penalties when manipulating
+judgment. Their Racial Perk, **Closework**, reduces penalties when manipulating
 compact mechanisms or working in confined stations. Their reach and unaided
 carrying capacity are limited, and shared equipment must be adjustable rather
 than assuming one body scale. Gnomes are not inherently inventive or
 scholarly; those qualities come from individual attributes, skills, and
 heritage.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Coilwhisper | `heritage.gnome.coilwhisper` | Feels subtle vibration, current, and mechanical imbalance through contact | Heavy vibration and electrical surges cause sensory strain |
 | Sporegarden | `heritage.gnome.sporegarden` | Symbiotic microbiome improves food variety and resistance to organic toxins | Sterile quarters and broad-spectrum medicine can disrupt recovery |
@@ -171,13 +170,13 @@ heritage.
 ### Goblins
 
 Goblins are compact, quick-moving people adapted to crowded habitats and
-improvised routes. Their Race Talent, **Tight Passage**, reduces movement and
+improvised routes. Their Racial Perk, **Tight Passage**, reduces movement and
 work penalties in ducts, wreckage, and congested decks. Their lighter frames
 are easier to throw off balance, and standard armor, furniture, and controls
 may require refitting. Goblins are not inherently dishonest, reckless, or
 crude; behavior comes from the individual and their society.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Cindervein | `heritage.goblin.cindervein` | Tolerates smoke, heat, and poor industrial air better | Cold exposure and sudden cooling cause fatigue sooner |
 | Nightglass | `heritage.goblin.nightglass` | Tracks motion and detail in very low light | Glare and rapid flashes impair vision without protection |
@@ -186,7 +185,7 @@ crude; behavior comes from the individual and their society.
 ### Somnari
 
 Somnari are a psychic race whose nervous systems resonate with nearby thought.
-Their Race Talent, **Mindwake**, lets them sense active psychic effects and
+Their Racial Perk, **Mindwake**, lets them sense active psychic effects and
 initiate a consensual short-range mindlink without a spell or device. Mindwake
 grants innate `access.psionics`, not mastery: the Psionics skill governs
 control, clarity, range, and learned techniques. Psychic storms, crowded minds,
@@ -200,7 +199,7 @@ Somnari breathe, eat, and rest normally, but their sleep includes a vivid dream
 phase needed to recover psychic strain. They are not inherently wiser, calmer,
 more truthful, or more intelligent than other races.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Chorusborn | `heritage.somnari.chorusborn` | Maintains a consensual mindlink among several nearby participants | Crowds and overlapping psychic signals accumulate strain faster |
 | Veilward | `heritage.somnari.veilward` | Shields themself or an assisted ally against psychic intrusion | Dropping the shield to receive beneficial contact takes focus and time |
@@ -212,14 +211,14 @@ Vampires are an undead race sustained by blood or a setting-specific vital
 essence. Their histories may describe inherited or transformative origins, but
 character creation stores `race.vampire` and one compatible heritage.
 
-All vampires receive the Race Talent **Unliving Physiology**: they do not
+All vampires receive the Racial Perk **Unliving Physiology**: they do not
 breathe, resist vacuum and common disease, and can remain active without
 ordinary food. They instead track thirst. Starvation does not silently force
 harmful behavior; it unlocks
 explicit risks, consent policies, restraint options, and command decisions.
 Radiant exposure impairs healing and may cause injury depending on protection.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Crimson | `heritage.vampire.crimson` | Converts fresh blood into rapid healing and strength | Thirst rises faster and stored blood spoils without refrigeration |
 | Umbral | `heritage.vampire.umbral` | Conceals presence and sees clearly in near darkness | Direct stellar light is especially dangerous |
@@ -237,7 +236,7 @@ and one compatible Heritage. They are distinct from vampires: a vampire
 maintains an undead body with vital essence, while an Eidolon's spirit operates
 a replaceable or reconstructable form from an external anchor.
 
-Their Race Talent, **Soul Anchor**, removes the need to breathe, eat ordinary
+Their Racial Perk, **Soul Anchor**, removes the need to breathe, eat ordinary
 food, or sleep and provides resistance to vacuum and common disease. Activity
 and recovery instead consume resonance held by the anchor, and serious bodily
 disruption requires a safe anchor, suitable material, and time to rebuild a
@@ -253,7 +252,7 @@ Eidolons may learn either access Feat through the same training available to
 other characters. They are not inherently ancient, emotionless, truthful, or
 knowledgeable; memories and personality belong to the individual.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Reliquary-Bound | `heritage.eidolon.reliquary-bound` | Reconstitutes more efficiently beside a portable, prepared reliquary | Concentrating anchor and reserve in one object makes its capture or damage especially dangerous |
 | Huskbound | `heritage.eidolon.huskbound` | A preserved organic vessel fits ordinary armor, tools, and some medical procedures | Decay control consumes preservative supplies and contaminated environments can damage the vessel |
@@ -263,7 +262,7 @@ knowledgeable; memories and personality belong to the individual.
 
 Kharuun are a spacefaring jackal-like race with long directional ears, keen
 chemical senses in atmosphere, and strong spatial memory. Character creation
-stores `race.kharuun` and one compatible Heritage. Their Race Talent,
+stores `race.kharuun` and one compatible Heritage. Their Racial Perk,
 **Trail Sense**, reduces uncertainty when following an already observed
 physical, chemical, thermal, acoustic, or signal trail. It improves how
 Sensors, Xenology, Ancient Lore, and relevant field work use available
@@ -277,125 +276,67 @@ accommodate muzzle, ears, digitigrade legs, and tail. Kharuun are not
 inherently loyal, predatory, nomadic, or suited to a particular profession;
 those qualities come from the character and their communities.
 
-| Heritage | Stable ID | Heritage Talent | Cost |
+| Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Sunwake | `heritage.kharuun.sunwake` | Tolerates heat, dry air, and long periods of measured water rationing | Cold exposure and sudden temperature drops accumulate fatigue faster |
 | Hull-Listener | `heritage.kharuun.hull-listener` | Reads faint vibration and movement through direct contact with a hull or deck | Heavy machinery, impacts, and sustained alarm noise cause sensory strain |
 | Startrail | `heritage.kharuun.startrail` | Retains bearings and correlates weak route traces after partial sensor loss | Featureless space and contradictory interference require more time and can produce false leads |
 
-## Racial talents
+## Racial perks
 
-A **Talent** is a racial feat: a discrete rule granted by a character's Race or
+A **Racial Perk** is a racial feat: a discrete rule granted by a character's Race or
 compatible Heritage. It represents inherited physiology, supernatural nature,
 or a heritage-specific adaptation. It does not represent personality, beliefs,
 professional training, or general learned competence.
 
-A Talent may explicitly grant an innate supernatural access ID. Innate access
+A Racial Perk may explicitly grant an innate supernatural access ID. Innate access
 substitutes for the corresponding learned access Feat, but never grants skill
 ranks or unnamed abilities. Learned Feats come from training and are defined in
-[`Skills.md`](Skills.md); they are not Talents and are not inherited.
+[`Skills.md`](Skills.md); they are not Racial Perks and are not inherited.
+See [`Perks.md`](Perks.md) for the wider Perk terminology and identity rules.
+The technical content namespace is `perk.*`, and Race and Heritage definitions
+grant their Perks through `grantedPerkIds`.
 
-Every character begins with two Talents:
+Every character begins with two Racial Perks:
 
-1. one Race Talent granted by their `raceId`; and
-2. one Heritage Talent granted by their `heritageId`.
+1. one Race Perk granted by their `raceId`; and
+2. one Heritage Perk granted by their `heritageId`.
 
-| Race | Race Talent | Stable Talent ID | Innate access |
+| Race | Race Perk | Stable technical ID | Innate access |
 | --- | --- | --- | --- |
-| Human | Versatility | `talent.race.human.versatility` | None |
-| Elf | Aether Sense | `talent.race.elf.aether-sense` | `access.magic` |
-| Half-elf | Blended Physiology | `talent.race.half-elf.blended-physiology` | None by default |
-| Dwarf | Braced Stance | `talent.race.dwarf.braced-stance` | None |
-| Orc | Second Wind | `talent.race.orc.second-wind` | None |
-| Gnome | Closework | `talent.race.gnome.closework` | None |
-| Goblin | Tight Passage | `talent.race.goblin.tight-passage` | None |
-| Somnari | Mindwake | `talent.race.somnari.mindwake` | `access.psionics` |
-| Vampire | Unliving Physiology | `talent.race.vampire.unliving-physiology` | None by default |
-| Eidolon | Soul Anchor | `talent.race.eidolon.soul-anchor` | None by default |
-| Kharuun | Trail Sense | `talent.race.kharuun.trail-sense` | None |
+| Human | Versatility | `perk.race.human.versatility` | None |
+| Elf | Aether Sense | `perk.race.elf.aether-sense` | `access.magic` |
+| Half-elf | Blended Physiology | `perk.race.half-elf.blended-physiology` | None by default |
+| Dwarf | Braced Stance | `perk.race.dwarf.braced-stance` | None |
+| Orc | Second Wind | `perk.race.orc.second-wind` | None |
+| Gnome | Closework | `perk.race.gnome.closework` | None |
+| Goblin | Tight Passage | `perk.race.goblin.tight-passage` | None |
+| Somnari | Mindwake | `perk.race.somnari.mindwake` | `access.psionics` |
+| Vampire | Unliving Physiology | `perk.race.vampire.unliving-physiology` | None by default |
+| Eidolon | Soul Anchor | `perk.race.eidolon.soul-anchor` | None by default |
+| Kharuun | Trail Sense | `perk.race.kharuun.trail-sense` | None |
 
-Heritage Talents use IDs such as `talent.heritage.dwarf.cometdelver`. A Talent
+Heritage Perks use IDs such as `perk.heritage.dwarf.cometdelver`. A Racial Perk
 definition owns its explicit effects, costs, requirements, and
-incompatibilities. Race and Heritage definitions grant Talent IDs rather than
+incompatibilities. Race and Heritage definitions grant Racial Perk IDs rather than
 duplicating those rules.
 
-Talents do not have a 0–100 value, improve through use, or unlock because of a
+Racial Perks do not have a 0–100 value, improve through use, or unlock because of a
 class. Learned techniques and professional expertise belong to Skills, while
 trained supernatural access belongs to learned Feats. Content validation
-rejects missing Talent IDs, unknown access IDs, duplicate grants, and Talents
+rejects missing Racial Perk IDs, unknown access IDs, duplicate grants, and Racial Perks
 that are incompatible with the granting Race or Heritage.
 
 ## Classless capabilities
 
 Characters have no class, global character level, class skill, or class-locked
 ability. Attributes describe broad capability, while independently advancing
-skills describe learned competence. Backgrounds and crew positions provide
-history and responsibility without restricting future progression.
+skills describe learned competence. Backgrounds provide history without
+restricting future progression.
 
 See [Attributes.md](Attributes.md) for the attribute roster, contextual use,
 and modifier rules. See [Skills.md](Skills.md) for the skill catalog, action
 resolution, advancement, languages, scripts, and ancient lore.
-
-## Crew positions and shipboard duties
-
-A **position** is a continuing post in the crew organization. A **duty** is a
-specific task or watch assignment. Doctor and Chef are positions; treating an
-injury and preparing supper are duties. Keeping these concepts separate lets a
-character help outside their normal job without changing class or identity.
-
-| Concept | Duration | Provides | Example |
-| --- | --- | --- | --- |
-| Background | Historical | Starting skills, contacts, and memories | Former dockhand |
-| Position | Until reassigned | Responsibility, authority, pay share, schedule priority | Ship's doctor |
-| Duty | One job or watch | A concrete action and success criteria | Treat a burned deckhand |
-
-### Positions
-
-The planned position catalog includes:
-
-| Department | Positions | Typical responsibilities |
-| --- | --- | --- |
-| Command | Captain, First Mate, Quartermaster | Policy, discipline, watches, cargo allocation, and pay shares |
-| Navigation | Pilot, Navigator, Cartographer | Helm control, route planning, charts, sensors, and docking |
-| Care | Doctor, Medic, Chef, Steward | Treatment, surgery, quarantine, meals, sanitation, and crew comfort |
-| Technical | Chief Engineer, Engineer, Artificer, Rigger | Drive operation, repairs, fabrication, rigging, and power allocation |
-| Exploration | Scout, Xenologist, Salvager, Alchemist | Surveys, field samples, ruins, reagents, and recovery operations |
-| Security | Master-at-Arms, Marine, Archer | Watches, boarding defense, personal weapons, prisoners, and drills |
-| Mystic | Ship Mage, Warden, Mindwarden | Magical navigation, wards, enchantments, psychic contact, curses, and anomalies |
-| Civil | Envoy, Trader, Chronicler, Antiquarian | Negotiation, commerce, languages, records, lore, and faction relations |
-
-Positions use stable IDs such as `position.doctor` and `position.chef`. A
-position definition contains localized name keys, responsibility tags,
-authority permissions, preferred skills, schedule defaults, and any required
-facility. Preferred skills generate recommendations; they do not prevent an
-unconventional appointment.
-
-A character normally holds one primary position and may hold one secondary
-position on a small ship. Posts can be vacant, shared, or temporarily filled by
-an acting crew member. Some permissions—opening the medicine locker, spending
-ship funds, changing course, or sentencing a prisoner—come from ship policy and
-position authority rather than personal skill.
-
-### Duties
-
-The schedule and command systems assign bounded duties such as:
-
-- helm the ship or plot a course;
-- stand lookout, security, or engineering watch;
-- diagnose a patient, perform treatment, or manage quarantine;
-- plan meals, prepare food, preserve provisions, or clean the galley;
-- inspect the drive, repair a module, fabricate a part, or work the rigging;
-- survey a location, gather reagents, salvage cargo, or identify an artifact;
-- copy an inscription, translate a text, authenticate a relic, or update lore;
-- maintain a ward, cast a voyage ritual, or contain a magical hazard;
-- train the crew, guard a prisoner, repel boarders, or operate a weapon; and
-- inventory cargo, negotiate a trade, update charts, or record discoveries.
-
-Duty performance emerges from attributes, skills, equipment, position
-authority, health, needs, environment, and cooperation. A Chef with high
-Medicine may treat an emergency; a Doctor with Alchemy may prepare medicine; a
-Captain with Cooking may take a galley watch. The interface should recommend
-qualified crew and explain penalties without forbidding those assignments.
 
 ## Character generation
 
@@ -403,15 +344,14 @@ Given a content revision, scenario, and explicit character seed, generation
 must be deterministic:
 
 1. Select an allowed race and compatible heritage.
-2. Grant and validate the Race Talent and Heritage Talent.
+2. Grant and validate the Race Perk and Heritage Perk.
 3. Generate age stage, body parameters, name seed, pronouns, and appearance.
 4. Allocate attributes, background skills, any documented pre-campaign
    training Feats, and one or more personal aptitudes.
 5. Assign known language, script, and lore IDs from heritage and personal history.
-6. Assign an initial crew position and bounded duty schedule.
-7. Add bounded beliefs and memories.
-8. Validate equipment, atmosphere, quarters, diet, and medical compatibility.
-9. Publish the character only after the complete definition passes validation.
+6. Add bounded beliefs and memories.
+7. Validate equipment, atmosphere, quarters, diet, and medical compatibility.
+8. Publish the character only after the complete definition passes validation.
 
 Scenarios may provide authored characters or weighted generation tables.
 Weights affect frequency, never capability ceilings or moral alignment.
@@ -429,8 +369,8 @@ race rather than copying the race definition:
   "raceId": "race.dwarf",
   "nameKey": "character.heritage.dwarf.cometdelver.name",
   "descriptionKey": "character.heritage.dwarf.cometdelver.description",
-  "grantedTalentIds": [
-    "talent.heritage.dwarf.cometdelver"
+  "grantedPerkIds": [
+    "perk.heritage.dwarf.cometdelver"
   ]
 }
 ```
@@ -438,13 +378,8 @@ race rather than copying the race definition:
 Persistent race state stores race and heritage definition IDs, definition
 revisions, and race-specific rolled parameters. It never stores localized names
 as identity. Definition loading must reject duplicate IDs, missing races,
-incompatible heritages, missing or incompatible Talents, incompatible body
+incompatible heritages, missing or incompatible Racial Perks, incompatible body
 rules, unknown modifiers, and unbounded generation tables before publication.
-
-Ship organization stores position assignments separately as stable character
-ID and position ID pairs. Reassigning a position updates authority and schedule
-only after the complete proposed roster passes staffing, capacity, and policy
-validation.
 
 ## Balance rules
 
@@ -452,12 +387,12 @@ validation.
   modifier.
 - Every heritage begins with one legible strength and one relevant cost.
 - Environmental advantages must matter often enough to be worth choosing but
-  must not make a heritage mandatory for a position or duty.
+  must not make a heritage mandatory for a particular activity.
 - Equipment, training, medicine, and ship design provide alternate solutions
   to most physiological disadvantages.
 - Mixed crews should create logistical and operational choices, not a hidden
   optimal mono-race strategy.
-- Automated crew decisions expose the need, duty, rule, and blocker that caused
+- Automated crew decisions expose the need, task, rule, and blocker that caused
   the choice.
 
 ## First playable character scope
@@ -465,20 +400,18 @@ validation.
 The first crew-enabled vertical slice should use eleven authored characters:
 one human, elf, half-elf, dwarf, orc, gnome, goblin, Somnari, vampire, Eidolon,
 and Kharuun. Each needs a race, heritage, background, attributes, skills, two
-Talents, crew position, and compatible quarters. The two Talents are racial
-feats: one granted by Race and one by Heritage. The Elf must exercise innate
+Racial Perks, and compatible quarters. The two Racial Perks are racial feats:
+one granted by Race and one by Heritage. The Elf must exercise innate
 magical access and the Somnari must exercise innate psychic access. The
 Eidolon's anchor logistics and the Kharuun's evidence-bounded tracking must
 each change at least one voyage decision. At least one character without
-either access Talent must demonstrate earning an access Feat through documented
-training. The initial roster must include a Doctor and Chef so medical care,
-meals, position authority, and cross-duty assignment are exercised. The slice
-needs only four shared needs—rest, nutrition or equivalent reserve, safety,
-and belonging—and five duties: navigate, salvage, repair, prepare a meal, and
-treat an injury.
+either access Racial Perk must demonstrate earning an access Feat through
+documented training. Ship jobs and schedules are a separate future crew-system
+concern, not a component of race or heritage. The slice needs only four shared
+needs—rest, nutrition or equivalent reserve, safety, and belonging.
 Attribute, skill, language, script, ancient-lore, and encounter scope is defined
 in the linked capability documents. See [`Battle.md`](Battle.md) for combat,
-injury, surrender, and tactical-position rules.
+injury, surrender, and tactical-layout rules.
 
 The slice succeeds when race and heritage change real voyage decisions, every
 crew action has an inspectable reason, and replaying the same seed and commands

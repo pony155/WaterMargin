@@ -17,10 +17,10 @@ definition families. Candidate strings were deduplicated and then reviewed to
 separate gameplay IDs from localization keys and adjacent definition kinds.
 
 Included categories are Attributes, Skills, learned Feats, racial or Heritage
-Talents, Access gates, Spells, psychic techniques, combat contexts, travel
-events and their explicit choices, ship modules, factions, and crises. Event
-choice, crisis phase, and crisis resolution IDs are retained in separate tables
-because they are explicit content references.
+Racial Perks, Access gates, Spells, psychic techniques, combat contexts, travel
+events and their explicit choices, ship modules, ship weapon configurations,
+factions, and crises. Event choice, crisis phase, and crisis resolution IDs are
+retained in separate tables because they are explicit content references.
 
 Excluded strings include localized keys ending in `.name` or `.description`,
 formula and effect IDs, psychic discipline IDs, psychic information-scope IDs,
@@ -34,7 +34,8 @@ inventoried when their definition schemas enter roadmap scope.
 | Attributes | 7 | [`Attributes.md`](../DesignConcept/Attributes.md) |
 | Skills | 29 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Learned Feats | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
-| Talents | 12 | [`Races.md`](../DesignConcept/Races.md) |
+| Racial Perks | 12 | [`Races.md`](../DesignConcept/Races.md) |
+| Equipment | 8 | [`Equipments.md`](../DesignConcept/Equipments.md) |
 | Access gates | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Spells | 32 | [`Spells.md`](../DesignConcept/Spells.md) |
 | Psychic techniques | 4 | [`PsychicAbilities.md`](../DesignConcept/PsychicAbilities.md) |
@@ -42,11 +43,12 @@ inventoried when their definition schemas enter roadmap scope.
 | Travel events | 8 | [`Events.md`](../DesignConcept/Events.md) |
 | Travel-event choices | 3 | [`Events.md`](../DesignConcept/Events.md) |
 | Ship modules | 35 | [`Ships.md`](../DesignConcept/Ships.md) |
+| Ship weapon configurations | 3 | [`Ships.md`](../DesignConcept/Ships.md) |
 | Factions | 6 | [`Factions.md`](../DesignConcept/Factions.md) |
 | Crisis families | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis phases | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis resolutions | 3 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
-| **Total** | **163** | |
+| **Total** | **174** | |
 
 ## Attributes
 
@@ -101,26 +103,39 @@ inventoried when their definition schemas enter roadmap scope.
 | Spellcasting Training | `feat.access.magic` |
 | Psionic Training | `feat.access.psionics` |
 
-## Talents
+## Racial Perks
 
 | Display label | Stable ID |
 | --- | --- |
-| Cometdelver Heritage Talent | `talent.heritage.dwarf.cometdelver` |
-| Braced Stance | `talent.race.dwarf.braced-stance` |
-| Soul Anchor | `talent.race.eidolon.soul-anchor` |
-| Aether Sense | `talent.race.elf.aether-sense` |
-| Closework | `talent.race.gnome.closework` |
-| Tight Passage | `talent.race.goblin.tight-passage` |
-| Blended Physiology | `talent.race.half-elf.blended-physiology` |
-| Versatility | `talent.race.human.versatility` |
-| Second Wind | `talent.race.orc.second-wind` |
-| Mindwake | `talent.race.somnari.mindwake` |
-| Unliving Physiology | `talent.race.vampire.unliving-physiology` |
-| Trail Sense | `talent.race.kharuun.trail-sense` |
+| Cometdelver Heritage Perk | `perk.heritage.dwarf.cometdelver` |
+| Braced Stance | `perk.race.dwarf.braced-stance` |
+| Soul Anchor | `perk.race.eidolon.soul-anchor` |
+| Aether Sense | `perk.race.elf.aether-sense` |
+| Closework | `perk.race.gnome.closework` |
+| Tight Passage | `perk.race.goblin.tight-passage` |
+| Blended Physiology | `perk.race.half-elf.blended-physiology` |
+| Versatility | `perk.race.human.versatility` |
+| Second Wind | `perk.race.orc.second-wind` |
+| Mindwake | `perk.race.somnari.mindwake` |
+| Unliving Physiology | `perk.race.vampire.unliving-physiology` |
+| Trail Sense | `perk.race.kharuun.trail-sense` |
 
-Heritage tables describe additional Heritage Talents without spelling out a
-Stable Talent ID for each row. Only the explicit Cometdelver example is listed
+Heritage tables describe additional Heritage Perks without spelling out a
+stable Perk ID for each row. Only the explicit Cometdelver example is listed
 above; the inventory does not synthesize IDs from Heritage IDs or display text.
+
+## Equipment
+
+| Display label | Stable ID |
+| --- | --- |
+| Casting focus | `item.arcane.casting-focus` |
+| Pressure suit | `item.armor.pressure-suit` |
+| Field medkit | `item.medical.field-medkit` |
+| Repair kit | `item.tool.repair-kit` |
+| Survey scanner | `item.tool.survey-scanner` |
+| Aether projector | `item.weapon.aether-projector` |
+| Boarding blade | `item.weapon.boarding-blade` |
+| Service pistol | `item.weapon.service-pistol` |
 
 ## Access gates
 
@@ -288,6 +303,14 @@ definition kinds and are not counted as psychic technique IDs.
 | Enchanting Chamber | `module.workshop.enchanting-chamber` |
 | Fabricator | `module.workshop.fabricator` |
 
+## Ship weapon configurations
+
+| Display label | Stable ID |
+| --- | --- |
+| Aether Energy Cannon | `ship.weapon.arcane.aether-cannon` |
+| Diesel Shell Cannon | `ship.weapon.industrial.diesel-shell-cannon` |
+| Atomic Shell Cannon | `ship.weapon.industrial.atomic-shell-cannon` |
+
 ## Factions
 
 | Display label | Stable ID |
@@ -339,9 +362,9 @@ by this inventory.
 
 ## Review result
 
-The requested categories contain 163 unique explicit gameplay IDs. No duplicate
+The requested categories contain 174 unique explicit gameplay IDs. No duplicate
 ID is assigned to two different labels within these tables. Repeated references
 to the same ID across design documents were consolidated under one entry.
 
-The missing Heritage Talent IDs noted above remain future content-authoring
+The missing Heritage Perk IDs noted above remain future content-authoring
 work. This inventory does not synthesize them from display text.

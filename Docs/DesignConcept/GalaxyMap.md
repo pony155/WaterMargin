@@ -20,6 +20,9 @@ Seeded situations that occur while crossing its routes are defined in
 - Make exploration reveal useful knowledge instead of simply uncovering icons.
 - Support both Arcane and Industrial ships without making either upgrade path
   unable to traverse the generated galaxy.
+- Place Arcane research sites, dieselpunk industrial ports, and atompunk-era
+  reactor installations as authored site content rather than treating advanced
+  technology as a rare exception.
 - Combine authored system definitions and event content in new arrangements
   rather than generating unreviewed narrative prose.
 - Keep generation, pathfinding, visibility, and per-tick simulation bounded.
