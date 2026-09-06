@@ -273,7 +273,7 @@ Serialized capabilities use stable IDs:
     "perk.race.elf.aether-sense",
     "perk.heritage.elf.dawnweave"
   ],
-  "knownTechniqueIds": ["spell.evocation.magic-missile"]
+  "knownTechniqueIds": ["spell.spirit.magic-missile"]
 }
 ```
 

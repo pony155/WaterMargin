@@ -149,27 +149,22 @@ above; the inventory does not synthesize IDs from Heritage IDs or display text.
 
 ## Spells
 
-### Divination
+### Elemental
 
 | Display label | Stable ID |
 | --- | --- |
-| Detect Invisibility | `spell.divination.detect-invisibility` |
+| Burning Hands | `spell.elemental.burning-hands` |
+| Lightning Bolt | `spell.elemental.lightning-bolt` |
 
-### Evocation
-
-| Display label | Stable ID |
-| --- | --- |
-| Burning Hands | `spell.evocation.burning-hands` |
-| Lightning Bolt | `spell.evocation.lightning-bolt` |
-| Magic Missile | `spell.evocation.magic-missile` |
-| Magic Missile Storm | `spell.evocation.magic-missile-storm` |
-
-### Illusion
+### Spirit
 
 | Display label | Stable ID |
 | --- | --- |
-| Invisibility | `spell.illusion.invisibility` |
-| Phantasmal Image | `spell.illusion.phantasmal-image` |
+| Detect Invisibility | `spell.spirit.detect-invisibility` |
+| Invisibility | `spell.spirit.invisibility` |
+| Magic Missile | `spell.spirit.magic-missile` |
+| Magic Missile Storm | `spell.spirit.magic-missile-storm` |
+| Phantasmal Image | `spell.spirit.phantasmal-image` |
 
 ## Psychic techniques
 

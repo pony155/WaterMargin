@@ -111,7 +111,7 @@ compatible Industrial equipment.
 | --- | --- | --- | --- |
 | Dawnweave | `heritage.elf.dawnweave` | Gains focus in strong natural or stellar light | Darkness increases fatigue unless quarters provide tuned lighting |
 | Gloamroot | `heritage.elf.gloamroot` | Excellent low-light sight and reduced sensory signature | Bright or rapidly changing light causes strain |
-| Glassleaf | `heritage.elf.glassleaf` | Reads crystalline and aetheric material with unusual precision | Resonant machinery and storms can overwhelm that sense |
+| Glassleaf | `heritage.elf.glassleaf` | Reads crystalline structures and nearby Aether patterns with unusual precision | Resonant machinery and storms can overwhelm that sense |
 
 ### Half-elves
 

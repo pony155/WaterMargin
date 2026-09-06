@@ -66,9 +66,10 @@ found items as cargo, but must equip them to use their active effect.
 
 ## Technology and magic
 
-Arcane equipment uses Aether, Focus, a known spell, or `access.magic` only when
-its definition says so. Industrial equipment may use ammunition or stored
-energy. Atompunk equipment can be powerful and rare, but it remains a simple
+Arcane is the overall magical practice; Aether is the non-material medium that
+carries its energy. Arcane equipment uses Focus, Aether charge, a
+known spell, or `access.magic` only when its definition says so. Industrial
+equipment may use ammunition or stored energy. Atompunk equipment can be powerful and rare, but it remains a simple
 item with a visible effect; radiation, reactor management, and exotic fuel
 chemistry are not ordinary equipment statistics.
 

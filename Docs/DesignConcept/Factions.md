@@ -31,8 +31,8 @@ Faction behavior during optional late-campaign threats is defined in
 The galaxy is technologically advanced: Arcane craft and dieselpunk-to-atompunk
 industry coexist in ports, fleets, markets, and law. Factions differ in how
 they regulate, finance, and deploy these tools—not in whether advanced
-technology or magic exists at all. Aether crystals, reactor material, fuel,
-enchantments, spare parts, and skilled labor are all normal political and
+technology or magic exists at all. Aether resonators, charge accumulators,
+reactor material, fuel, enchantments, spare parts, and skilled labor are all normal political and
 economic concerns. The setting baseline is in [`Setting.md`](Setting.md).
 
 ## Race, culture, and faction
@@ -79,7 +79,7 @@ state.
 | --- | --- |
 | Leadership | Current office holders, claimants, succession, and vacancies |
 | Holdings | Controlled stations, settlements, fleets, depots, and mobile assets |
-| Resources | Treasury, fuel, food, reactor material, aether crystals, influence, and logistics |
+| Resources | Treasury, fuel, food, reactor material, Aether charge hardware, influence, and logistics |
 | Goals | Secure a route, relieve a shortage, recover a relic, enforce a claim, or survive a threat |
 | Policies | Active laws, emergency orders, embargoes, amnesties, and rules of engagement |
 | Relations | Treaties, disputes, wars, truces, debts, and opinions of other factions |
@@ -221,7 +221,7 @@ abandonment conditions, and explanation keys.
 Possible goals include:
 
 - secure or survey a Starway;
-- acquire food, fuel, reactor material, aether crystals, ships, or knowledge;
+- acquire food, fuel, reactor material, Aether resonators, ships, or knowledge;
 - protect a settlement, convoy, ruin, ecology, or allied faction;
 - enforce a claim, embargo, quarantine, warrant, or treaty;
 - investigate a disappearance, psychic intrusion, relic, or anomaly;

@@ -128,7 +128,7 @@ skill.engineering
 feat.access.magic
 perk.race.elf.aether-sense
 access.psionics
-spell.evocation.magic-missile
+spell.spirit.magic-missile
 combat.context.ruin
 ```
 

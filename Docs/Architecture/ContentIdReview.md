@@ -59,10 +59,10 @@ public save contract.
 The first M4 Spell slice is:
 
 ```text
-spell.divination.detect-invisibility
-spell.evocation.burning-hands
-spell.evocation.magic-missile
-spell.illusion.phantasmal-image
+spell.elemental.burning-hands
+spell.spirit.detect-invisibility
+spell.spirit.magic-missile
+spell.spirit.phantasmal-image
 ```
 
 The other three Spell IDs remain base-owned deferred catalog content.

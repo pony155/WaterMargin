@@ -21,11 +21,34 @@ industry. The latest atompunk equipment includes powered armor, laser weapons,
 and plasma weapons. These terms describe the setting's functional technology level, not
 a requirement to simulate every pipe, fuel mixture, or reactor detail.
 
+## Arcane and Aether
+
+**Arcane** is the umbrella term for magic: its learned traditions, spells,
+enchantments, wards, and magical devices. **Aether** is a non-material medium
+permeating space that carries Arcane energy and patterns. It is not a substance
+that can be mined, bottled, or carried as cargo. Its currents, density, and
+interference can still be observed and can affect Arcane work.
+
+The decisive discovery of the age was that Aether exists beyond a world's
+atmosphere. Before that discovery, Arcane practice was local and ships relied
+on conventional propulsion. Once navigators learned to couple a vessel's
+resonators and Arcane drive to open-space Aether, sustained magical spaceflight
+became possible. This opened the first Arcane trade routes, wreck expeditions,
+and interstellar settlements; it did not make Industrial propulsion obsolete.
+
+A caster uses the surrounding Aether as a focus medium, while a ship couples to
+it through physical resonators, conduits, and accumulators. **Aether charge**
+is not stored Aether; it is the usable Arcane energy that a device has captured
+and held after coupling to the medium. Ordinary personal casting keeps this
+simple: Focus represents the caster's controlled use of available Arcane
+energy. A spell or item names Aether charge only when that extra cost is an
+interesting player decision.
+
 ## Two coexisting traditions
 
 | Tradition | Everyday role | Characteristic feel |
 | --- | --- | --- |
-| Arcane | Aether power, enchantment, wards, magical navigation, energy weapons, and trained spells | Strange, flexible, and dependent on knowledge, charge, and safe use |
+| Arcane | Spells, enchantment, wards, magical navigation, and devices powered through Aether | Strange, flexible, and dependent on knowledge, Aether charge, and safe use |
 | Industrial | Engines, reactors, armor, physical ammunition, fabrication, sensors, and heavy propulsion | Rugged, powerful, and dependent on fuel, parts, space, and maintenance |
 
 Neither tradition is inherently superior or tied to a Race, morality, or one
@@ -44,7 +67,8 @@ boarder, and a laser or plasma weapon can challenge armor. None is a universal
 answer.
 
 The game presents these ideas through readable choices rather than technical
-simulation. A player sees useful values and consequences—such as Focus, Aether,
+simulation. A player sees useful values and consequences—such as Focus, Aether
+charge,
 energy, fuel, ammunition, armor, shields, and module slots—not hidden
 engineering calculations.
 

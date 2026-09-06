@@ -9,8 +9,9 @@ implemented in the current ship-level expedition prototype.
 
 Magic creates memorable choices, not aether chemistry or ritual accounting. A
 spell tooltip shows its **Focus cost**, **range**, **cast time**, and **effect**;
-it may also show a short cooldown. A personal spell uses Focus, while a future
-ship spell uses Aether from an Arcane module.
+it may also show a short cooldown. Arcane is the overall magical practice;
+Aether is the non-material medium that carries its energy. A personal spell uses
+Focus, while an item or ship spell may explicitly consume Aether charge.
 
 Casting is one action: choose a legal target, preview the effect, pay the cost,
 and resolve it. A failed spell spends its stated cost and clearly says why it
@@ -31,8 +32,9 @@ Characters have no mage class. To cast, a character needs:
 3. enough Focus and a legal target.
 
 The Elf Race Perk **Aether Sense** is the initial innate source of
-`access.magic`. It grants access but no free Magic ranks or known spells. A
-high Magic skill, spellbook, or item never bypasses the access requirement.
+`access.magic`. It grants the ability to perceive nearby Aether patterns, but
+no free Magic ranks or known spells. A high Magic skill, spellbook, or item
+never bypasses the access requirement.
 
 Learning a spell is a short, explicit training project: find a source, meet its
 stated requirement, spend downtime, and add its spell ID. Sources can be
@@ -40,14 +42,15 @@ teachers, books, ruins, factions, or discoveries.
 
 ## Schools
 
-There are only three magic schools. Schools organize discovery and teaching;
-they are not classes and do not add separate resource systems.
+There are four Arcane Traditions. Traditions organize discovery and
+teaching; they are not classes and do not add separate resource systems.
 
 | School | Purpose |
 | --- | --- |
-| Evocation | Direct Arcane force, fire, and lightning for clear combat effects |
-| Illusion | Concealment and believable false sights that can be investigated |
-| Divination | Bounded actionable information, including detecting invisible targets |
+| Elemental | Fire, lightning, and other direct natural-energy effects |
+| Spirit | Arcane force, perception, invisible presences, and false sights |
+| Hex | Temporary curses and disruptive effects with a clear counter or end condition |
+| Nature | Living systems, plants, ecosystems, and cooperation with a local environment |
 
 ## Spell definition
 
@@ -62,47 +65,56 @@ The first character-combat slice uses four Tier 1 spells:
 
 | Spell | Stable ID | Focus | Range | Cast time | Effect |
 | --- | --- | ---: | --- | --- | --- |
-| Magic Missile | `spell.evocation.magic-missile` | Low | Far | Instant | Deal reliable Arcane damage to one visible target. |
-| Burning Hands | `spell.evocation.burning-hands` | Low | Near | Instant | Deal fire damage in a short previewed cone. |
-| Phantasmal Image | `spell.illusion.phantasmal-image` | Low | Near | Instant | Create one visual decoy that distracts or misleads. |
-| Detect Invisibility | `spell.divination.detect-invisibility` | Low | Near | Instant | Reveal nearby invisible subjects or their outline briefly. |
+| Magic Missile | `spell.spirit.magic-missile` | Low | Far | Instant | Deal reliable Arcane damage to one visible target. |
+| Burning Hands | `spell.elemental.burning-hands` | Low | Near | Instant | Deal fire damage in a short previewed cone. |
+| Phantasmal Image | `spell.spirit.phantasmal-image` | Low | Near | Instant | Create one visual decoy that distracts or misleads. |
+| Detect Invisibility | `spell.spirit.detect-invisibility` | Low | Near | Instant | Reveal nearby invisible subjects or their outline briefly. |
 
 ## Catalog
 
 The remaining entries are planned content candidates. Their final numbers are
 balance data; their intended use stays short and readable.
 
-### Evocation
+### Elemental
 
 | Spell | Stable ID | Tier | Intended effect |
 | --- | --- | ---: | --- |
-| Magic Missile | `spell.evocation.magic-missile` | 1 | Deal reliable Arcane damage to one visible target. |
-| Magic Missile Storm | `spell.evocation.magic-missile-storm` | 3 | Split Arcane missiles among several visible targets. |
-| Burning Hands | `spell.evocation.burning-hands` | 1 | Deal fire damage in a short, previewed cone. |
-| Lightning Bolt | `spell.evocation.lightning-bolt` | 2 | Deal lightning damage along a previewed line. |
+| Burning Hands | `spell.elemental.burning-hands` | 1 | Deal fire damage in a short, previewed cone. |
+| Lightning Bolt | `spell.elemental.lightning-bolt` | 2 | Deal lightning damage along a previewed line. |
 
-Magic Missile is reliable rather than a free answer: it still needs a legal
-visible target, Focus, and any defense declared by its definition. Burning
-Hands and Lightning Bolt show their area before casting, including allies.
+Burning Hands and Lightning Bolt show their area before casting, including
+allies.
 
-### Illusion
+### Spirit
 
 | Spell | Stable ID | Tier | Intended effect |
 | --- | --- | ---: | --- |
-| Invisibility | `spell.illusion.invisibility` | 2 | Hide one subject until it attacks, casts, or the short duration ends. |
-| Phantasmal Image | `spell.illusion.phantasmal-image` | 1 | Create one visual decoy that can distract or mislead. |
+| Magic Missile | `spell.spirit.magic-missile` | 1 | Deal reliable Arcane damage to one visible target. |
+| Magic Missile Storm | `spell.spirit.magic-missile-storm` | 3 | Split Arcane missiles among several visible targets. |
+| Invisibility | `spell.spirit.invisibility` | 2 | Hide one subject until it attacks, casts, or the short duration ends. |
+| Phantasmal Image | `spell.spirit.phantasmal-image` | 1 | Create one visual decoy that can distract or mislead. |
+| Detect Invisibility | `spell.spirit.detect-invisibility` | 1 | Reveal nearby invisible subjects or their outline briefly. |
 
-Illusions change perception; they do not rewrite memory, create physical cover,
-or force belief. A successful inspection or detection effect reveals them.
+Spirit effects change perception or strike through Arcane force; they do not rewrite
+memory, create physical cover, or force belief. A successful inspection or
+Spirit detection effect reveals an illusion or invisible subject. Magic Missile
+still needs a legal visible target, Focus, and any defense declared by its
+definition.
 
-### Divination
+### Hex
 
-| Spell | Stable ID | Tier | Intended effect |
-| --- | --- | ---: | --- |
-| Detect Invisibility | `spell.divination.detect-invisibility` | 1 | Reveal nearby invisible subjects or their outline briefly. |
+Hex is a planned tradition for temporary curses, misfortune, weakening, and
+disruption. It has no base spell in the first catalog yet. Every future Hex
+must show its duration, counterplay, and clear end condition; it cannot impose
+permanent mind control or an unexplained irreversible penalty.
 
-Divination reveals bounded actionable information. Detect Invisibility does not
-reveal every hidden object, read minds, or bypass an unrelated ward.
+### Nature
+
+Nature is a planned tradition for living habitats, plants, beasts, recovery,
+and environmental adaptation. It does not grant automatic control over animals
+or create unlimited food, oxygen, or healing. The first catalog contains no
+Nature spell yet; each future spell must create a clear exploration, survival,
+or support choice with a visible limit.
 
 ## Limits, saves, and delivery
 

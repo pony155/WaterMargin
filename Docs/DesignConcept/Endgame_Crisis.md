@@ -173,10 +173,10 @@ arrival, diversion, rescue, or loss rule.
 
 ### The Glasswake Bloom
 
-Translucent aether crystal begins growing through ruins, habitats, cargo, and
-Arcane power systems. It stores extraordinary energy, making early fragments
+Translucent Aether-reactive crystal begins growing through ruins, habitats,
+cargo, and Arcane power systems. It stores extraordinary energy, making early fragments
 valuable and politically divisive. Mature growth drains or overloads nearby
-aether sources, alters local environments, and launches seeded fragments along
+Aether resonators, alters local environments, and launches seeded fragments along
 trade routes.
 
 The Bloom is neither a race nor automatically a conscious enemy. Research may

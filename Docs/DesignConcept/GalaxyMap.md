@@ -34,6 +34,11 @@ generated strategy-game galaxies, varied system layouts, and connected travel
 networks. Spelljammer uses its own topology rules, terminology, content,
 factions, cosmology, and voyage-scale simulation.
 
+Arcane navigation became possible when open-space Aether was discovered and
+ships learned to couple to it. Aether currents and interference therefore
+create meaningful route conditions, while Industrial vessels retain a separate
+propulsion path through the same galaxy.
+
 ## Map hierarchy
 
 | Layer | Responsibility |
@@ -156,7 +161,7 @@ disabled defenses, damage, hazards, recovered objects, and abandoned actors.
 Each Starway stores stable endpoint IDs and authored or generated values for:
 
 - route distance and base travel time;
-- fuel, propellant, or aether demand;
+- fuel, propellant, or Aether-charge demand;
 - known and hidden hazard tags;
 - stability, current direction, and seasonal state;
 - minimum navigation or ship-capability requirements;

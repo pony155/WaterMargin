@@ -11,6 +11,10 @@ Ship engagements, boarding transitions, and shipboard combat are defined in
 The wider Arcane-Industrial setting baseline is defined in
 [`Setting.md`](Setting.md).
 
+Arcane ships exist because their drives couple to the Aether discovered in open
+space. They were the first practical magical spacecraft; Industrial propulsion
+later became a parallel route to spaceflight rather than a replacement.
+
 ## Design goals
 
 - Make the ship a persistent home whose layout, capabilities, damage, and scars
@@ -110,13 +114,14 @@ crew's culture, morality, faction, or available character skills.
 
 | Upgrade path | Stable ID | Energy and progression | Strengths | Costs and risks |
 | --- | --- | --- | --- | --- |
-| Arcane | `ship.path.arcane` | Aether crystals, ambient currents, runic conduits, and enchantments | Flexible energy use, wards, and energy weapons | Aether interference and scarce charge sources |
+| Arcane | `ship.path.arcane` | Ambient Aether, resonator crystals, runic conduits, and enchantments | Flexible energy use, wards, and energy weapons | Aether interference and scarce charge sources |
 | Industrial | `ship.path.industrial` | Dieselpunk machinery advancing into atompunk reactors and drives | Reliable power, armor, and physical ammunition | Fuel or advanced-ammunition supply and larger slot cost |
 
 ### Arcane progression
 
-The Arcane path treats aether as the ship's primary energy source. Early
-upgrades stabilize an Aether Dynamo and Flux Sail. Later upgrades improve
+Arcane is the ship's magical discipline; Aether is the non-material medium it
+couples to through resonators, then captures as charge and routes as energy.
+Early upgrades stabilize an Aether Dynamo and Flux Sail. Later upgrades improve
 crystal storage, runic distribution, remote control, ward efficiency, and
 enchantment capacity. Magic and Enchantment provide the main specialist work,
 while Engineering remains important for the physical housings, controls, and
@@ -210,7 +215,7 @@ installed instances commit together or the original ship remains unchanged.
 | Module | Stable ID | Path | Function | Typical skill or position |
 | --- | --- | --- | --- | --- |
 | Flux Sail | `module.propulsion.flux-sail` | Arcane | Converts aether charge and stellar currents into voyage movement | Piloting or Rigging; Pilot or Rigger |
-| Aether Dynamo | `module.power.aether-dynamo` | Arcane | Converts crystals or gathered currents into ship power and aether charge | Magic, Enchantment, or Engineering; Ship Mage or Engineer |
+| Aether Dynamo | `module.power.aether-dynamo` | Arcane | Couples to ambient Aether through resonator crystals to create ship power and Aether charge | Magic, Enchantment, or Engineering; Ship Mage or Engineer |
 | Crystal Accumulator | `module.power.crystal-accumulator` | Arcane | Stores bounded aether charge for peak demand and emergency operation | Enchantment; Artificer |
 | Runic Distributor | `module.power.runic-distributor` | Arcane | Routes and prioritizes aether while isolating unstable branches | Enchantment or Engineering; Artificer |
 | Diesel Generator | `module.power.diesel-generator` | Industrial—Dieselpunk | Produces Power from fuel | Engineering; Engineer |
@@ -268,7 +273,7 @@ failure consequences are different.
 
 | Cannon family | Stable ID | Resource path | Role and risk |
 | --- | --- | --- | --- |
-| Aether Energy Cannon | `ship.weapon.arcane.aether-cannon` | Aether network and stored Aether charge | A magical energy cannon. It needs no physical ammunition, but it cannot fire when its charge request is unmet and is vulnerable to aether interference. |
+| Aether Energy Cannon | `ship.weapon.arcane.aether-cannon` | Aether network and available Aether charge | A magical energy cannon. It needs no physical ammunition, but it cannot fire when its charge request is unmet and is vulnerable to aether interference. |
 | Diesel Shell Cannon | `ship.weapon.industrial.diesel-shell-cannon` | Logistics path from a magazine of physical shells | A dieselpunk cannon using manufacturable shells and propellant. It remains usable during Aether disruption, but spends ammunition. |
 | Atomic Shell Cannon | `ship.weapon.industrial.atomic-shell-cannon` | Logistics path from sealed advanced shells; optional Industrial power for its loader | An atompunk ammunition cannon using high-density penetrators or shaped-charge shells. Its advanced ammunition is costly but has no extra subsystem to manage. |
 
