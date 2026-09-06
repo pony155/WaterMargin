@@ -78,7 +78,13 @@ public sealed record TrainingProjectDefinition(
     string DescriptionKey,
     ImmutableArray<SkillId> RequiredSkillIds,
     int WorkUnits,
-    ImmutableArray<FeatId> GrantedFeatIds)
+    int ProgressCap,
+    ContentId FacilityId,
+    ResourceId ResourceId,
+    int ResourceCost,
+    ContentId SafetyId,
+    ImmutableArray<FeatId> GrantedFeatIds,
+    ImmutableArray<TechniqueId> GrantedTechniqueIds)
     : ContentDefinition(TrainingProjectId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
 
 public sealed record HeritageDefinition(
@@ -111,6 +117,43 @@ public sealed record TechniqueDefinition(
     ImmutableArray<AccessId> RequiredAccessIds,
     ImmutableArray<PerkId> GrantedPerkIds)
     : ContentDefinition(TechniqueId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record SpellDefinition(
+    SpellId SpellId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    AccessId RequiredAccessId,
+    SkillId SkillId,
+    ResourceId FocusResourceId,
+    int FocusCost,
+    ContentId RangeId,
+    int CastTimeTicks,
+    int CooldownTicks,
+    ImmutableArray<string> TargetTags,
+    ImmutableArray<ContentId> EffectIds)
+    : ContentDefinition(SpellId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record PsychicTechniqueDefinition(
+    PsychicTechniqueId PsychicTechniqueId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    AccessId RequiredAccessId,
+    SkillId SkillId,
+    SkillId ResistanceSkillId,
+    ResourceId StrainResourceId,
+    int StrainCost,
+    int SustainCostPerTick,
+    ContentId ContactModeId,
+    ContentId RangeId,
+    ContentId InformationScopeId,
+    ImmutableArray<ContentId> DisciplineIds,
+    ImmutableArray<string> TargetTags,
+    ImmutableArray<ContentId> EffectIds)
+    : ContentDefinition(PsychicTechniqueId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
 
 public sealed record CharacterDefinition(
     CharacterId CharacterId,

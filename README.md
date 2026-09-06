@@ -14,7 +14,10 @@ characters, rules, content, code, artwork, and sound remain original.
 > [!IMPORTANT]
 > Spelljammer is at a playable-prototype stage, not a content-complete game.
 > The current shell exposes a small deterministic expedition loop and a native
-> renderer demonstration. Crew simulation, encounters, combat, trading,
+> renderer demonstration. A headless eleven-character capability roster now
+> exists with trained and innate supernatural access, Magic Missile, and
+> consensual Mindlink execution, but crew schedules and relationships,
+> encounters, combat, trading,
 > procedural ship interiors, saves, and a full game UI remain planned.
 
 ## Current prototype
@@ -32,7 +35,12 @@ Implemented foundations include:
 - a bounded gameplay-content foundation with validated stable IDs, strict JSON
   pack loading, deterministic dependency ordering, immutable snapshots,
   canonical SHA-256 fingerprints, transactional publication, and production
-  registries for seven Attributes and 29 Skills;
+  registries for seven Attributes, 29 Skills, the first character slice, one
+  Spell, and one psychic technique;
+- deterministic immutable character creation for eleven races, bounded
+  capability/grant storage, action eligibility and resolution, Skill practice,
+  Feat training, mixed-crew support validation, and localization-ready roster
+  inspection;
 - a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
 - a child Win32 viewport rendered through SpriteForge's native D3D12 sprite
   renderer and a narrow managed/native interop layer;
@@ -93,12 +101,12 @@ defined in
 | Path | Purpose |
 | --- | --- |
 | `Source/Spelljammer.App/` | WPF host, expedition presentation, SpriteForge interop, and renderer viewport. |
-| `Source/Spelljammer.Simulation/` | Headless authoritative space-expedition state and commands. |
+| `Source/Spelljammer.Simulation/` | Headless authoritative expedition and character-capability state and commands. |
 | `Source/Spelljammer.Content/` | Pack loading, validation, immutable registries, and semantic fingerprints. |
 | `Source/Spelljammer.Localization/` | Game-owned localization runtime and message formatter. |
 | `Tools/Spelljammer.Content.Compiler/` | Offline gameplay-pack validation tool. |
 | `Tools/Spelljammer.Localization.Compiler/` | Source-catalog compiler and validation tools. |
-| `Content/Packs/base/` | Built-in Attribute and Skill definitions with their authored localization catalogs. |
+| `Content/Packs/base/` | Built-in capability, Race, Heritage, Perk, training, and first-roster definitions with localization. |
 | `Content/Localization/` | Pinned locale-data inputs and third-party notices. |
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only deterministic simulation contracts. |
 | `Tests/Spelljammer.Localization.Tests/` | Compile-only localization contracts. |

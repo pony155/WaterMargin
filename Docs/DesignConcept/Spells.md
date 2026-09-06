@@ -2,8 +2,9 @@
 
 ## Status
 
-This document defines the planned spell system and catalog. It is not
-implemented in the current ship-level expedition prototype.
+Magic Missile, its learning project, typed registry, and deterministic
+headless execution phases are implemented. The remaining catalog and visual
+encounter integration are planned.
 
 ## Simple magic rule
 

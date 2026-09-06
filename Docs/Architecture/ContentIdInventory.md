@@ -2,9 +2,9 @@
 
 ## Status
 
-This document is the reviewed inventory produced by roadmap task `M0.1.1`. It
-records stable gameplay IDs explicitly present under `Docs/DesignConcept`; it
-does not claim that runtime definitions or loaders exist.
+This document began as the reviewed inventory produced by roadmap task
+`M0.1.1`. Milestone 3 extends it with the reviewed IDs assigned while authoring
+the base character pack; those entries now have runtime definitions.
 
 The inventory is a documentation snapshot, not yet a machine-readable content
 manifest. Ownership and lifecycle classifications, plus collision and spelling
@@ -34,7 +34,21 @@ inventoried when their definition schemas enter roadmap scope.
 | Attributes | 7 | [`Attributes.md`](../DesignConcept/Attributes.md) |
 | Skills | 29 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Learned Feats | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
-| Racial Perks | 12 | [`Races.md`](../DesignConcept/Races.md) |
+| Racial Perks | 22 | [`Races.md`](../DesignConcept/Races.md) |
+| Races | 11 | [`Races.md`](../DesignConcept/Races.md) |
+| First-slice Heritages | 11 | [`Races.md`](../DesignConcept/Races.md) |
+| Backgrounds | 1 | Milestone 3 base content |
+| Authored Characters | 11 | Milestone 3 base content |
+| Character techniques | 2 | Milestone 3 base content |
+| Training Projects | 4 | Milestone 4 base content |
+| Roster equipment primitives | 15 | Milestone 3 base content |
+| Crew positions | 11 | Milestone 3 base content |
+| Character languages | 9 | Milestone 3 base content |
+| Character scripts | 7 | [`Skills.md`](../DesignConcept/Skills.md) and Milestone 3 base content |
+| Crew support requirements | 19 | Milestone 3 base content |
+| Character resources | 5 | Milestone 4 base content |
+| Scenarios | 1 | Milestone 3 base content |
+| Character action primitives | 5 | Milestone 3 simulation |
 | Equipment | 11 | [`Equipments.md`](../DesignConcept/Equipments.md) |
 | Access gates | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Spells | 7 | [`Spells.md`](../DesignConcept/Spells.md) |
@@ -48,7 +62,7 @@ inventoried when their definition schemas enter roadmap scope.
 | Crisis families | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis phases | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis resolutions | 3 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
-| **Total** | **152** | |
+| **Total** | **270** | |
 
 ## Attributes
 
@@ -108,6 +122,16 @@ inventoried when their definition schemas enter roadmap scope.
 | Display label | Stable ID |
 | --- | --- |
 | Cometdelver Heritage Perk | `perk.heritage.dwarf.cometdelver` |
+| Dawnweave Heritage Perk | `perk.heritage.elf.dawnweave` |
+| Reliquary-Bound Heritage Perk | `perk.heritage.eidolon.reliquary-bound` |
+| Coilwhisper Heritage Perk | `perk.heritage.gnome.coilwhisper` |
+| Hullrunner Heritage Perk | `perk.heritage.goblin.hullrunner` |
+| Concord Heritage Perk | `perk.heritage.half-elf.concord` |
+| Hearthworld Heritage Perk | `perk.heritage.human.hearthworld` |
+| Redwake Heritage Perk | `perk.heritage.orc.redwake` |
+| Chorusborn Heritage Perk | `perk.heritage.somnari.chorusborn` |
+| Startrail Heritage Perk | `perk.heritage.tharun.startrail` |
+| Crimson Court Heritage Perk | `perk.heritage.veyr.crimson-court` |
 | Braced Stance | `perk.race.dwarf.braced-stance` |
 | Soul Anchor | `perk.race.eidolon.soul-anchor` |
 | Aether Sense | `perk.race.elf.aether-sense` |
@@ -120,9 +144,146 @@ inventoried when their definition schemas enter roadmap scope.
 | Dusk Sight | `perk.race.veyr.dusk-sight` |
 | Trail Sense | `perk.race.tharun.trail-sense` |
 
-Heritage tables describe additional Heritage Perks without spelling out a
-stable Perk ID for each row. Only the explicit Cometdelver example is listed
-above; the inventory does not synthesize IDs from Heritage IDs or display text.
+Milestone 3 assigned the ten previously missing first-slice Heritage Perk IDs.
+Additional deferred Heritage rows still require explicit review before use.
+
+## Milestone 3 character definitions
+
+| Race | Race ID | First-slice Heritage | Heritage ID | Character ID |
+| --- | --- | --- | --- | --- |
+| Human | `race.human` | Hearthworld | `heritage.human.hearthworld` | `character.first-voyage.human` |
+| Elf | `race.elf` | Dawnweave | `heritage.elf.dawnweave` | `character.first-voyage.elf` |
+| Half-elf | `race.half-elf` | Concord | `heritage.half-elf.concord` | `character.first-voyage.half-elf` |
+| Dwarf | `race.dwarf` | Cometdelver | `heritage.dwarf.cometdelver` | `character.first-voyage.dwarf` |
+| Orc | `race.orc` | Redwake | `heritage.orc.redwake` | `character.first-voyage.orc` |
+| Gnome | `race.gnome` | Coilwhisper | `heritage.gnome.coilwhisper` | `character.first-voyage.gnome` |
+| Goblin | `race.goblin` | Hullrunner | `heritage.goblin.hullrunner` | `character.first-voyage.goblin` |
+| Somnari | `race.somnari` | Chorusborn | `heritage.somnari.chorusborn` | `character.first-voyage.somnari` |
+| Veyr | `race.veyr` | Crimson Court | `heritage.veyr.crimson-court` | `character.first-voyage.veyr` |
+| Eidolon | `race.eidolon` | Reliquary-Bound | `heritage.eidolon.reliquary-bound` | `character.first-voyage.eidolon` |
+| Tharun | `race.tharun` | Startrail | `heritage.tharun.startrail` | `character.first-voyage.tharun` |
+
+The shared first-slice Background is `background.expedition-veteran`.
+Character definitions also use the reviewed techniques
+`technique.recovery.soul-reconstitution` and
+`technique.navigation.trail-interpretation`. Learned access is provided by
+`training.magic.spellcasting`, `training.magic.magic-missile`,
+`training.psionics.awakening`, and `training.psionics.mindlink`.
+
+The roster also inventories these adjacent stable primitives until their later
+full definition registries arrive:
+
+```text
+scenario.first-voyage
+position.bosun
+position.captain
+position.enchanter
+position.engineer
+position.envoy
+position.medic
+position.navigator
+position.salvager
+position.scout
+position.steward
+position.technician
+language.dwarven
+language.elven
+language.gnomish
+language.goblin
+language.orcish
+language.somnari
+language.tharun
+language.trade
+language.veyr
+script.concord
+script.dwarven
+script.elven
+script.precursor
+script.somnari
+script.tharun
+script.veyr
+resource.focus
+resource.psychic-strain
+resource.resonance
+resource.stamina
+resource.training-supplies
+```
+
+Milestone 4 also reviews these bounded runtime primitives used by training and
+supernatural execution:
+
+```text
+facility.arcane-study
+facility.quiet-sanctum
+safety.supervised
+range.far
+range.near
+contact.invited
+effect.spirit.magic-missile-impact
+effect.psychic.shared-channel
+evidence.spell.cast
+evidence.psychic.mindlink
+```
+
+The bounded Soul Anchor action uses these reviewed simulation primitives:
+
+```text
+action.recovery.soul-anchor
+context.recovery.safe-anchor
+effect.recovery.soul-anchor
+effect.tracking.observed-trail
+formula.check.standard
+```
+
+The 15 `equipment.*` IDs are the exact values authored in the eleven Character
+documents. They are scenario equipment primitives for M3, not substitutes for
+the M5 `item.*` definitions:
+
+```text
+equipment.aether-compass
+equipment.cargo-ledger
+equipment.command-tablet
+equipment.engineering-kit
+equipment.medical-kit
+equipment.rigging-tools
+equipment.salvage-cutter
+equipment.sensor-probe
+equipment.soul-anchor.portable
+equipment.translation-slate
+equipment.vac-suit.adjustable
+equipment.vac-suit.compact
+equipment.vac-suit.eidolon
+equipment.vac-suit.reinforced
+equipment.vac-suit.tharun
+```
+
+The 19 `support.*` IDs in Race definitions cover
+care, environment, nutrition or reserve, quarters, and rest; roster publication
+requires a matching support profile:
+
+```text
+support.care.organic
+support.care.resonant
+support.environment.dim
+support.environment.filtered
+support.environment.standard
+support.environment.vacuum
+support.nutrition.high
+support.nutrition.resonance
+support.nutrition.standard
+support.quarters.anchor
+support.quarters.compact
+support.quarters.fitted
+support.quarters.reinforced
+support.quarters.standard
+support.rest.adaptive
+support.rest.anchor
+support.rest.dream
+support.rest.sleep
+support.rest.trance
+```
+
+Both sets remain stable until their dedicated registries are introduced.
 
 ## Equipment
 
@@ -310,9 +471,9 @@ by this inventory.
 
 ## Review result
 
-The requested categories contain 152 unique explicit gameplay IDs. No duplicate
-ID is assigned to two different labels within these tables. Repeated references
-to the same ID across design documents were consolidated under one entry.
+No duplicate ID is assigned to two different labels within these tables.
+Repeated references to the same ID across design documents were consolidated
+under one entry.
 
-The missing Heritage Perk IDs noted above remain future content-authoring
-work. This inventory does not synthesize them from display text.
+Deferred Heritage rows remain future content-authoring work; their Perk IDs
+must still be assigned explicitly rather than synthesized from display text.

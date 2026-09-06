@@ -2,11 +2,10 @@
 
 ## Status
 
-This document defines the planned psychic-technique, contact, consent,
-resistance, strain, information, hazard, learning, and persistence systems.
-They are not implemented yet. `skill.psionics`, `feat.access.psionics`, and the
-Somnari Mindwake Racial Perk exists only in product design; the current voyage
-prototype has no characters or psychic actions.
+Mindlink, Psychic Strain, explicit invitation and consent, bounded deliberate-
+message scope, learning, innate Mindwake provenance, sustain, and release are
+implemented as a headless character slice. Other psychic techniques, hazards,
+and visual encounter integration remain planned.
 
 ## Core boundary
 

@@ -125,9 +125,40 @@ internal static class CanonicalSemanticWriter
                 properties["grantedPerkIds"] = output => WriteIds(output, value.GrantedPerkIds.Select(id => id.Value));
                 properties["requiredAccessIds"] = output => WriteIds(output, value.RequiredAccessIds.Select(id => id.Value));
                 break;
+            case SpellDefinition value:
+                properties["castTimeTicks"] = output => output.Append(value.CastTimeTicks);
+                properties["cooldownTicks"] = output => output.Append(value.CooldownTicks);
+                properties["effectIds"] = output => WriteIds(output, value.EffectIds);
+                properties["focusCost"] = output => output.Append(value.FocusCost);
+                properties["focusResourceId"] = output => WriteString(output, value.FocusResourceId.ToString());
+                properties["rangeId"] = output => WriteString(output, value.RangeId.ToString());
+                properties["requiredAccessId"] = output => WriteString(output, value.RequiredAccessId.ToString());
+                properties["skillId"] = output => WriteString(output, value.SkillId.ToString());
+                properties["targetTags"] = output => WriteStrings(output, value.TargetTags);
+                break;
+            case PsychicTechniqueDefinition value:
+                properties["contactModeId"] = output => WriteString(output, value.ContactModeId.ToString());
+                properties["disciplineIds"] = output => WriteIds(output, value.DisciplineIds);
+                properties["effectIds"] = output => WriteIds(output, value.EffectIds);
+                properties["informationScopeId"] = output => WriteString(output, value.InformationScopeId.ToString());
+                properties["rangeId"] = output => WriteString(output, value.RangeId.ToString());
+                properties["requiredAccessId"] = output => WriteString(output, value.RequiredAccessId.ToString());
+                properties["resistanceSkillId"] = output => WriteString(output, value.ResistanceSkillId.ToString());
+                properties["skillId"] = output => WriteString(output, value.SkillId.ToString());
+                properties["strainCost"] = output => output.Append(value.StrainCost);
+                properties["strainResourceId"] = output => WriteString(output, value.StrainResourceId.ToString());
+                properties["sustainCostPerTick"] = output => output.Append(value.SustainCostPerTick);
+                properties["targetTags"] = output => WriteStrings(output, value.TargetTags);
+                break;
             case TrainingProjectDefinition value:
+                properties["facilityId"] = output => WriteString(output, value.FacilityId.ToString());
                 properties["grantedFeatIds"] = output => WriteIds(output, value.GrantedFeatIds.Select(id => id.Value));
+                properties["grantedTechniqueIds"] = output => WriteIds(output, value.GrantedTechniqueIds.Select(id => id.Value));
+                properties["progressCap"] = output => output.Append(value.ProgressCap);
                 properties["requiredSkillIds"] = output => WriteIds(output, value.RequiredSkillIds.Select(id => id.Value));
+                properties["resourceCost"] = output => output.Append(value.ResourceCost);
+                properties["resourceId"] = output => WriteString(output, value.ResourceId.ToString());
+                properties["safetyId"] = output => WriteString(output, value.SafetyId.ToString());
                 properties["workUnits"] = output => output.Append(value.WorkUnits);
                 break;
         }
@@ -161,8 +192,10 @@ internal static class CanonicalSemanticWriter
         RaceDefinition => 6,
         SkillDefinition => 7,
         PerkDefinition => 8,
-        TechniqueDefinition => 9,
-        TrainingProjectDefinition => 10,
+        PsychicTechniqueDefinition => 9,
+        SpellDefinition => 10,
+        TechniqueDefinition => 11,
+        TrainingProjectDefinition => 12,
         _ => throw new ArgumentOutOfRangeException(nameof(definition)),
     };
 

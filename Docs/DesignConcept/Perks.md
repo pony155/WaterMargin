@@ -2,8 +2,9 @@
 
 ## Status
 
-This document defines planned Perk terminology and rules. Perks are not
-implemented in the current ship-level expedition prototype.
+Milestone 3 implements Perk definitions, Race and Heritage compatibility,
+bounded grant graphs, provenance, and the first Race/Heritage grant roster.
+Broader non-racial Perks remain planned.
 
 ## Purpose
 

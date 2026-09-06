@@ -8,12 +8,15 @@ deterministic ordering, immutable candidate compilation, semantic
 fingerprinting, transactional publication, and offline validation are
 available. Milestone 2 adds the production base Attribute and Skill catalogs,
 typed dense registries, default-locale validation, and registry inspection.
-Character state and the current expedition behavior remain unchanged.
+Milestone 3 adds strict Character, Background, Heritage, and Technique kinds,
+grant-graph validation, the base race roster, and the simulation catalog
+boundary. Milestone 4 adds Spell and psychic-technique kinds, expanded training
+projects, and their fingerprint-scoped registries. The current WPF expedition
+behavior remains unchanged.
 
-The first implementation moves character Attributes and Skills into a built-in
-base pack without changing the expedition prototype. Later systems reuse the
-pipeline for Races, Heritage, Perks, Feats, techniques, spells, items, ships,
-encounters, factions, and crises.
+The implementation moves character definitions into a built-in base pack
+without changing the expedition UI. Later systems reuse the pipeline for
+spells, items, ships, encounters, factions, and crises.
 
 ## Decisions
 
@@ -49,7 +52,7 @@ Tools/Spelljammer.Content.Compiler
 state, commands, and generic rule execution. It does not discover files, parse
 JSON, display localized strings, or depend on WPF.
 
-The planned `Spelljammer.Content` project owns manifests, source DTOs, JSON
+The implemented `Spelljammer.Content` project owns manifests, source DTOs, JSON
 parsing, pack ordering, cross-reference resolution, validation, compilation,
 fingerprinting, and diagnostics. It may reference Simulation contracts;
 Simulation must not reference the loader.
@@ -58,7 +61,7 @@ The application selects configured content roots and requests a complete
 `GameContentSnapshot`. That snapshot is passed into world creation and cannot
 be replaced for a running campaign without an explicit validated migration.
 
-The planned offline compiler uses the same loader and validators. A later
+The offline compiler uses the same loader and validators. A later
 binary artifact must preserve the same stable IDs, schema versions, bounds, and
 semantic fingerprint as source JSON.
 
@@ -71,11 +74,18 @@ Content/
       manifest.json
       Definitions/
         Attributes/
+        Access/
+        Backgrounds/
+        Characters/
         Skills/
         Feats/
         Perks/
+        PsychicTechniques/
         Races/
-        Heritage/
+        Spells/
+        Heritages/
+        Techniques/
+        TrainingProjects/
         Spells/
         PsychicTechniques/
         Items/

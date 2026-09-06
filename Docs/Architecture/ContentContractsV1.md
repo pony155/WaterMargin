@@ -3,7 +3,9 @@
 ## Status
 
 This document freezes the decisions required by roadmap phase M0.2 and the
-version 1 fixtures. The Milestone 1 loader implements these contracts. Changes
+version 1 fixtures. The Milestone 1 loader implements the foundation and
+Milestones 3 and 4 add the strict character and supernatural definition
+profiles recorded below. Changes
 to these decisions require updating the implementation, fixtures, and expected
 fingerprints together; changes after a public save contract also require the
 compatibility rules below.
@@ -141,10 +143,16 @@ Initial semantic fields are:
 | Attribute | `minimum`, `maximum`, `defaultValue`, `tags` |
 | Skill | `minimum`, `maximum`, `progressionCurveId`, `actionTags` |
 | Access | `tags` |
+| Background | `compatibleRaceIds`, `attributeBonusIds`, `focusSkillIds` |
+| Character | `raceId`, `heritageId`, `backgroundId`, `scenarioIds`, `positionId`, `languageIds`, `scriptIds`, `equipmentIds`, `focusSkillIds`, `resourceIds` |
 | Feat | `trainingProjectId`, `grantedAccessIds` |
-| Perk | `compatibleRaceIds`, `grantedAccessIds`, `grantedTechniqueIds` |
-| Race | `grantedPerkIds` |
-| Training Project | `requiredSkillIds`, `workUnits`, `grantedFeatIds` |
+| Heritage | `raceId`, `grantedPerkIds` |
+| Perk | `compatibleRaceIds`, `grantedAccessIds`, `grantedTechniqueIds`; optional `grantedPerkIds`, `effectIds` |
+| Race | `grantedPerkIds`; optional `requiredSupportIds` |
+| Spell | `requiredAccessId`, `skillId`, `focusResourceId`, `focusCost`, `rangeId`, `castTimeTicks`, `cooldownTicks`, `targetTags`, `effectIds` |
+| Psychic Technique | `requiredAccessId`, `skillId`, `resistanceSkillId`, `strainResourceId`, `strainCost`, `sustainCostPerTick`, `contactModeId`, `rangeId`, `informationScopeId`, `disciplineIds`, `targetTags`, `effectIds` |
+| Technique | `requiredAccessIds`, `grantedPerkIds` |
+| Training Project | `requiredSkillIds`, `workUnits`, `progressCap`, `facilityId`, `resourceId`, `resourceCost`, `safetyId`, `grantedFeatIds`, `grantedTechniqueIds` |
 
 Version 1 recognizes these exact first-level directories under a definition
 root:
@@ -154,14 +162,20 @@ root:
 | `Attributes` | `Attribute` | `attribute.` |
 | `Skills` | `Skill` | `skill.` |
 | `Access` | `Access` | `access.` |
+| `Backgrounds` | `Background` | `background.` |
+| `Characters` | `Character` | `character.` |
 | `Feats` | `Feat` | `feat.` |
+| `Heritages` | `Heritage` | `heritage.` |
 | `Perks` | `Perk` | `perk.` |
 | `Races` | `Race` | `race.` |
+| `Spells` | `Spell` | `spell.` |
+| `PsychicTechniques` | `PsychicTechnique` | `psychic.` |
+| `Techniques` | `Technique` | `technique.` |
 | `TrainingProjects` | `TrainingProject` | `training.` |
 
 An unregistered directory, a file directly in a definition root, or a prefix
-that disagrees with its directory produces `CONTENT_KIND_MISMATCH`. Additional
-kinds require a later schema-contract revision before the loader accepts them.
+that disagrees with its directory produces `CONTENT_KIND_MISMATCH`. Any kind
+not listed above requires a later schema-contract revision before acceptance.
 
 The M0 valid fixture includes the Race and Training Project support definitions
 needed to resolve the required Feat and Perk references.
@@ -171,19 +185,27 @@ A Race that grants a Perk MUST be listed by that Perk's
 while violating this cross-definition rule; that failure is
 `CONTENT_SEMANTIC_INVALID`.
 
+A Heritage references exactly one Race. Each granted Perk must be compatible
+with that Race. An authored Character's Race must match its Heritage and be in
+its Background compatibility set. Perk/Technique grant edges form one bounded
+acyclic graph; missing targets fail linking and a cycle is
+`CONTENT_SEMANTIC_INVALID`.
+
 `progressionCurveId` and entries in `actionTags` identify allowlisted runtime
 primitives in version 1; they are validated against the loader's built-in
 primitive registry rather than linked as content definitions. The M0 registry
 contains `progression.skill.standard`, `action.spell.cast`, and
 `action.spell.identify`.
 
-`tags` contain zero through 64 values matching the single-segment portion of
+`tags` and `targetTags` contain zero through 64 values matching the single-segment portion of
 the Stable ID grammar above. All `*Ids` arrays
 are duplicate-free semantic sets. A definition has at most 256 content
-references across all of its fields. `requiredSkillIds`, `grantedFeatIds`,
-`grantedAccessIds` on a Feat, and `compatibleRaceIds` are nonempty; other
-reference sets may be empty. `workUnits` is an integer from 1 through
-1,000,000 inclusive.
+references across all of its fields. `requiredSkillIds`, `grantedAccessIds` on
+a Feat, and `compatibleRaceIds` are nonempty; other reference sets may be
+empty. A training project must grant at least one Feat or
+known technique. `workUnits` is an integer from 1 through 1,000,000 inclusive,
+`progressCap` is at least `workUnits`, Spell Focus costs are positive, and
+psychic strain costs remain within the runtime's 0–100 meter.
 
 Base Attribute definitions use an exact 1–10 value range. Their default must be
 inside that range. Base Skill definitions use an exact 0–100 range. General
@@ -233,10 +255,10 @@ canonical byte contract is named `spelljammer-semantic-v1`:
 - UTF-8 without BOM and exactly one final LF;
 - no insignificant whitespace;
 - object properties sorted by bytewise ordinal property name;
-- definition kinds use the frozen canonical order Access, Attribute, Feat,
-  Race, Skill, Perk, and Training Project, with definitions sorted by Stable
-  ID within each kind (this ordering reproduces the reviewed M0 canonical
-  fixture);
+- definition kinds use the canonical order Access, Attribute, Background,
+  Character, Feat, Heritage, Race, Skill, Perk, Technique, and Training
+  Project, with definitions sorted by Stable ID within each kind. This
+  preserves the relative order and bytes of the reviewed M0 kinds;
 - packs retained in resolved load order;
 - set-like arrays deduplicated during validation and sorted ordinally;
 - sequence arrays retain validated authored order;
@@ -292,6 +314,7 @@ command.technique-unknown
 command.skill-required
 command.attribute-required
 command.equipment-required
+command.context-required
 command.resource-insufficient
 command.out-of-range
 command.consent-required

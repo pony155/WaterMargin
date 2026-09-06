@@ -20,13 +20,12 @@ public sealed class CharacterCapabilities
         ImmutableArray<ushort> skillPractice,
         ImmutableHashSet<FeatId> feats,
         ImmutableHashSet<PerkId> perks,
-        ImmutableHashSet<AccessId> access,
         ImmutableHashSet<TechniqueId> techniques,
         ImmutableArray<CapabilityGrant> grantSources,
         ImmutableHashSet<ContentId>? practiceKeys = null)
     {
         if (attributeValues.Length == 0 || skillValues.Length == 0 || skillValues.Length != skillPractice.Length ||
-            feats.Count > MaximumSetEntries || perks.Count > MaximumSetEntries || access.Count > MaximumSetEntries ||
+            feats.Count > MaximumSetEntries || perks.Count > MaximumSetEntries ||
             techniques.Count > MaximumSetEntries || grantSources.Length > MaximumSetEntries)
         {
             throw new ArgumentException("Character capability storage is incomplete or exceeds its bounded capacity.");
@@ -38,7 +37,6 @@ public sealed class CharacterCapabilities
         this.skillPractice = skillPractice;
         Feats = feats;
         Perks = perks;
-        Access = access;
         Techniques = techniques;
         GrantSources = grantSources;
         this.practiceKeys = practiceKeys ?? ImmutableHashSet<ContentId>.Empty;
@@ -47,8 +45,19 @@ public sealed class CharacterCapabilities
     public ContentFingerprint Fingerprint { get; }
     public ImmutableHashSet<FeatId> Feats { get; }
     public ImmutableHashSet<PerkId> Perks { get; }
-    public ImmutableHashSet<AccessId> Access { get; }
+    public ImmutableHashSet<AccessId> Access => GrantSources
+        .Where(value => value.CapabilityId.ToString().StartsWith("access.", StringComparison.Ordinal))
+        .Select(value => new AccessId(value.CapabilityId))
+        .ToImmutableHashSet();
     public ImmutableHashSet<TechniqueId> Techniques { get; }
+    public ImmutableHashSet<SpellId> KnownSpellIds => Techniques
+        .Where(value => value.Value.ToString().StartsWith("spell.", StringComparison.Ordinal))
+        .Select(value => new SpellId(value.Value))
+        .ToImmutableHashSet();
+    public ImmutableHashSet<PsychicTechniqueId> KnownPsychicTechniqueIds => Techniques
+        .Where(value => value.Value.ToString().StartsWith("psychic.", StringComparison.Ordinal))
+        .Select(value => new PsychicTechniqueId(value.Value))
+        .ToImmutableHashSet();
     public ImmutableArray<CapabilityGrant> GrantSources { get; }
 
     public bool TryGetAttribute(
@@ -163,28 +172,42 @@ public sealed class CharacterCapabilities
             skillPractice.SetItem(index, (ushort)practice),
             Feats,
             Perks,
-            Access,
             Techniques,
             GrantSources,
             practiceKeys.Add(practiceKey));
     }
 
     internal CharacterCapabilities WithTrainingGrants(
-        FeatDefinition feat,
-        TrainingProjectId projectId)
+        TrainingProjectDefinition project,
+        ImmutableArray<FeatDefinition> definitions)
     {
-        if (Feats.Contains(feat.FeatId))
+        ImmutableHashSet<FeatId> feats = Feats;
+        ImmutableHashSet<TechniqueId> techniques = Techniques;
+        ImmutableArray<CapabilityGrant>.Builder grants = GrantSources.ToBuilder();
+        foreach (FeatDefinition feat in definitions)
         {
-            return this;
+            if (feats.Contains(feat.FeatId))
+            {
+                continue;
+            }
+
+            feats = feats.Add(feat.FeatId);
+            grants.Add(new CapabilityGrant(feat.FeatId.Value, project.TrainingProjectId.Value, GrantSourceKind.TrainingProject));
+            foreach (AccessId accessId in feat.GrantedAccessIds)
+            {
+                grants.Add(new CapabilityGrant(accessId.Value, feat.FeatId.Value, GrantSourceKind.Feat));
+            }
         }
 
-        ImmutableHashSet<FeatId> feats = Feats.Add(feat.FeatId);
-        ImmutableHashSet<AccessId> access = Access.Union(feat.GrantedAccessIds);
-        ImmutableArray<CapabilityGrant>.Builder grants = GrantSources.ToBuilder();
-        grants.Add(new CapabilityGrant(feat.FeatId.Value, projectId.Value, GrantSourceKind.TrainingProject));
-        foreach (AccessId accessId in feat.GrantedAccessIds)
+        foreach (TechniqueId techniqueId in project.GrantedTechniqueIds)
         {
-            grants.Add(new CapabilityGrant(accessId.Value, feat.FeatId.Value, GrantSourceKind.Feat));
+            if (techniques.Contains(techniqueId))
+            {
+                continue;
+            }
+
+            techniques = techniques.Add(techniqueId);
+            grants.Add(new CapabilityGrant(techniqueId.Value, project.TrainingProjectId.Value, GrantSourceKind.TrainingProject));
         }
 
         if (grants.Count > MaximumSetEntries)
@@ -193,7 +216,75 @@ public sealed class CharacterCapabilities
         }
 
         return new CharacterCapabilities(Fingerprint, attributeValues, skillValues, skillPractice, feats, Perks,
-            access, Techniques, grants.MoveToImmutable(), practiceKeys);
+            techniques, grants.MoveToImmutable(), practiceKeys);
+    }
+
+    internal CharacterCapabilities WithPerkGrant(PerkDefinition perk, ContentId sourceId)
+    {
+        if (Perks.Contains(perk.PerkId))
+        {
+            return this;
+        }
+
+        ImmutableArray<CapabilityGrant>.Builder grants = GrantSources.ToBuilder();
+        grants.Add(new CapabilityGrant(perk.PerkId.Value, sourceId, GrantSourceKind.Perk));
+        foreach (AccessId accessId in perk.GrantedAccessIds)
+        {
+            grants.Add(new CapabilityGrant(accessId.Value, perk.PerkId.Value, GrantSourceKind.Perk));
+        }
+
+        foreach (TechniqueId techniqueId in perk.GrantedTechniqueIds)
+        {
+            grants.Add(new CapabilityGrant(techniqueId.Value, perk.PerkId.Value, GrantSourceKind.Perk));
+        }
+
+        if (grants.Count > MaximumSetEntries)
+        {
+            throw new InvalidOperationException("Action grants exceed the character capability capacity.");
+        }
+
+        return new CharacterCapabilities(
+            Fingerprint,
+            attributeValues,
+            skillValues,
+            skillPractice,
+            Feats,
+            Perks.Add(perk.PerkId),
+            Techniques.Union(perk.GrantedTechniqueIds),
+            grants.MoveToImmutable(),
+            practiceKeys);
+    }
+
+    public CharacterCapabilities WithoutGrantSource(ContentId sourceId)
+    {
+        HashSet<ContentId> removedSources = [sourceId];
+        bool changed;
+        do
+        {
+            changed = false;
+            foreach (CapabilityGrant grant in GrantSources)
+            {
+                if (removedSources.Contains(grant.SourceId) && removedSources.Add(grant.CapabilityId))
+                {
+                    changed = true;
+                }
+            }
+        }
+        while (changed && removedSources.Count <= MaximumSetEntries + 1);
+
+        ImmutableArray<CapabilityGrant> remaining =
+            [.. GrantSources.Where(value => !removedSources.Contains(value.SourceId))];
+        ImmutableHashSet<ContentId> retainedCapabilities = remaining.Select(value => value.CapabilityId).ToImmutableHashSet();
+        return new CharacterCapabilities(
+            Fingerprint,
+            attributeValues,
+            skillValues,
+            skillPractice,
+            Feats.Where(value => retainedCapabilities.Contains(value.Value)).ToImmutableHashSet(),
+            Perks.Where(value => retainedCapabilities.Contains(value.Value)).ToImmutableHashSet(),
+            Techniques.Where(value => retainedCapabilities.Contains(value.Value)).ToImmutableHashSet(),
+            remaining,
+            practiceKeys);
     }
 }
 
@@ -211,7 +302,28 @@ public sealed record CharacterState(
     ImmutableHashSet<ContentId> EquipmentIds,
     ImmutableDictionary<ResourceId, int> Resources,
     ImmutableDictionary<TrainingProjectId, int> TrainingProgress,
-    bool CanAct = true);
+    bool CanAct = true)
+{
+    public ImmutableArray<ActiveCapabilityEffect> ActiveEffects { get; init; } = [];
+    public ImmutableArray<ObservableCapabilityEvidence> Evidence { get; init; } = [];
+}
+
+public sealed record ActiveCapabilityEffect(
+    ContentId EffectId,
+    ContentId SourceId,
+    CharacterId ActorId,
+    CharacterId TargetId,
+    long StartTick,
+    long EndTick,
+    ContentId ScopeId);
+
+public sealed record ObservableCapabilityEvidence(
+    ContentId EvidenceId,
+    ContentId SourceId,
+    CharacterId ActorId,
+    CharacterId TargetId,
+    long Tick,
+    bool Succeeded);
 
 public sealed record SkillAdvancementEvent(
     SkillId SkillId,

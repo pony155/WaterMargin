@@ -23,6 +23,7 @@ public static class RaceCapabilities
 
         return new ActionDefinition(
             new ActionId("action.recovery.soul-anchor"),
+            new ContentId("formula.check.standard"),
             new ActionRequirement(
                 null,
                 new TechniqueId("technique.recovery.soul-reconstitution"),
@@ -35,7 +36,8 @@ public static class RaceCapabilities
             [new ActionCost(new ResourceId("resource.resonance"), 2)],
             75,
             0,
-            4);
+            4,
+            []);
     }
 
     public static ImmutableArray<TrailInterpretation> InterpretObservedTrails(

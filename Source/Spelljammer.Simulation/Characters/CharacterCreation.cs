@@ -163,11 +163,10 @@ public static class CharacterCreator
             ImmutableArray.CreateRange(Enumerable.Repeat((ushort)0, catalog.Skills.Length)),
             ImmutableHashSet<FeatId>.Empty,
             grants.Perks,
-            grants.Access,
             grants.Techniques,
             grants.Sources);
         ImmutableDictionary<ResourceId, int> resources = template.ResourceIds
-            .ToImmutableDictionary(id => id, _ => 10);
+            .ToImmutableDictionary(id => id, id => id == new ResourceId("resource.psychic-strain") ? 0 : 10);
 
         CharacterState published = new(
             template.CharacterId,
@@ -268,19 +267,28 @@ public static class CharacterCreator
     private sealed class GrantCollector(ICharacterContentCatalog catalog, RaceId raceId)
     {
         private readonly HashSet<PerkId> perks = [];
-        private readonly HashSet<AccessId> access = [];
         private readonly HashSet<TechniqueId> techniques = [];
         private readonly List<CapabilityGrant> sources = [];
 
         public ImmutableHashSet<PerkId> Perks => perks.ToImmutableHashSet();
-        public ImmutableHashSet<AccessId> Access => access.ToImmutableHashSet();
         public ImmutableHashSet<TechniqueId> Techniques => techniques.ToImmutableHashSet();
         public ImmutableArray<CapabilityGrant> Sources => [.. sources];
         public bool CapacityExceeded { get; private set; }
 
         public bool AddPerk(PerkId perkId, ContentId sourceId, GrantSourceKind sourceKind, out ContentId? missing)
         {
+            return AddPerk(perkId, sourceId, sourceKind, 0, out missing);
+        }
+
+        private bool AddPerk(PerkId perkId, ContentId sourceId, GrantSourceKind sourceKind, int depth, out ContentId? missing)
+        {
             missing = null;
+            if (depth >= 64)
+            {
+                CapacityExceeded = true;
+                return false;
+            }
+
             if (perks.Contains(perkId))
             {
                 return true;
@@ -302,13 +310,12 @@ public static class CharacterCreator
             sources.Add(new CapabilityGrant(perkId.Value, sourceId, sourceKind));
             foreach (AccessId accessId in perk.GrantedAccessIds)
             {
-                access.Add(accessId);
                 sources.Add(new CapabilityGrant(accessId.Value, perkId.Value, GrantSourceKind.Perk));
             }
 
             foreach (TechniqueId techniqueId in perk.GrantedTechniqueIds)
             {
-                if (!catalog.TryGetTechnique(techniqueId, out TechniqueDefinition? technique))
+                if (!TryGetTechnique(techniqueId, out ImmutableArray<PerkId> nestedPerks))
                 {
                     missing = techniqueId.Value;
                     return false;
@@ -316,9 +323,9 @@ public static class CharacterCreator
 
                 techniques.Add(techniqueId);
                 sources.Add(new CapabilityGrant(techniqueId.Value, perkId.Value, GrantSourceKind.Perk));
-                foreach (PerkId nested in technique!.GrantedPerkIds)
+                foreach (PerkId nested in nestedPerks)
                 {
-                    if (!AddPerk(nested, techniqueId.Value, GrantSourceKind.Technique, out missing))
+                    if (!AddPerk(nested, techniqueId.Value, GrantSourceKind.Technique, depth + 1, out missing))
                     {
                         return false;
                     }
@@ -327,7 +334,7 @@ public static class CharacterCreator
 
             foreach (PerkId nested in perk.GrantedPerkIds)
             {
-                if (!AddPerk(nested, perkId.Value, GrantSourceKind.Perk, out missing))
+                if (!AddPerk(nested, perkId.Value, GrantSourceKind.Perk, depth + 1, out missing))
                 {
                     return false;
                 }
@@ -335,6 +342,32 @@ public static class CharacterCreator
 
             CapacityExceeded = sources.Count > CharacterCapabilities.MaximumSetEntries;
             return !CapacityExceeded;
+        }
+
+        private bool TryGetTechnique(TechniqueId id, out ImmutableArray<PerkId> grantedPerks)
+        {
+            if (id.Value.ToString().StartsWith("spell.", StringComparison.Ordinal) &&
+                catalog.TryGetSpell(new SpellId(id.Value), out _))
+            {
+                grantedPerks = [];
+                return true;
+            }
+
+            if (id.Value.ToString().StartsWith("psychic.", StringComparison.Ordinal) &&
+                catalog.TryGetPsychicTechnique(new PsychicTechniqueId(id.Value), out _))
+            {
+                grantedPerks = [];
+                return true;
+            }
+
+            if (catalog.TryGetTechnique(id, out TechniqueDefinition? technique))
+            {
+                grantedPerks = technique!.GrantedPerkIds;
+                return true;
+            }
+
+            grantedPerks = [];
+            return false;
         }
     }
 }

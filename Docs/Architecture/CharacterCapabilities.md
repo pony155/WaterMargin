@@ -2,10 +2,11 @@
 
 ## Status
 
-This document specifies data and runtime contracts for Attributes, Skills,
-learned Feats, Racial Perks, supernatural access, and known techniques.
-Milestone 2 implements the Attribute and Skill definitions and typed registries;
-the remaining capability systems and character state are not implemented.
+Milestone 4 implements the data and runtime contracts in this document for
+Attributes, Skills, learned Feats, Racial Perks, access grants, techniques,
+character creation, eligibility, practice, training, and roster inspection.
+Magic Missile and consensual Mindlink now provide the first complete
+supernatural execution paths; the wider catalogs remain planned.
 
 Product behavior is defined in
 [`../DesignConcept/Attributes.md`](../DesignConcept/Attributes.md),
@@ -178,7 +179,7 @@ enter an explicit migration.
 
 ## Character state
 
-A planned state boundary resembles:
+The implemented immutable state boundary follows this shape:
 
 ```csharp
 public sealed class CharacterState
@@ -201,6 +202,11 @@ responsibility and authority, not personal Skills, Feats, or Perks.
 
 ## Action eligibility and resolution
 
+`CharacterActionSystem` now performs this ordered validation, returns a
+non-mutating `ActionReservation`, resolves the standard integer check from an
+owned `(seed, sequence)` stream, and publishes costs, successful grants,
+practice, and explanation events in one replacement state.
+
 Eligibility is separate from outcome resolution. A command checks:
 
 1. actor exists, is controllable, and can act;
@@ -221,6 +227,11 @@ random stream. The committed event records the stable IDs and numeric modifiers
 needed to explain and replay the result.
 
 ## Training and advancement
+
+`CharacterTrainingSystem` keeps bounded partial work separate from effective
+grants and applies the Feat plus derived Access provenance only at completion.
+Skill practice is keyed by a bounded evidence ID so repeating the same trivial
+action cannot award progress indefinitely.
 
 Skill practice and Feat training are separate state machines.
 
@@ -293,7 +304,12 @@ requirements, and safe result details. WPF resolves localized presentation
 separately and iterates registry definitions instead of assuming fixed
 Strength or Engineering properties.
 
-The interface must support unknown future definitions, content limits, missing
+`RosterInspection` is the initial headless presentation adapter. It iterates
+the active Attribute and Skill registries and accepts a localization resolver,
+including for disabled-action codes; it never mutates character state or binds
+fixed capability properties.
+
+The interface supports unknown future definitions, content limits, missing
 optional icons, long localized names, and disabled actions with explicit
 reasons.
 

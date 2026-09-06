@@ -14,6 +14,8 @@ internal enum DefinitionKind : byte
     Heritage,
     Perk,
     Race,
+    Spell,
+    PsychicTechnique,
     Technique,
     TrainingProject
 }

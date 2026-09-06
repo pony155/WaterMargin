@@ -29,6 +29,9 @@ internal static class ContentContracts
         BaseRosterIsDeterministicAndDynamic();
         EligibilityAndResolutionAreAtomic();
         TrainingGrantsAccessOnlyAtCompletion();
+        AccessSourcesCoexistAndRecompute();
+        SupernaturalDefinitionsAndExecutionAreBounded();
+        MindlinkRequiresKnowledgeConsentAndStrain();
         RaceCapabilitiesRespectTheirBoundaries();
         Console.WriteLine("Content and character capability contracts passed.");
         return 0;
@@ -223,6 +226,13 @@ internal static class ContentContracts
         ContentCompilationResult missing = new GameContentCompiler().Compile([new MemoryPackSource(missingGrant, [])], GameVersion);
         False(missing.Succeeded, "A missing racial grant was published.");
         Equal("CONTENT_REFERENCE_UNKNOWN", missing.Diagnostics[0].Code, "Missing grants did not fail during linking.");
+        GameContentRegistry registry = new();
+        ContentCompilationResult published = registry.CompileAndPublish(
+            [new MemoryPackSource(Clone(baseFiles), [])], GameVersion);
+        True(published.Succeeded, Primary(published));
+        GameContentSnapshot previous = registry.Current!;
+        registry.CompileAndPublish([new MemoryPackSource(missingGrant, [])], GameVersion);
+        True(ReferenceEquals(previous, registry.Current), "An invalid grant replaced the published registry.");
 
         Dictionary<string, byte[]> incompatible = Clone(baseFiles);
         ReplaceText(incompatible, "Definitions/Characters/human.json", "heritage.human.hearthworld", "heritage.elf.dawnweave");
@@ -257,6 +267,13 @@ internal static class ContentContracts
             "An identical content fingerprint and seed produced a different roster.");
         Equal(snapshot.Attributes.Length, first.Roster.AttributeColumns.Length, "Roster Attribute columns are not registry-driven.");
         Equal(snapshot.Skills.Length, first.Roster.SkillColumns.Length, "Roster Skill columns are not registry-driven.");
+        CharacterRosterDisplay display = RosterInspection.Project(
+            first.Roster,
+            snapshot,
+            key => "[" + key + "]",
+            ActionRejectionCodes.EquipmentRequired);
+        Equal(snapshot.Attributes.Length, display.Characters[0].Attributes.Length, "Roster display fixed its Attribute columns.");
+        Equal("[command.equipment-required]", display.DisabledReason!, "Disabled reason did not pass through localization.");
 
         RosterCreationResult unsupported = CharacterCreator.CreateRoster(
             snapshot.Fingerprint,
@@ -308,13 +325,150 @@ internal static class ContentContracts
         AccessId magic = new("access.magic");
         False(human.Capabilities.Access.Contains(magic), "The human began with unexplained magical access.");
         TrainingProjectId project = new("training.magic.spellcasting");
-        TrainingContributionResult partial = CharacterTrainingSystem.Contribute(human, project, 40, snapshot);
+        True(snapshot.TryGetTrainingProject(project, out TrainingProjectDefinition? found), "Training definition was missing.");
+        TrainingProjectDefinition definition = found!;
+        TrainingContext context = TrainingContextFor(definition);
+        TrainingCommandResult started = CharacterTrainingSystem.Start(human, project, context, snapshot);
+        True(started.Accepted, started.RejectionCode);
+        TrainingCommandResult partial = CharacterTrainingSystem.Contribute(started.State, project, 40, snapshot);
         True(partial.Accepted, partial.RejectionCode);
         False(partial.State.Capabilities.Access.Contains(magic), "Partial training granted partial access.");
-        TrainingContributionResult completed = CharacterTrainingSystem.Contribute(partial.State, project, 60, snapshot);
+        TrainingCommandResult ready = CharacterTrainingSystem.Contribute(partial.State, project, 60, snapshot);
+        False(ready.State.Capabilities.Access.Contains(magic), "Ready training granted access before completion.");
+        int supplies = ready.State.Resources[definition.ResourceId];
+        TrainingCommandResult completed = CharacterTrainingSystem.Complete(ready.State, project, snapshot);
         True(completed.Accepted, completed.RejectionCode);
         True(completed.State.Capabilities.Access.Contains(magic), "Completed training did not atomically grant access.");
         True(completed.Completion!.GrantedFeatIds.Contains(new FeatId("feat.access.magic")), "Training event omitted the Feat grant.");
+        Equal(supplies - definition.ResourceCost, completed.State.Resources[definition.ResourceId], "Training cost was not committed atomically.");
+
+        TrainingCommandResult restarted = CharacterTrainingSystem.Start(completed.State, project, context, snapshot);
+        TrainingCommandResult cancelled = CharacterTrainingSystem.Cancel(restarted.State, project, snapshot);
+        True(cancelled.Accepted, cancelled.RejectionCode);
+        False(cancelled.State.TrainingProgress.ContainsKey(project), "Cancelled training retained project state.");
+        Equal(completed.State.Resources[definition.ResourceId], cancelled.State.Resources[definition.ResourceId], "Cancellation consumed resources.");
+    }
+
+    private static void AccessSourcesCoexistAndRecompute()
+    {
+        (GameContentSnapshot snapshot, RosterSnapshot roster) = BaseRoster();
+        CharacterState elf = roster.Characters.Single(value => value.RaceId == new RaceId("race.elf"));
+        AccessId magic = new("access.magic");
+        True(elf.Capabilities.Access.Contains(magic), "Aether Sense did not grant innate magic access.");
+        True(elf.Capabilities.GrantSources.Any(value => value.CapabilityId == magic.Value && value.SourceKind == GrantSourceKind.Perk),
+            "Innate magic access lost its provenance.");
+
+        CharacterState trained = CompleteTraining(elf, new TrainingProjectId("training.magic.spellcasting"), snapshot);
+        Equal(2, trained.Capabilities.GrantSources.Count(value => value.CapabilityId == magic.Value),
+            "Innate and trained access sources did not coexist.");
+        CharacterCapabilities withoutInnate = trained.Capabilities.WithoutGrantSource(new PerkId("perk.race.elf.aether-sense").Value);
+        True(withoutInnate.Access.Contains(magic), "Removing the innate source removed a surviving trained source.");
+        CharacterCapabilities withoutEither = withoutInnate.WithoutGrantSource(new TrainingProjectId("training.magic.spellcasting").Value);
+        False(withoutEither.Access.Contains(magic), "Effective access did not recompute after all sources were removed.");
+    }
+
+    private static void SupernaturalDefinitionsAndExecutionAreBounded()
+    {
+        (GameContentSnapshot snapshot, RosterSnapshot roster) = BaseRoster();
+        Equal(1, snapshot.SpellRegistry.Count, "The first-playable Spell registry is incomplete.");
+        Equal(1, snapshot.PsychicTechniqueRegistry.Count, "The first-playable psychic registry is incomplete.");
+        SpellId spellId = new("spell.spirit.magic-missile");
+        CharacterState human = roster.Characters.Single(value => value.RaceId == new RaceId("race.human"));
+        CharacterState target = roster.Characters.Single(value => value.RaceId == new RaceId("race.orc"));
+        SupernaturalTarget spellTarget = new(target.Id, true, true, true, ImmutableHashSet.Create("character"));
+
+        SpellActionResult noAccess = SpellActionSystem.Declare(human, spellId, spellTarget, 42, 3, 7, snapshot);
+        Equal(ActionRejectionCodes.AccessRequired, noAccess.RejectionCode, "A Spell bypassed access.");
+        CharacterState withAccess = CompleteTraining(human, new TrainingProjectId("training.magic.spellcasting"), snapshot);
+        SpellActionResult unknown = SpellActionSystem.Declare(withAccess, spellId, spellTarget, 42, 3, 7, snapshot);
+        Equal(ActionRejectionCodes.TechniqueUnknown, unknown.RejectionCode, "A Spell bypassed knowledge.");
+        CharacterState caster = CompleteTraining(withAccess, new TrainingProjectId("training.magic.magic-missile"), snapshot);
+        True(caster.Capabilities.KnownSpellIds.Contains(spellId), "Completed study did not add the bounded known Spell ID.");
+
+        CharacterState mismatched = caster with { ContentFingerprint = new ContentFingerprint(new string('0', 64)) };
+        SpellActionResult wrongFingerprint = SpellActionSystem.Declare(mismatched, spellId, spellTarget, 42, 3, 7, snapshot);
+        Equal(ActionRejectionCodes.ContentMismatch, wrongFingerprint.RejectionCode,
+            "Known Spell state crossed its active content fingerprint.");
+
+        CharacterState lowFocus = caster with
+        {
+            Resources = caster.Resources.SetItem(new ResourceId("resource.focus"), 1),
+        };
+        SpellActionResult lowDeclared = SpellActionSystem.Declare(lowFocus, spellId, spellTarget, 42, 3, 7, snapshot);
+        SpellActionResult lowPreviewed = SpellActionSystem.Preview(lowDeclared.Action!);
+        SpellActionResult insufficient = SpellActionSystem.Reserve(lowPreviewed.Action!);
+        Equal(ActionRejectionCodes.ResourceInsufficient, insufficient.RejectionCode, "A Spell bypassed its Focus cost.");
+        True(ReferenceEquals(lowFocus, insufficient.Actor), "Failed Spell reservation changed the actor state.");
+
+        SpellActionResult declared = SpellActionSystem.Declare(caster, spellId, spellTarget, 42, 3, 7, snapshot);
+        True(declared.Accepted, declared.RejectionCode);
+        SpellActionResult previewed = SpellActionSystem.Preview(declared.Action!);
+        SpellActionResult reserved = SpellActionSystem.Reserve(previewed.Action!);
+        Equal(caster.Resources[new ResourceId("resource.focus")], reserved.Actor.Resources[new ResourceId("resource.focus")],
+            "Spell reservation mutated published Focus.");
+        SpellActionResult prepared = SpellActionSystem.Prepare(reserved.Action!);
+        SpellActionResult resolved = SpellActionSystem.Resolve(prepared.Action!, snapshot);
+        SpellActionResult replay = SpellActionSystem.Resolve(prepared.Action!, snapshot);
+        Equal(resolved.Action!.Roll, replay.Action!.Roll, "Spell replay changed its owned random result.");
+        SpellActionResult committed = SpellActionSystem.Commit(resolved.Action);
+        True(committed.Accepted, committed.RejectionCode);
+        Equal(caster.Resources[new ResourceId("resource.focus")] - 2, committed.Actor.Resources[new ResourceId("resource.focus")],
+            "Spell commit charged the wrong Focus cost.");
+        True(committed.Actor.Evidence.Any(value => value.SourceId == spellId.Value), "Spell commit omitted observable evidence.");
+        True(committed.Actor.ActiveEffects.Any(value => value.SourceId == spellId.Value), "Spell commit omitted its bounded active effect.");
+        SpellActionResult recovered = SpellActionSystem.Recover(committed.Actor, committed.Action!);
+        Equal(SpellActionPhase.Recovered, recovered.Action!.Phase, "Spell recovery did not close the phase sequence.");
+        SpellActionResult interruption = SpellActionSystem.Interrupt(reserved.Action!);
+        False(interruption.Accepted, "An instant Spell was interruptible as a channeled action.");
+        True(ReferenceEquals(caster, interruption.Actor), "Rejected interruption changed the actor state.");
+    }
+
+    private static void MindlinkRequiresKnowledgeConsentAndStrain()
+    {
+        (GameContentSnapshot snapshot, RosterSnapshot roster) = BaseRoster();
+        PsychicTechniqueId mindlinkId = new("psychic.contact.mindlink");
+        CharacterState somnari = roster.Characters.Single(value => value.RaceId == new RaceId("race.somnari"));
+        CharacterState human = roster.Characters.Single(value => value.RaceId == new RaceId("race.human"));
+        True(somnari.Capabilities.Access.Contains(new AccessId("access.psionics")), "Mindwake omitted innate psionic access.");
+        True(somnari.Capabilities.KnownPsychicTechniqueIds.Contains(mindlinkId), "Mindwake omitted innate Mindlink knowledge.");
+        MindlinkResult noAccess = MindlinkSystem.Invite(human, somnari, mindlinkId, true, 10, snapshot);
+        Equal(ActionRejectionCodes.AccessRequired, noAccess.RejectionCode, "Mindlink bypassed psionic access.");
+
+        MindlinkResult invited = MindlinkSystem.Invite(somnari, human, mindlinkId, true, 11, snapshot);
+        True(invited.Accepted, invited.RejectionCode);
+        MindlinkResult declined = MindlinkSystem.Respond(invited.Link!, human.Id, false);
+        Equal(MindlinkPhase.Rejected, declined.Link!.Phase, "Mindlink rejection was not explicit.");
+        Equal(0, declined.Actor.Evidence.Length, "Rejected Mindlink leaked protected evidence.");
+        MindlinkResult accepted = MindlinkSystem.Respond(invited.Link!, human.Id, true);
+        MindlinkResult reserved = MindlinkSystem.Reserve(accepted.Link!);
+        Equal(0, reserved.Actor.Resources[new ResourceId("resource.psychic-strain")], "Mindlink reservation mutated published Strain.");
+        MindlinkResult active = MindlinkSystem.Commit(reserved.Link!);
+        MindlinkResult replay = MindlinkSystem.Commit(reserved.Link!);
+        Equal(active.Actor.Resources[new ResourceId("resource.psychic-strain")], replay.Actor.Resources[new ResourceId("resource.psychic-strain")],
+            "Mindlink replay changed deterministic strain publication.");
+        Equal(4, active.Actor.Resources[new ResourceId("resource.psychic-strain")], "Mindlink charged the wrong initial Strain.");
+        True(active.Actor.Evidence.Any(value => value.SourceId == mindlinkId.Value), "Mindlink commit omitted observable evidence.");
+        True(active.Actor.ActiveEffects.Any(value => value.ScopeId == new ContentId("psychic.scope.deliberate-message")),
+            "Mindlink exposed a broader information scope.");
+        MindlinkResult sustained = MindlinkSystem.Sustain(active.Actor, active.Link!, 12);
+        Equal(5, sustained.Actor.Resources[new ResourceId("resource.psychic-strain")], "Mindlink sustain charged the wrong Strain.");
+        MindlinkResult revoked = MindlinkSystem.Revoke(sustained.Actor, sustained.Link!, human.Id);
+        False(revoked.Actor.ActiveEffects.Any(value => value.SourceId == mindlinkId.Value), "Revoked Mindlink retained its active channel.");
+
+        CharacterState awakened = CompleteTraining(human, new TrainingProjectId("training.psionics.awakening"), snapshot);
+        MindlinkResult unknown = MindlinkSystem.Invite(awakened, somnari, mindlinkId, true, 13, snapshot);
+        Equal(ActionRejectionCodes.TechniqueUnknown, unknown.RejectionCode, "Mindlink bypassed technique knowledge.");
+        CharacterState trained = CompleteTraining(awakened, new TrainingProjectId("training.psionics.mindlink"), snapshot);
+        True(trained.Capabilities.KnownPsychicTechniqueIds.Contains(mindlinkId), "Trained Mindlink knowledge was not published.");
+        True(trained.Capabilities.GrantSources.Any(value => value.CapabilityId == mindlinkId.Value && value.SourceKind == GrantSourceKind.TrainingProject),
+            "Trained Mindlink knowledge lost its provenance.");
+        True(snapshot.TryGetPsychicTechnique(mindlinkId, out PsychicTechniqueDefinition? definition) &&
+            snapshot.TryGetSkill(definition!.ResistanceSkillId, out _, out _),
+            "Mindlink's reviewed resistance reference was not linked to the active fingerprint.");
+        True(MindlinkSystem.Invite(trained, somnari, mindlinkId, true, 14, snapshot).Accepted,
+            "A trained Mindlink user could not declare the same action as an innate user.");
+        MindlinkResult released = MindlinkSystem.Release(replay.Actor, replay.Link!);
+        Equal(MindlinkPhase.Released, released.Link!.Phase, "Mindlink release did not close the active channel.");
     }
 
     private static void RaceCapabilitiesRespectTheirBoundaries()
@@ -356,6 +510,26 @@ internal static class ContentContracts
         True(roster.Succeeded, roster.Failure.ToString());
         return (snapshot, roster.Roster!);
     }
+
+    private static CharacterState CompleteTraining(
+        CharacterState character,
+        TrainingProjectId projectId,
+        GameContentSnapshot snapshot)
+    {
+        True(snapshot.TryGetTrainingProject(projectId, out TrainingProjectDefinition? found), "Training definition was missing.");
+        TrainingProjectDefinition definition = found!;
+        TrainingCommandResult started = CharacterTrainingSystem.Start(character, projectId, TrainingContextFor(definition), snapshot);
+        True(started.Accepted, started.RejectionCode);
+        TrainingCommandResult contributed = CharacterTrainingSystem.Contribute(started.State, projectId, definition.WorkUnits, snapshot);
+        True(contributed.Accepted, contributed.RejectionCode);
+        TrainingCommandResult completed = CharacterTrainingSystem.Complete(contributed.State, projectId, snapshot);
+        True(completed.Accepted, completed.RejectionCode);
+        return completed.State;
+    }
+
+    private static TrainingContext TrainingContextFor(TrainingProjectDefinition definition) => new(
+        ImmutableHashSet.Create(definition.FacilityId),
+        ImmutableHashSet.Create(definition.SafetyId));
 
     private static CrewSupportProfile FullSupport(GameContentSnapshot snapshot) => new(
         snapshot.Races.SelectMany(value => value.RequiredSupportIds).ToImmutableHashSet(),

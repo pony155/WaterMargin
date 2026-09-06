@@ -3,13 +3,14 @@
 ## Status and purpose
 
 This document sequences the transition from the compiled expedition prototype
-to data-driven, mod-ready gameplay. It is a plan, not a claim that the systems
-exist.
+to data-driven, mod-ready gameplay. Checked tasks describe implemented work;
+unchecked tasks remain planned.
 
 The current headless simulation has immutable expedition state, typed commands,
-deterministic sector derivation, bounded masks, and stable rejection enums. It
-does not have fixed-tick `VoyageWorld`, gameplay content loading, characters,
-mods, public saves, ship modules, tactical battle, factions, or crises.
+deterministic sector derivation, bounded content loading, an eleven-character
+roster, capability training, and the first Spell and psychic-technique paths.
+It does not have fixed-tick `VoyageWorld`, public saves, ship modules, tactical
+battle, factions, or crises.
 
 The transition is incremental. The existing 4 × 4 expedition remains buildable
 until a replacement slice satisfies its contracts. New architecture is added
@@ -313,74 +314,78 @@ iteration, diagnostics, and UI projection see it without a source change.
 
 ## Milestone 3: character capability slice
 
+**Status: Complete.** The headless character slice is data-driven and ships
+with an eleven-character first-voyage roster. WPF remains on the expedition
+prototype; `RosterInspection` is the localization-ready inspection adapter.
+
 ### Phase M3.1: add character definition kinds
 
-- [ ] **M3.1.1** Add typed IDs and schemas for Character, Race, Heritage,
+- [x] **M3.1.1** Add typed IDs and schemas for Character, Race, Heritage,
   Background, Perk, Feat, Access, Technique, and Training Project.
-- [ ] **M3.1.2** Implement compatibility and grant-reference linking.
-- [ ] **M3.1.3** Add minimal base definitions for one Race, Heritage,
+- [x] **M3.1.2** Implement compatibility and grant-reference linking.
+- [x] **M3.1.3** Add minimal base definitions for one Race, Heritage,
   Background, and their Perk grants.
-- [ ] **M3.1.4** Reject incompatible Heritage, missing grant, and grant cycles.
+- [x] **M3.1.4** Reject incompatible Heritage, missing grant, and grant cycles.
 
 ### Phase M3.2: implement generic capability storage
 
-- [ ] **M3.2.1** Add bounded immutable Attribute and Skill value storage indexed
+- [x] **M3.2.1** Add bounded immutable Attribute and Skill value storage indexed
   by the compiled registry.
-- [ ] **M3.2.2** Add bounded Feat, Perk, Technique, and grant-source sets.
-- [ ] **M3.2.3** Implement typed lookup that returns explicit missing-definition
+- [x] **M3.2.2** Add bounded Feat, Perk, Technique, and grant-source sets.
+- [x] **M3.2.3** Implement typed lookup that returns explicit missing-definition
   failures rather than default values.
-- [ ] **M3.2.4** Produce a read-only character capability snapshot.
+- [x] **M3.2.4** Produce a read-only character capability snapshot.
 
 ### Phase M3.3: implement deterministic character creation
 
-- [ ] **M3.3.1** Define a typed creation request containing content fingerprint,
+- [x] **M3.3.1** Define a typed creation request containing content fingerprint,
   scenario, definition IDs, and explicit seed.
-- [ ] **M3.3.2** Allocate Attribute and Skill values through bounded authored
+- [x] **M3.3.2** Allocate Attribute and Skill values through bounded authored
   rules and owned random streams.
-- [ ] **M3.3.3** Grant Race and Heritage Perks with provenance.
-- [ ] **M3.3.4** Validate the complete character before assigning its stable ID
+- [x] **M3.3.3** Grant Race and Heritage Perks with provenance.
+- [x] **M3.3.4** Validate the complete character before assigning its stable ID
   and publishing state.
 
 ### Phase M3.4: implement action eligibility
 
-- [ ] **M3.4.1** Define minimal Action, Requirement, Cost, Target, and stable
+- [x] **M3.4.1** Define minimal Action, Requirement, Cost, Target, and stable
   Rejection contracts.
-- [ ] **M3.4.2** Check actor, definition, grant, technique, Skill, Attribute,
+- [x] **M3.4.2** Check actor, definition, grant, technique, Skill, Attribute,
   equipment, context, and resource requirements in a fixed order.
-- [ ] **M3.4.3** Reserve costs without mutating published state.
-- [ ] **M3.4.4** Prove rejection consumes nothing and exposes no protected
+- [x] **M3.4.3** Reserve costs without mutating published state.
+- [x] **M3.4.4** Prove rejection consumes nothing and exposes no protected
   information.
 
 ### Phase M3.5: implement resolution and explanation
 
-- [ ] **M3.5.1** Implement one allowlisted standard check formula using integer
+- [x] **M3.5.1** Implement one allowlisted standard check formula using integer
   or fixed-point arithmetic.
-- [ ] **M3.5.2** Feed it an explicitly owned deterministic random stream.
-- [ ] **M3.5.3** Commit result, costs, grants, and events atomically.
-- [ ] **M3.5.4** Record every contributing ID, modifier, roll, and failure reason
+- [x] **M3.5.2** Feed it an explicitly owned deterministic random stream.
+- [x] **M3.5.3** Commit result, costs, grants, and events atomically.
+- [x] **M3.5.4** Record every contributing ID, modifier, roll, and failure reason
   required for replay and UI explanation.
 
 ### Phase M3.6: implement Skill advancement and roster UI
 
-- [ ] **M3.6.1** Add bounded practice awards and anti-trivial-repetition rules.
-- [ ] **M3.6.2** Add deterministic advancement threshold processing.
-- [ ] **M3.6.3** Expose a roster snapshot that iterates dynamic Attribute and
+- [x] **M3.6.1** Add bounded practice awards and anti-trivial-repetition rules.
+- [x] **M3.6.2** Add deterministic advancement threshold processing.
+- [x] **M3.6.3** Expose a roster snapshot that iterates dynamic Attribute and
   Skill registries.
-- [ ] **M3.6.4** Render localized values and disabled-action reasons without
+- [x] **M3.6.4** Render localized values and disabled-action reasons without
   direct mutation or fixed-property binding.
 
 ### Phase M3.7: author and prove the base race roster
 
-- [ ] **M3.7.1** Author all eleven base Race definitions and their Race Perk
+- [x] **M3.7.1** Author all eleven base Race definitions and their Race Perk
   grants, including Eidolon Soul Anchor and Tharun Trail Sense.
-- [ ] **M3.7.2** Author one compatible first-slice Heritage and Heritage Perk
+- [x] **M3.7.2** Author one compatible first-slice Heritage and Heritage Perk
   for each Race; defer additional Heritage rows until their Perk IDs are
   explicitly inventoried.
-- [ ] **M3.7.3** Author one deterministic first-slice character per Race with
+- [x] **M3.7.3** Author one deterministic first-slice character per Race with
   attributes, skills, background, position, language, script, and equipment.
-- [ ] **M3.7.4** Validate mixed-race quarters, equipment, care, nutrition or
+- [x] **M3.7.4** Validate mixed-race quarters, equipment, care, nutrition or
   reserve, rest, and environmental compatibility before roster publication.
-- [ ] **M3.7.5** Prove Soul Anchor recovery requires its anchor and resources,
+- [x] **M3.7.5** Prove Soul Anchor recovery requires its anchor and resources,
   and prove Trail Sense consumes only observed evidence without revealing
   hidden state.
 
@@ -410,57 +415,57 @@ reveal unobserved information.
 
 ### Phase M4.1: implement access definitions and grants
 
-- [ ] **M4.1.1** Add `access.magic` and `access.psionics` base definitions.
-- [ ] **M4.1.2** Add `feat.access.magic` and `feat.access.psionics` definitions
+- [x] **M4.1.1** Add `access.magic` and `access.psionics` base definitions.
+- [x] **M4.1.2** Add `feat.access.magic` and `feat.access.psionics` definitions
   with training-project references.
-- [ ] **M4.1.3** Derive effective access from bounded grant sources rather than
+- [x] **M4.1.3** Derive effective access from bounded grant sources rather than
   storing independent booleans.
-- [ ] **M4.1.4** Verify multiple sources coexist and source removal recomputes
+- [x] **M4.1.4** Verify multiple sources coexist and source removal recomputes
   access correctly.
 
 ### Phase M4.2: implement training projects
 
-- [ ] **M4.2.1** Add training prerequisites, work units, facility, cost, safety,
+- [x] **M4.2.1** Add training prerequisites, work units, facility, cost, safety,
   progress cap, and completion grants.
-- [ ] **M4.2.2** Add start, contribute, cancel, and complete commands.
-- [ ] **M4.2.3** Keep partial progress from granting partial access.
-- [ ] **M4.2.4** Commit completion Feat and access provenance atomically.
+- [x] **M4.2.2** Add start, contribute, cancel, and complete commands.
+- [x] **M4.2.3** Keep partial progress from granting partial access.
+- [x] **M4.2.4** Commit completion Feat and access provenance atomically.
 
 ### Phase M4.3: implement innate access
 
-- [ ] **M4.3.1** Add Elf Aether Sense and Somnari Mindwake Perk definitions.
-- [ ] **M4.3.2** Grant innate access during deterministic character creation.
-- [ ] **M4.3.3** Grant only named racial abilities, never free Skill ranks or an
+- [x] **M4.3.1** Add Elf Aether Sense and Somnari Mindwake Perk definitions.
+- [x] **M4.3.2** Grant innate access during deterministic character creation.
+- [x] **M4.3.3** Grant only named racial abilities, never free Skill ranks or an
   entire technique catalog.
-- [ ] **M4.3.4** Expose trained versus innate provenance to inspection UI.
+- [x] **M4.3.4** Expose trained versus innate provenance to inspection UI.
 
 ### Phase M4.4: implement known-content collections
 
-- [ ] **M4.4.1** Add bounded Spell and psychic-technique definition registries.
-- [ ] **M4.4.2** Add character-known ID sets and learning-project state.
-- [ ] **M4.4.3** Validate required access, Skill, target, resource, consent, and
+- [x] **M4.4.1** Add bounded Spell and psychic-technique definition registries.
+- [x] **M4.4.2** Add character-known ID sets and learning-project state.
+- [x] **M4.4.3** Validate required access, Skill, target, resource, consent, and
   resistance references.
-- [ ] **M4.4.4** Reject a known technique whose definition is missing from the
+- [x] **M4.4.4** Reject a known technique whose definition is missing from the
   active content fingerprint.
 
 ### Phase M4.5: implement one Spell
 
-- [ ] **M4.5.1** Author one first-playable Spell, initially Brace Ward or
-  Lantern Spark, with complete costs and failure behavior.
-- [ ] **M4.5.2** Implement declare, preview, reserve, prepare, resolve, commit,
+- [x] **M4.5.1** Author one first-playable Spell, Magic Missile, with complete
+  costs and failure behavior.
+- [x] **M4.5.2** Implement declare, preview, reserve, prepare, resolve, commit,
   and recover phases.
-- [ ] **M4.5.3** Persist observable evidence and bounded active effects.
-- [ ] **M4.5.4** Cover no-access, unknown-Spell, insufficient-resource,
+- [x] **M4.5.3** Persist observable evidence and bounded active effects.
+- [x] **M4.5.4** Cover no-access, unknown-Spell, insufficient-resource,
   interruption, success, and deterministic replay cases.
 
 ### Phase M4.6: implement one psychic technique
 
-- [ ] **M4.6.1** Author Mindlink with access, knowledge, consent, range, strain,
+- [x] **M4.6.1** Author Mindlink with access, knowledge, consent, range, strain,
   sustain, and information-scope rules.
-- [ ] **M4.6.2** Implement invitation, acceptance or rejection, reservation,
+- [x] **M4.6.2** Implement invitation, acceptance or rejection, reservation,
   commit, sustain, revocation, and release.
-- [ ] **M4.6.3** Ensure failed or rejected contact reveals no protected data.
-- [ ] **M4.6.4** Cover trained and innate users, Psychic Strain, resistance,
+- [x] **M4.6.3** Ensure failed or rejected contact reveals no protected data.
+- [x] **M4.6.4** Cover trained and innate users, Psychic Strain, resistance,
   evidence, and replay.
 
 Deliverables:
@@ -950,6 +955,6 @@ Report engine, game, content-tool, and CI-owned test status separately.
 | Loader failure publishes partial state | Candidate registry and validate-before-publish transaction |
 | Scope delays the playable voyage | Move one content family at a time and retain the prototype |
 
-The near-term target is Milestone 2, not complete public mod support. It proves
-the critical decision—Attribute and Skill lists are data—while the validation
-surface remains small.
+The near-term target is Milestone 5, not complete public mod support. Milestone
+4 proves trained and innate supernatural access, bounded knowledge, and atomic
+Spell and Mindlink execution on the deterministic character foundation.

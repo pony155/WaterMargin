@@ -25,8 +25,13 @@ internal static class DefinitionParser
             [DefinitionKind.Heritage] = new(["raceId", "grantedPerkIds"], []),
             [DefinitionKind.Perk] = new(["compatibleRaceIds", "grantedAccessIds", "grantedTechniqueIds"], ["grantedPerkIds", "effectIds"]),
             [DefinitionKind.Race] = new(["grantedPerkIds"], ["requiredSupportIds"]),
+            [DefinitionKind.Spell] = new(
+                ["requiredAccessId", "skillId", "focusResourceId", "focusCost", "rangeId", "castTimeTicks", "cooldownTicks", "targetTags", "effectIds"], []),
+            [DefinitionKind.PsychicTechnique] = new(
+                ["requiredAccessId", "skillId", "resistanceSkillId", "strainResourceId", "strainCost", "sustainCostPerTick", "contactModeId", "rangeId", "informationScopeId", "disciplineIds", "targetTags", "effectIds"], []),
             [DefinitionKind.Technique] = new(["requiredAccessIds", "grantedPerkIds"], []),
-            [DefinitionKind.TrainingProject] = new(["requiredSkillIds", "workUnits", "grantedFeatIds"], []),
+            [DefinitionKind.TrainingProject] = new(
+                ["requiredSkillIds", "workUnits", "progressCap", "facilityId", "resourceId", "resourceCost", "safetyId", "grantedFeatIds", "grantedTechniqueIds"], []),
         };
 
     private static readonly IReadOnlyDictionary<string, DefinitionKind> Directories =
@@ -41,6 +46,8 @@ internal static class DefinitionParser
             ["Heritages"] = DefinitionKind.Heritage,
             ["Perks"] = DefinitionKind.Perk,
             ["Races"] = DefinitionKind.Race,
+            ["Spells"] = DefinitionKind.Spell,
+            ["PsychicTechniques"] = DefinitionKind.PsychicTechnique,
             ["Techniques"] = DefinitionKind.Technique,
             ["TrainingProjects"] = DefinitionKind.TrainingProject,
         };
@@ -154,9 +161,9 @@ internal static class DefinitionParser
 
         foreach ((string field, ImmutableArray<string> values) in arrays)
         {
-            if (field is "tags" or "effectIds")
+            if (field is "tags" or "targetTags" or "effectIds")
             {
-                bool invalid = field == "tags"
+                bool invalid = field is "tags" or "targetTags"
                     ? values.Any(value => !SourceValidation.IsIdSegment(value))
                     : values.Any(value => !ContentId.IsCanonical(value));
                 if (invalid)

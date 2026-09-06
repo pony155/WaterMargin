@@ -10,12 +10,21 @@ and performs no filesystem work.
 Milestone 2 additionally provides typed Attribute and Skill registries whose
 dense indices are scoped to one fingerprint, required `en-US` key validation,
 and a headless inspection snapshot used by the offline `report` command.
+Milestone 3 registers Character, Background, Heritage, and Technique schemas,
+links bounded grant graphs, and exposes typed registries through the
+simulation-owned character catalog interface. Character creation and action
+rules remain in `Spelljammer.Simulation`; `RosterInspection` is a read-only,
+localization-ready presentation projection.
+Milestone 4 adds strict Spell and psychic-technique definitions, expanded
+training-project contracts, fingerprint-scoped registries, and validation for
+supernatural access, knowledge, targets, resources, consent, resistance, and
+bounded effects.
 
 Public namespaces are:
 
 - `Spelljammer.Content` for versioned limits;
 - `Spelljammer.Content.Compilation` for compilation results, snapshots,
-  fingerprints, and registry publication;
+  registry publication, fingerprints, and roster inspection;
 - `Spelljammer.Content.Diagnostics` for bounded structured failures;
 - `Spelljammer.Content.Manifests` for semantic versions and manifest contracts;
   and

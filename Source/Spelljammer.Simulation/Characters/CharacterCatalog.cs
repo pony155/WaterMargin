@@ -9,6 +9,8 @@ public interface ICharacterContentCatalog
     ImmutableArray<AttributeDefinition> Attributes { get; }
     ImmutableArray<SkillDefinition> Skills { get; }
     ImmutableArray<CharacterDefinition> Characters { get; }
+    ImmutableArray<SpellDefinition> Spells { get; }
+    ImmutableArray<PsychicTechniqueDefinition> PsychicTechniques { get; }
 
     bool TryGetAttribute(AttributeId id, out AttributeDefinition? definition, out int index);
     bool TryGetSkill(SkillId id, out SkillDefinition? definition, out int index);
@@ -19,6 +21,8 @@ public interface ICharacterContentCatalog
     bool TryGetHeritage(HeritageId id, out HeritageDefinition? definition);
     bool TryGetPerk(PerkId id, out PerkDefinition? definition);
     bool TryGetRace(RaceId id, out RaceDefinition? definition);
+    bool TryGetSpell(SpellId id, out SpellDefinition? definition);
+    bool TryGetPsychicTechnique(PsychicTechniqueId id, out PsychicTechniqueDefinition? definition);
     bool TryGetTechnique(TechniqueId id, out TechniqueDefinition? definition);
     bool TryGetTrainingProject(TrainingProjectId id, out TrainingProjectDefinition? definition);
 }
@@ -38,6 +42,8 @@ public enum GrantSourceKind : byte
     Feat,
     Technique,
     TrainingProject,
+    Spell,
+    PsychicTechnique,
 }
 
 public sealed record CapabilityGrant(ContentId CapabilityId, ContentId SourceId, GrantSourceKind SourceKind);

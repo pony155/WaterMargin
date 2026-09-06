@@ -2,13 +2,14 @@
 
 ## Status
 
-This document completes roadmap tasks `M0.1.2` and `M0.1.3`. It classifies the
-152 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
+This document completes roadmap tasks `M0.1.2` and `M0.1.3` and includes the
+Milestone 4 character and supernatural ID extensions. It classifies the explicit IDs in
+[`ContentIdInventory.md`](ContentIdInventory.md) and records
 the spelling and collision review performed before version 1 loader work.
 
-The gameplay content loader and the M2 base Attribute and Skill definitions now
-exist. No public save format exists yet; classifications for later milestones
-remain design commitments rather than implementation claims.
+The gameplay loader and M4 base character and supernatural definitions now exist. No public save
+format exists yet; classifications for later milestones remain design
+commitments rather than implementation claims.
 
 ## Classification model
 
@@ -35,12 +36,26 @@ second 152-row table that could drift from the canonical inventory.
 | --- | ---: | --- | --- | --- |
 | Attributes | 7 | Base-owned | M2 | All seven are required base definitions |
 | Skills | 29 | Base-owned | M2 | All 29 are required base definitions |
-| Racial Perks | 12 | Base-owned | M3/M4 | Registry begins in M3; supernatural grants become executable in M4 |
+| Racial Perks | 22 | Base-owned | M3 | Eleven Race and eleven first-slice Heritage grants are implemented |
+| Races | 11 | Base-owned | M3 | All eleven base definitions are implemented |
+| First-slice Heritages | 11 | Base-owned | M3 | One compatible Heritage per Race is implemented |
+| Backgrounds | 1 | Base-owned | M3 | Shared expedition-veteran starting rules |
+| Authored Characters | 11 | Base-owned | M3 | One deterministic first-voyage character per Race |
+| Character techniques | 2 | Base-owned | M3 | Soul reconstitution and observed-trail interpretation |
+| Training Projects | 4 | Base-owned | M3/M4 | Access projects plus Magic Missile and Mindlink learning |
+| Roster equipment primitives | 15 | Base-owned | M3/M5 | Validated by first-voyage support; migrate to linked Item definitions in M5 |
+| Crew positions | 11 | Base-owned | M3 | Authored responsibility IDs, not capability grants |
+| Character languages | 9 | Base-owned | M3 | First-roster knowledge IDs |
+| Character scripts | 7 | Base-owned | M3 | First-roster script knowledge IDs |
+| Crew support requirements | 19 | Base-owned | M3 | Care, environment, nutrition/reserve, quarters, and rest gates |
+| Character resources | 5 | Base-owned | M3/M4 | Bounded stores including Focus and Psychic Strain |
+| Scenarios | 1 | Base-owned | M3 | `scenario.first-voyage` |
+| Character action primitives | 5 | Base-owned | M3 | Standard check, Soul Anchor action/context, and bounded Race effects |
 | Equipment | 11 | Base-owned | M5 | Initial weapons, powered armor, tools, medical gear, and Arcane focus |
 | Learned Feats | 2 | Base-owned | M4 | Both are required access paths |
 | Access gates | 2 | Base-owned | M4 | Both are required access definitions |
-| Spells | 7 | Base-owned | M4 | Four are first-slice; three are deferred catalog content |
-| Psychic techniques | 4 | Base-owned | M4 | All four are first-slice content |
+| Spells | 7 | Base-owned | M4 | Magic Missile is implemented; six remain catalog candidates |
+| Psychic techniques | 4 | Base-owned | M4 | Mindlink is implemented; three remain catalog candidates |
 | Combat contexts | 6 | Base-owned | M5 | Three initial contexts and three deferred contexts |
 | Travel events | 8 | Base-owned | M8 | Four first-voyage events and four deferred events |
 | Travel-event choices | 3 | Base-owned | M8 | All three belong to the first Coolant Leak event |
@@ -57,7 +72,7 @@ public save contract.
 
 ## First-slice and deferred exceptions
 
-The first M4 Spell slice is:
+The planned first character-combat Spell set is:
 
 ```text
 spell.elemental.burning-hands
@@ -66,7 +81,8 @@ spell.spirit.magic-missile
 spell.spirit.phantasmal-image
 ```
 
-The other three Spell IDs remain base-owned deferred catalog content.
+Magic Missile is implemented by M4. The other six Spell IDs remain base-owned
+catalog candidates for later combat work.
 
 The initial M5 combat contexts are:
 
@@ -165,14 +181,15 @@ These are new explicit IDs derived directly from unique existing Skill labels;
 no prior ID was renamed. `skill.medicine` already existed in the Ships sickbay
 example and was moved into the authoritative Skill table without changing it.
 
-Heritage rows still describe Perks whose individual Perk IDs are not
-authored. They are not required by the M0 fixture or M2 Attribute/Skill loader;
-M3 content authoring must assign and review them before the base character pack
-is complete.
+Milestone 3 assigned and reviewed explicit Perk IDs for Hearthworld,
+Dawnweave, Concord, Redwake, Coilwhisper, Hullrunner, Chorusborn, Crimson
+Court, Reliquary-Bound, and Startrail. Cometdelver was already explicit.
+Other Heritage rows remain deferred until their individual Perk IDs are
+reviewed.
 
 ## Collision review
 
-The 152 inventoried IDs are unique. No one ID maps to two different display
+The 270 inventoried IDs are unique. No one ID maps to two different display
 labels, and ordinal comparison produces no case-only collision.
 
 The following similar forms are intentional:

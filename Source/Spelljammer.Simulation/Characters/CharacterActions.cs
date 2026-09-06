@@ -50,11 +50,13 @@ public sealed record ActionCost
 
 public sealed record ActionDefinition(
     ActionId Id,
+    ContentId FormulaId,
     ActionRequirement Requirement,
     ImmutableArray<ActionCost> Costs,
     int Difficulty,
     int Modifier,
-    ushort PracticeAward);
+    ushort PracticeAward,
+    ImmutableArray<PerkId> GrantedPerkIds);
 
 public sealed record ActionTarget(ContentId Id, bool IsPresent, bool IsLegal);
 
@@ -83,6 +85,7 @@ public sealed record ActionEligibilityResult(ActionReservation? Reservation, str
 public sealed record ActionResolutionEvent(
     CharacterId ActorId,
     ActionId ActionId,
+    ContentId FormulaId,
     ContentId TargetId,
     AttributeId AttributeId,
     short AttributeValue,
@@ -93,7 +96,8 @@ public sealed record ActionResolutionEvent(
     int Total,
     int Difficulty,
     bool Succeeded,
-    string FailureReason);
+    string FailureReason,
+    ImmutableArray<PerkId> GrantedPerkIds);
 
 public sealed record ActionExecutionResult(
     CharacterState State,
@@ -105,6 +109,8 @@ public sealed record ActionExecutionResult(
 
 public static class CharacterActionSystem
 {
+    private static readonly ContentId StandardCheckFormula = new("formula.check.standard");
+
     public static ActionEligibilityResult CheckEligibility(
         CharacterState? actor,
         ActionDefinition? definition,
@@ -131,6 +137,24 @@ public static class CharacterActionSystem
             return Rejected(ActionRejectionCodes.ActionUnknown, request.ActionId.Value);
         }
 
+        if (definition.FormulaId != StandardCheckFormula ||
+            definition.Costs.Length > 32 || definition.GrantedPerkIds.Length > CharacterCapabilities.MaximumSetEntries ||
+            request.ContextIds.Count > CharacterCapabilities.MaximumSetEntries ||
+            definition.Costs.Select(value => value.ResourceId).Distinct().Count() != definition.Costs.Length ||
+            definition.GrantedPerkIds.Distinct().Count() != definition.GrantedPerkIds.Length ||
+            definition.Difficulty is < 0 or > 10_000 || definition.Modifier is < -10_000 or > 10_000)
+        {
+            return Rejected(ActionRejectionCodes.ActionUnknown, request.ActionId.Value);
+        }
+
+        foreach (PerkId perkId in definition.GrantedPerkIds)
+        {
+            if (!catalog.TryGetPerk(perkId, out PerkDefinition? perk) || !perk!.CompatibleRaceIds.Contains(actor.RaceId))
+            {
+                return Rejected(ActionRejectionCodes.ActionUnknown, perkId.Value);
+            }
+        }
+
         if (request.Target is null || !request.Target.IsPresent)
         {
             return Rejected(ActionRejectionCodes.TargetMissing);
@@ -142,13 +166,16 @@ public static class CharacterActionSystem
         }
 
         ActionRequirement requirement = definition.Requirement;
-        if (requirement.AccessId is AccessId accessId && !actor.Capabilities.Access.Contains(accessId))
+        if (requirement.AccessId is AccessId accessId &&
+            (!actor.Capabilities.Access.Contains(accessId) ||
+             !actor.Capabilities.GrantSources.Any(value => value.CapabilityId == accessId.Value)))
         {
             return Rejected(ActionRejectionCodes.AccessRequired, accessId.Value);
         }
 
         if (requirement.TechniqueId is TechniqueId techniqueId &&
-            (!catalog.TryGetTechnique(techniqueId, out _) || !actor.Capabilities.Techniques.Contains(techniqueId)))
+            (!catalog.TryGetTechnique(techniqueId, out _) || !actor.Capabilities.Techniques.Contains(techniqueId) ||
+             !actor.Capabilities.GrantSources.Any(value => value.CapabilityId == techniqueId.Value)))
         {
             return Rejected(ActionRejectionCodes.TechniqueUnknown, techniqueId.Value);
         }
@@ -212,6 +239,12 @@ public static class CharacterActionSystem
         }
 
         CharacterCapabilities capabilities = reservation.OriginalState.Capabilities;
+        foreach (PerkId perkId in succeeded ? reservation.Definition.GrantedPerkIds : [])
+        {
+            catalog.TryGetPerk(perkId, out PerkDefinition? perk);
+            capabilities = capabilities.WithPerkGrant(perk!, reservation.Definition.Id.Value);
+        }
+
         SkillAdvancementEvent? advancement = null;
         if (reservation.Definition.PracticeAward > 0 &&
             reservation.Definition.Difficulty >= reservation.SkillValue)
@@ -232,6 +265,7 @@ public static class CharacterActionSystem
         ActionResolutionEvent resolution = new(
             committed.Id,
             reservation.Definition.Id,
+            reservation.Definition.FormulaId,
             reservation.Request.Target!.Id,
             reservation.Definition.Requirement.AttributeId,
             reservation.AttributeValue,
@@ -242,7 +276,8 @@ public static class CharacterActionSystem
             total,
             reservation.Definition.Difficulty,
             succeeded,
-            succeeded ? ActionRejectionCodes.None : "resolution.check-failed");
+            succeeded ? ActionRejectionCodes.None : "resolution.check-failed",
+            succeeded ? reservation.Definition.GrantedPerkIds : []);
         return new ActionExecutionResult(committed, true, succeeded, ActionRejectionCodes.None, resolution, advancement);
     }
 

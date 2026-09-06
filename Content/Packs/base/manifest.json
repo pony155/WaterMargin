@@ -8,5 +8,5 @@
   "loadAfter": [],
   "definitionRoots": ["Definitions"],
   "localizationRoots": ["Localization"],
-  "contentRevision": 3
+  "contentRevision": 4
 }

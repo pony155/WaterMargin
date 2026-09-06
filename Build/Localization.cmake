@@ -73,11 +73,131 @@ add_custom_target(SpelljammerLocalizationCatalogs
         -- compile
         ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/skills.sfloc.json
         ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/skills.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/accesses.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/accesses.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/backgrounds.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/backgrounds.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/feats.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/feats.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/trainings.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/trainings.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/techniques.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/techniques.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/spells.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/spells.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/psychic-techniques.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/psychic-techniques.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/races.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/races.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/heritages.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/heritages.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/perks.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/perks.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/commands.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/commands.sfloc
+   COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/characters.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/characters.sfloc
     BYPRODUCTS
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/accesses.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/backgrounds.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/feats.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/trainings.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/techniques.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/spells.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/psychic-techniques.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/races.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/heritages.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/perks.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/commands.sfloc
         ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/core.sfloc
         ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/content-pack.sfloc
         ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/attributes.sfloc
         ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/skills.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/characters.sfloc
     WORKING_DIRECTORY ${SPELLJAMMER_ROOT}
     COMMENT "Compiling deterministic Spelljammer localization catalogs"
     VERBATIM

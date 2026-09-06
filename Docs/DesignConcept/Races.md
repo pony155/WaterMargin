@@ -2,9 +2,11 @@
 
 ## Status
 
-This document defines planned race, heritage, physiology, and character-creation
-rules. These systems are not implemented yet. The current prototype simulates
-only ship-level expedition resources.
+Milestone 3 implements the first character-capability slice: eleven base Race
+definitions, one compatible Heritage and authored character per Race,
+deterministic creation, capability grants, and mixed-crew support validation.
+The WPF shell still presents the ship-level expedition loop; broader needs,
+relationships, schedules, and campaign persistence remain planned.
 
 ## Design goals
 
@@ -474,8 +476,8 @@ Weights affect frequency, never capability ceilings or moral alignment.
 
 ## Data and persistence contract
 
-Planned authored definitions live under `Content/Characters/` and compile into
-validated bounded artifacts. A heritage definition references its compatible
+Authored definitions live under `Content/Packs/base/Definitions/` and compile
+into validated bounded artifacts. A heritage definition references its compatible
 race rather than copying the race definition:
 
 ```json

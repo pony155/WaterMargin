@@ -3,13 +3,20 @@ using Spelljammer.Simulation.Content;
 
 namespace Spelljammer.Simulation.Characters;
 
+public sealed record TrainingContext(
+    ImmutableHashSet<ContentId> AvailableFacilityIds,
+    ImmutableHashSet<ContentId> AvailableSafetyIds);
+
 public sealed record TrainingCompletionEvent(
     CharacterId CharacterId,
     TrainingProjectId ProjectId,
     ImmutableArray<FeatId> GrantedFeatIds,
-    ImmutableArray<AccessId> GrantedAccessIds);
+    ImmutableArray<AccessId> GrantedAccessIds,
+    ImmutableArray<TechniqueId> GrantedTechniqueIds,
+    ResourceId ResourceId,
+    int ResourceCost);
 
-public sealed record TrainingContributionResult(
+public sealed record TrainingCommandResult(
     CharacterState State,
     bool Accepted,
     string RejectionCode,
@@ -18,30 +25,28 @@ public sealed record TrainingContributionResult(
 
 public static class CharacterTrainingSystem
 {
-    public static TrainingContributionResult Contribute(
+    public static TrainingCommandResult Start(
         CharacterState character,
         TrainingProjectId projectId,
-        int workUnits,
+        TrainingContext context,
         ICharacterContentCatalog catalog)
     {
-        ArgumentNullException.ThrowIfNull(character);
-        ArgumentNullException.ThrowIfNull(catalog);
-        if (character.ContentFingerprint != catalog.Fingerprint)
+        if (!TryProject(character, projectId, catalog, out TrainingProjectDefinition? project, out string rejection))
         {
-            return Rejected(character, ActionRejectionCodes.ContentMismatch);
+            return Rejected(character, rejection);
         }
 
-        if (!catalog.TryGetTrainingProject(projectId, out TrainingProjectDefinition? project))
+        if (character.TrainingProgress.ContainsKey(projectId))
         {
-            return Rejected(character, ActionRejectionCodes.ActionUnknown);
+            return Rejected(character, "command.training-already-started");
         }
 
-        if (workUnits <= 0 || workUnits > project!.WorkUnits)
+        if (character.TrainingProgress.Count >= CharacterCapabilities.MaximumSetEntries)
         {
-            return Rejected(character, "command.training-work-invalid");
+            return Rejected(character, "command.queue-capacity");
         }
 
-        foreach (SkillId skillId in project.RequiredSkillIds)
+        foreach (SkillId skillId in project!.RequiredSkillIds)
         {
             if (!character.Capabilities.TryGetSkill(skillId, catalog, out byte value, out _) || value == 0)
             {
@@ -49,7 +54,102 @@ public static class CharacterTrainingSystem
             }
         }
 
-        ImmutableArray<FeatDefinition>.Builder feats = ImmutableArray.CreateBuilder<FeatDefinition>();
+        if (!context.AvailableFacilityIds.Contains(project.FacilityId))
+        {
+            return Rejected(character, "command.training-facility-required");
+        }
+
+        if (!context.AvailableSafetyIds.Contains(project.SafetyId))
+        {
+            return Rejected(character, "command.training-safety-required");
+        }
+
+        character.Resources.TryGetValue(project.ResourceId, out int available);
+        if (available < project.ResourceCost)
+        {
+            return Rejected(character, ActionRejectionCodes.ResourceInsufficient);
+        }
+
+        CharacterState started = character with { TrainingProgress = character.TrainingProgress.Add(projectId, 0) };
+        return Accepted(started, 0);
+    }
+
+    public static TrainingCommandResult Contribute(
+        CharacterState character,
+        TrainingProjectId projectId,
+        int workUnits,
+        ICharacterContentCatalog catalog)
+    {
+        if (!TryProject(character, projectId, catalog, out TrainingProjectDefinition? project, out string rejection))
+        {
+            return Rejected(character, rejection);
+        }
+
+        if (!character.TrainingProgress.TryGetValue(projectId, out int current))
+        {
+            return Rejected(character, "command.training-not-started");
+        }
+
+        if (workUnits <= 0 || current < 0 || current > project!.ProgressCap ||
+            (long)current + workUnits > project.ProgressCap)
+        {
+            return Rejected(character, "command.training-work-invalid");
+        }
+
+        int progress = current + workUnits;
+        CharacterState contributed = character with
+        {
+            TrainingProgress = character.TrainingProgress.SetItem(projectId, progress),
+        };
+        return Accepted(contributed, progress);
+    }
+
+    public static TrainingCommandResult Cancel(
+        CharacterState character,
+        TrainingProjectId projectId,
+        ICharacterContentCatalog catalog)
+    {
+        if (!TryProject(character, projectId, catalog, out _, out string rejection))
+        {
+            return Rejected(character, rejection);
+        }
+
+        if (!character.TrainingProgress.TryGetValue(projectId, out int progress))
+        {
+            return Rejected(character, "command.training-not-started");
+        }
+
+        CharacterState cancelled = character with { TrainingProgress = character.TrainingProgress.Remove(projectId) };
+        return Accepted(cancelled, progress);
+    }
+
+    public static TrainingCommandResult Complete(
+        CharacterState character,
+        TrainingProjectId projectId,
+        ICharacterContentCatalog catalog)
+    {
+        if (!TryProject(character, projectId, catalog, out TrainingProjectDefinition? project, out string rejection))
+        {
+            return Rejected(character, rejection);
+        }
+
+        if (!character.TrainingProgress.TryGetValue(projectId, out int progress))
+        {
+            return Rejected(character, "command.training-not-started");
+        }
+
+        if (progress < project!.WorkUnits || progress > project.ProgressCap)
+        {
+            return Rejected(character, "command.training-incomplete");
+        }
+
+        character.Resources.TryGetValue(project.ResourceId, out int available);
+        if (available < project.ResourceCost)
+        {
+            return Rejected(character, ActionRejectionCodes.ResourceInsufficient);
+        }
+
+        ImmutableArray<FeatDefinition>.Builder featBuilder = ImmutableArray.CreateBuilder<FeatDefinition>();
         foreach (FeatId featId in project.GrantedFeatIds)
         {
             if (!catalog.TryGetFeat(featId, out FeatDefinition? feat) || feat!.TrainingProjectId != projectId)
@@ -57,33 +157,81 @@ public static class CharacterTrainingSystem
                 return Rejected(character, ActionRejectionCodes.ActionUnknown);
             }
 
-            feats.Add(feat);
+            featBuilder.Add(feat);
         }
 
-        character.TrainingProgress.TryGetValue(projectId, out int current);
-        int progress = Math.Min(project.WorkUnits, checked(current + workUnits));
-        if (progress < project.WorkUnits)
+        foreach (TechniqueId techniqueId in project.GrantedTechniqueIds)
         {
-            CharacterState partial = character with { TrainingProgress = character.TrainingProgress.SetItem(projectId, progress) };
-            return new TrainingContributionResult(partial, true, ActionRejectionCodes.None, progress, null);
+            bool known = techniqueId.Value.ToString().StartsWith("spell.", StringComparison.Ordinal)
+                ? catalog.TryGetSpell(new SpellId(techniqueId.Value), out _)
+                : techniqueId.Value.ToString().StartsWith("psychic.", StringComparison.Ordinal)
+                    ? catalog.TryGetPsychicTechnique(new PsychicTechniqueId(techniqueId.Value), out _)
+                    : catalog.TryGetTechnique(techniqueId, out _);
+            if (!known)
+            {
+                return Rejected(character, ActionRejectionCodes.ActionUnknown);
+            }
         }
 
-        CharacterCapabilities capabilities = character.Capabilities;
-        foreach (FeatDefinition feat in feats)
+        ImmutableArray<FeatDefinition> feats = featBuilder.MoveToImmutable();
+        CharacterCapabilities capabilities;
+        try
         {
-            capabilities = capabilities.WithTrainingGrants(feat, projectId);
+            capabilities = character.Capabilities.WithTrainingGrants(project, feats);
+        }
+        catch (InvalidOperationException)
+        {
+            return Rejected(character, "command.queue-capacity");
         }
 
-        ImmutableArray<AccessId> access = [.. feats.SelectMany(value => value.GrantedAccessIds).Distinct().Order()];
         CharacterState completed = character with
         {
             Capabilities = capabilities,
+            Resources = character.Resources.SetItem(project.ResourceId, available - project.ResourceCost),
             TrainingProgress = character.TrainingProgress.Remove(projectId),
         };
-        TrainingCompletionEvent completion = new(character.Id, projectId, [.. feats.Select(value => value.FeatId).Order()], access);
-        return new TrainingContributionResult(completed, true, ActionRejectionCodes.None, progress, completion);
+        ImmutableArray<AccessId> access =
+            [.. feats.SelectMany(value => value.GrantedAccessIds).Distinct().Order()];
+        TrainingCompletionEvent completion = new(
+            character.Id,
+            projectId,
+            [.. project.GrantedFeatIds.Order()],
+            access,
+            project.GrantedTechniqueIds,
+            project.ResourceId,
+            project.ResourceCost);
+        return new TrainingCommandResult(completed, true, ActionRejectionCodes.None, progress, completion);
     }
 
-    private static TrainingContributionResult Rejected(CharacterState character, string code) =>
+    private static bool TryProject(
+        CharacterState character,
+        TrainingProjectId projectId,
+        ICharacterContentCatalog catalog,
+        out TrainingProjectDefinition? project,
+        out string rejection)
+    {
+        ArgumentNullException.ThrowIfNull(character);
+        ArgumentNullException.ThrowIfNull(catalog);
+        if (character.ContentFingerprint != catalog.Fingerprint)
+        {
+            project = null;
+            rejection = ActionRejectionCodes.ContentMismatch;
+            return false;
+        }
+
+        if (!catalog.TryGetTrainingProject(projectId, out project))
+        {
+            rejection = ActionRejectionCodes.ActionUnknown;
+            return false;
+        }
+
+        rejection = ActionRejectionCodes.None;
+        return true;
+    }
+
+    private static TrainingCommandResult Accepted(CharacterState state, int progress) =>
+        new(state, true, ActionRejectionCodes.None, progress, null);
+
+    private static TrainingCommandResult Rejected(CharacterState character, string code) =>
         new(character, false, code, 0, null);
 }
