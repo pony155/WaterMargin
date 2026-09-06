@@ -97,9 +97,10 @@ added explicitly to `Spelljammer.slnx`.
 
 ### Phase M0.1: inventory existing identities
 
-- [ ] **M0.1.1** Extract every current Attribute, Skill, Feat, Talent, Access,
+- [x] **M0.1.1** Extract every current Attribute, Skill, Feat, Talent, Access,
   Spell, psychic-technique, combat-context, ship-module, faction, and crisis ID
-  from `Docs/Product` into a reviewed inventory.
+  from `Docs/Product` into the reviewed
+  [`ContentIdInventory.md`](ContentIdInventory.md).
 - [ ] **M0.1.2** Mark each ID as base-owned, example-only, deferred, or already
   serialized by the prototype.
 - [ ] **M0.1.3** Find spelling variants and collisions without silently renaming

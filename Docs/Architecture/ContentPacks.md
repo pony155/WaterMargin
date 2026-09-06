@@ -131,6 +131,9 @@ spell.warding.brace-ward
 combat.context.ruin
 ```
 
+The reviewed Product-document snapshot is maintained in
+[`ContentIdInventory.md`](ContentIdInventory.md).
+
 IDs use lowercase ASCII letters, digits, periods, and hyphens, begin with a
 definition-kind segment, and have a fixed maximum byte length. Case folding,
 Unicode normalization, display names, and paths never change identity.
