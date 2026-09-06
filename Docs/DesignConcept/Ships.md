@@ -12,8 +12,10 @@ The wider Arcane-Industrial setting baseline is defined in
 [`Setting.md`](Setting.md).
 
 Arcane ships exist because their drives couple to the Aether discovered in open
-space. They were the first practical magical spacecraft; Industrial propulsion
-later became a parallel route to spaceflight rather than a replacement.
+space. Elven resonance vessels were the first documented magical spacecraft;
+dwarf and gnome coupling science later made their power systems more measurable
+and repeatable. Industrial propulsion became a parallel route to spaceflight,
+rather than a replacement.
 
 ## Design goals
 
@@ -121,7 +123,9 @@ crew's culture, morality, faction, or available character skills.
 
 Arcane is the ship's magical discipline; Aether is the non-material medium it
 couples to through resonators, then captures as charge and routes as energy.
-Early upgrades stabilize an Aether Dynamo and Flux Sail. Later upgrades improve
+Elven resonance craft supplies starwood fittings, tuned hull components, and
+long-lived navigation instruments for this path. Early upgrades stabilize an
+Aether Dynamo and Flux Sail. Later upgrades improve
 crystal storage, runic distribution, remote control, ward efficiency, and
 enchantment capacity. Magic and Enchantment provide the main specialist work,
 while Engineering remains important for the physical housings, controls, and

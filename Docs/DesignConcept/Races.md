@@ -78,11 +78,14 @@ better.
 
 ### Humans
 
-Humans are widespread generalists whose settlements survive through social and
-technical adaptation. Their Racial Perk is **Versatility**: one starting
-aptitude may be reassigned during recruitment. Their bodies have no extreme
-environmental adaptation and depend on ordinary atmosphere, food, sleep, and
-medical support.
+Humans originate from their own homeworld. When elven and dwarven explorers
+first arrived, humanity was between a medieval and renaissance age and had not
+yet achieved spaceflight. The First Concord gave human communities access to
+elven Aether navigation and dwarven engineering methods; human crews then made
+those methods their own and became widespread through social and technical
+adaptation. Their Racial Perk is **Versatility**: one starting aptitude may be
+reassigned during recruitment. Their bodies have no extreme environmental
+adaptation and depend on ordinary atmosphere, food, sleep, and medical support.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
@@ -92,8 +95,10 @@ medical support.
 
 ### Elves
 
-Elves are long-lived beings whose nervous systems sense patterns in light and
-the void's aetheric currents. Their Racial Perk, **Aether Sense**, can reveal
+Elves originate from a homeworld distinct from human and dwarven worlds. Their
+long-lived nervous systems sense patterns in light and the void's aetheric
+currents. Elven records preserve the earliest documented successful Arcane
+spaceflight. Their Racial Perk, **Aether Sense**, can reveal
 weak anomalies or unstable routes before ordinary instruments, but intense
 interference causes sensory strain. Aether Sense grants innate `access.magic`,
 allowing an Elf to learn and cast spells without the Spellcasting Training
@@ -106,6 +111,18 @@ favor natural environments, living craft, Arcane navigation, wards, and
 enchantment instead. This is a cultural and historical tendency, not a
 biological restriction: an individual Elf may study Engineering or use any
 compatible Industrial equipment.
+
+This preference does not make elven craft primitive. Elven resonance smiths
+produce exceptional blades, armor, starwood hull components, Aether resonators,
+and Arcane instruments. Each is a carefully tuned masterwork intended to keep
+its harmony with a bearer or ship over a long life, rather than a standardized
+industrial product.
+
+Elven culture is also shaped by fascination with the beauty of the galaxy:
+nebulae, starfields, Aether tides, strange worlds, and unbroken night skies.
+Many elven voyages prioritize observation, star-charting, art, and the
+protection of exceptional natural sites. An individual elf can still become a
+miner, trader, or industrial engineer; this is a cultural passion, not a rule.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
@@ -132,8 +149,9 @@ for half-elves must remain valid through an explicit migration.
 
 ### Dwarves
 
-Dwarves are compact, dense-bodied people adapted to confined habitats and
-demanding physical environments. Their Racial Perk, **Braced Stance**, reduces
+Dwarves originate from a homeworld distinct from human and elven worlds. They
+are compact, dense-bodied people adapted to confined habitats and demanding
+physical environments. Their Racial Perk, **Braced Stance**, reduces
 forced movement and work interruption. Their mass raises acceleration costs,
 and cramped does not mean weightless: ship layout and rescue equipment must
 support them.
@@ -144,6 +162,17 @@ weapons, and plasma weapons represent a deliberate industrial tradition rather
 than an innate racial ability. An individual dwarf may still reject that
 tradition and pursue Arcane or natural practices.
 
+Dwarven engineering values repeatable standards, interchangeable parts, and
+field repair. Where an elven resonance smith tunes one object to its bearer or
+ship, a dwarven foundry builds a reliable pattern that can be maintained,
+upgraded, and deployed across a fleet.
+
+Many dwarven fleets treat space as a resource frontier. They prospect
+asteroids, comet fragments, dead moons, and gas-giant atmospheres for rare
+metals, volatiles, reactor material, and industrial gases. Mining claims,
+extraction rights, and safe transport routes are major dwarven economic and
+political interests, not an obligation imposed on every dwarf.
+
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Deepforge | `heritage.dwarf.deepforge` | Exceptional high-gravity and heat tolerance | Low gravity reduces precision until acclimated |
@@ -152,11 +181,14 @@ tradition and pursue Arcane or natural practices.
 
 ### Orcs
 
-Orcs are powerfully built and recover well from exertion. Their Racial Perk,
-**Second Wind**, allows
-a controlled burst of work or combat stamina followed by a visible recovery
-debt. Orcs are not inherently violent, unintelligent, or hostile; individuals
-and communities determine their values and behavior.
+Orcs are powerfully built, warlike people who recover well from exertion. They
+regard victory in conflict, command through strength, and territorial conquest
+as central virtues. Alongside goblin societies, they uncovered ancient wrecks
+on their shared ancestral homeworld: ships made by an unknown civilization that
+travelled the void before the earliest elven record. Their spacefaring cultures
+grew through generations of salvage and reverse engineering, not through the
+First Concord. Their Racial Perk, **Second Wind**, allows a controlled burst of
+work or combat stamina followed by a visible recovery debt.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
@@ -167,7 +199,10 @@ and communities determine their values and behavior.
 ### Gnomes
 
 Gnomes are small-bodied people with extremely sensitive touch and fine spatial
-judgment. Their Racial Perk, **Closework**, reduces penalties when manipulating
+judgment. Several dwarf and gnome research communities developed the first
+repeatable instruments and scientific methods for measuring and coupling to
+Aether; this is a shared historical achievement, not an innate trait. Their
+Racial Perk, **Closework**, reduces penalties when manipulating
 compact mechanisms or working in confined stations. Their reach and unaided
 carrying capacity are limited, and shared equipment must be adjustable rather
 than assuming one body scale. Gnomes are not inherently inventive or
@@ -183,11 +218,14 @@ heritage.
 ### Goblins
 
 Goblins are compact, quick-moving people adapted to crowded habitats and
-improvised routes. Their Racial Perk, **Tight Passage**, reduces movement and
-work penalties in ducts, wreckage, and congested decks. Their lighter frames
-are easier to throw off balance, and standard armor, furniture, and controls
-may require refitting. Goblins are not inherently dishonest, reckless, or
-crude; behavior comes from the individual and their society.
+improvised routes. Alongside orc societies, their salvagers and makers
+recovered precursor ships on their shared ancestral homeworld and
+reverse-engineered enough of their Aether couplers to begin independent
+spaceflight. Their Racial Perk, **Tight Passage**, reduces movement and work
+penalties in ducts, wreckage, and congested decks. Their lighter frames are
+easier to throw off balance, and standard armor, furniture, and controls may
+require refitting. Goblins are not inherently dishonest, reckless, or crude;
+behavior comes from the individual and their society.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |

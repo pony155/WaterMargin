@@ -85,6 +85,18 @@ to all hazards. A casting focus helps an authorized caster; it does not replace
 Spellcasting Training or an innate Racial Perk. A weapon's technology path does
 not make it automatically stronger than the other path.
 
+## Resonance and industrial craft
+
+Elven resonance craft makes a small number of Arcane masterworks: tuned blades,
+armor, Aether resonators, wards, and starwood fittings. These items emphasize
+one distinctive, inspectable effect. Dwarven industrial craft makes repeatable
+equipment with standardized parts: armor, tools, engines, laser weapons, and
+plasma weapons. These items emphasize reliability and straightforward repair.
+
+Both traditions use the same simple equipment rules. They are cultural craft
+styles, not equipment restrictions by Race; any compatible character can use,
+study, buy, repair, or improve either kind of item.
+
 ## Definition contract
 
 Every equipment definition declares:

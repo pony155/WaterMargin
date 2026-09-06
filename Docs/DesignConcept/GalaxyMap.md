@@ -23,6 +23,9 @@ Seeded situations that occur while crossing its routes are defined in
 - Place Arcane research sites, dieselpunk industrial ports, and atompunk-era
   reactor installations as authored site content rather than treating advanced
   technology as a rare exception.
+- Generate nebulae, Aether tides, and exceptional worlds that attract elven
+  observatories, as well as asteroid fields, comet belts, and gas giants that
+  attract dwarven prospectors and extraction fleets.
 - Combine authored system definitions and event content in new arrangements
   rather than generating unreviewed narrative prose.
 - Keep generation, pathfinding, visibility, and per-tick simulation bounded.
@@ -34,10 +37,11 @@ generated strategy-game galaxies, varied system layouts, and connected travel
 networks. Spelljammer uses its own topology rules, terminology, content,
 factions, cosmology, and voyage-scale simulation.
 
-Arcane navigation became possible when open-space Aether was discovered and
-ships learned to couple to it. Aether currents and interference therefore
-create meaningful route conditions, while Industrial vessels retain a separate
-propulsion path through the same galaxy.
+Arcane navigation began with the elven discovery of open-space Aether. Dwarf
+and gnome scientists later developed repeatable coupling methods for ships and
+instruments. Aether currents and interference therefore create meaningful route
+conditions, while Industrial vessels retain a separate propulsion path through
+the same galaxy.
 
 ## Map hierarchy
 
