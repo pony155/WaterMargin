@@ -55,7 +55,7 @@ public static class GameSettingsChoices
     public const string DesktopResolution = "desktop";
 
     public static IReadOnlyList<string> Languages { get; } = Array.AsReadOnly(
-        [DefaultLanguage, "fr-FR"]);
+        [DefaultLanguage, "fr-FR", "zh-Hant-TW"]);
 
     public static IReadOnlyList<GameResolutionChoice> Resolutions { get; } = Array.AsReadOnly(
         new GameResolutionChoice[]

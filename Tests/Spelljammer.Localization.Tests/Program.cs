@@ -143,7 +143,7 @@ internal static class LocalizationTests
         Equal("2 units — 12.50% — Defender", summary!.Text, "Typed formatting output is wrong.");
         Equal("other", service.GetDiagnostics().Records.Last().PluralCategory!, "Plural diagnostic is wrong.");
         Equal("CLDR-48.2.0", summary.LanguageProfile.LocaleDataVersion, "Language profile data version is wrong.");
-        Equal("2265a7eeeb5488b3745eda9b0f6d247b819f3c72f961d5668dc97e3120a8b3bf",
+        Equal("bb8b91669fa8c4c07974c07bff22bccd54080ededdfb9906e377340a9c801c1a",
             summary.LanguageProfile.LocaleDataHash, "Language profile data hash is wrong.");
 
         Success(service.Format(LocalizationKey.Create("ui.test.summary"),
@@ -209,6 +209,11 @@ internal static class LocalizationTests
             LocalizationArgument.Integer("count", 3),
             TextDirection.RightToLeft),
             "Arabic digits or cardinal formatting is wrong.");
+        Equal("12,345.67", FormatOne("zh-Hant-TW",
+            "{value, number}",
+            "{\"value\":{\"type\":\"fixed\",\"scale\":2}}",
+            LocalizationArgument.Fixed("value", 1_234_567, 2)),
+            "Chinese fixed-decimal formatting is wrong.");
     }
 
     private static string FormatOne(

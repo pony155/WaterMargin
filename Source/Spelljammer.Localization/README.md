@@ -3,9 +3,10 @@
 The Game-owned localization runtime resolves immutable static and typed
 messages from validated `.sfloc` artifacts. `en-US` is the source locale;
 `qps-ploc` (accented/expanded) and `qps-keyecho` are development-only
-transforms. The WPF host now stages embedded `en-US` and `fr-FR` `menu` and
-`settings` catalogs on the UI owner thread, displays resolved text in the main
-menu and settings dialog, and republishes those surfaces when language changes.
+transforms. The WPF host now stages embedded `en-US`, `fr-FR`, and
+`zh-Hant-TW` `menu`, `settings`, and `creation` catalogs on the UI owner thread,
+displays resolved text in the main menu and its in-window flows, and republishes
+those surfaces when language changes.
 Localization of the older expedition prototype remains planned.
 
 ## Runtime contract
@@ -83,11 +84,12 @@ Locale tags use the documented canonical structural subset (for example
 `en-US`, `fr-FR`, or `zh-Hant-TW`); registry-backed BCP-47 deprecation and alias
 data remains a later pinned-data task.
 
-Phase 2 pins bounded `en`, `fr`, `ru`, and `ar` decimal/percent/plural profiles
-from CLDR 48.2.0 under Unicode-3.0. These are formatting fixtures and available
-runtime profiles, not a claim that French, Russian, or Arabic translations or
-production RTL UI currently ship. No host culture or platform locale data is
-consulted.
+Phase 2 pins bounded `en`, `fr`, `ru`, `ar`, and `zh`
+decimal/percent/plural profiles from CLDR 48.2.0 under Unicode-3.0. These are
+formatting fixtures and available runtime profiles. English, French, and
+Traditional Chinese application translations ship; Russian and Arabic
+translations and production RTL UI do not. No host culture or platform locale
+data is consulted.
 
 Compile a catalog from the Spelljammer repository root:
 

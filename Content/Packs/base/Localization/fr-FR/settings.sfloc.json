@@ -154,6 +154,10 @@
       "description": "Nom de l’option de langue française.",
       "message": "Français"
     },
+    "settings.value.language.zh-hant-tw": {
+      "description": "Nom de l’option de langue chinoise traditionnelle.",
+      "message": "Chinois traditionnel"
+    },
     "settings.value.percent": {
       "description": "Pourcentage entier affiché à côté d’un curseur.",
       "arguments": {

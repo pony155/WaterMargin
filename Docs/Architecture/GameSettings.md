@@ -8,11 +8,11 @@ pointer, or authoritative campaign dependency. The active profile contains
 stable language and resolution choices, bounded master, music, and effects
 volumes, subtitles, reduced motion, screen shake, and interface scale.
 
-The WPF host owns startup loading and the modal lifecycle. The dialog delegates
-its retained document, fixed logical layout, focus, modal trapping,
-pointer/keyboard interaction, sliders, toggles, buttons, and typed action queue
-to SpriteForge UI. The game maps copied stable actions to a draft profile and
-publishes that draft only after durable persistence succeeds.
+The WPF host owns startup loading and the in-window overlay lifecycle. The
+overlay delegates its retained document, fixed logical layout, focus, modal
+trapping, pointer/keyboard interaction, sliders, toggles, buttons, and typed
+action queue to SpriteForge UI. The game maps copied stable actions to a draft
+profile and publishes that draft only after durable persistence succeeds.
 
 The integration requires SpriteForge UI interop version 1 from
 `Engine/Public/SpriteForgeUIInterop.h`. The ABI is deliberately generic; no
@@ -25,8 +25,8 @@ caller-owned bounded arrays.
 
 The current profile schema is 2. Volumes are integers from 0 through 100 and
 interface scale is an integer percentage from 75 through 150. Language is one
-of `en-US` or `fr-FR`; resolution is `desktop`, `1280x720`, `1600x900`,
-`1920x1080`, or `2560x1440`. The strict JSON codec rejects duplicate or unknown
+of `en-US`, `fr-FR`, or `zh-Hant-TW`; resolution is `desktop`, `1280x720`,
+`1600x900`, `1920x1080`, or `2560x1440`. The strict JSON codec rejects duplicate or unknown
 properties, malformed input, unsupported schema versions, unknown stable
 options, out-of-range values, trailing data, and documents larger than 64 KiB.
 Schema 1 profiles migrate in memory to schema 2 with `en-US` and `desktop`
@@ -53,9 +53,9 @@ cleanup deletes only that recovery path.
 
 ## Presentation and localization
 
-The settings source strings live in the `en-US` and `fr-FR` catalogs under
-`Content/Packs/base/Localization`. The offline compiler produces validated
-artifacts before WPF compilation and embeds them in the application. At
+The settings source strings live in the `en-US`, `fr-FR`, and `zh-Hant-TW`
+catalogs under `Content/Packs/base/Localization`. The offline compiler produces
+validated artifacts before WPF compilation and embeds them in the application. At
 startup the game-owned localization runtime decodes all installed application
 catalogs, then stages and publishes the selected locale and its explicit
 fallback on the UI thread. Applying a new language republishes the locale and

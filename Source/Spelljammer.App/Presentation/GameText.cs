@@ -12,8 +12,13 @@ internal sealed class GameText
     [
         "Spelljammer.Localization.en-US.menu.sfloc",
         "Spelljammer.Localization.en-US.settings.sfloc",
+        "Spelljammer.Localization.en-US.creation.sfloc",
         "Spelljammer.Localization.fr-FR.menu.sfloc",
         "Spelljammer.Localization.fr-FR.settings.sfloc",
+        "Spelljammer.Localization.fr-FR.creation.sfloc",
+        "Spelljammer.Localization.zh-Hant-TW.menu.sfloc",
+        "Spelljammer.Localization.zh-Hant-TW.settings.sfloc",
+        "Spelljammer.Localization.zh-Hant-TW.creation.sfloc",
     ];
 
     private readonly LocalizationService localization;
@@ -52,7 +57,7 @@ internal sealed class GameText
         LocalizationService service = new();
         Require(service.Initialize(new LocalizationConfig(
             "en-US",
-            RequiredNamespaces: ["menu", "settings"])),
+            RequiredNamespaces: ["menu", "settings", "creation"])),
             "Could not initialize the application localization service.");
         GameText result = new(service, catalogs);
         result.SetLanguage(language);
@@ -98,6 +103,7 @@ internal sealed class GameText
     {
         "en-US" => "settings.value.language.en-us",
         "fr-FR" => "settings.value.language.fr-fr",
+        "zh-Hant-TW" => "settings.value.language.zh-hant-tw",
         _ => throw new ArgumentOutOfRangeException(nameof(language)),
     });
 

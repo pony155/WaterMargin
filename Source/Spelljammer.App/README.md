@@ -17,6 +17,8 @@ App.OnStartup
   -> load embedded menu/settings catalogs through GameText
   -> create MainMenuWindow
        -> SpriteForgeMainMenuView
+            -> New Game     -> CharacterCreationScreen
+                                  -> SpriteForgeCharacterCreationView
             -> Game Settings -> GameSettingsDialog
                                   -> SpriteForgeSettingsView
                                   -> GameSettingsRegistry.Apply
@@ -42,8 +44,9 @@ menu action constructs them.
 
 | File | Responsibility |
 | --- | --- |
-| `MainMenuWindow.cs` | Current maximized top-level window and application flow coordinator. It owns the shared settings registry, settings path, and `GameText`; reads the display version from assembly metadata; hosts `SpriteForgeMainMenuView`; opens the modal settings dialog; forwards save/load status to the menu; shuts down on Quit; and detaches/disposes the view when closed. |
-| `GameSettingsDialog.cs` | WPF modal shell around `SpriteForgeSettingsView`. It starts settings publication on a worker thread, prevents duplicate Apply operations and closure during a write, reports failures without replacing active settings, and returns `DialogResult = true` only after successful durable publication. |
+| `MainMenuWindow.cs` | Current maximized top-level window and application flow coordinator. It owns the shared settings registry, settings path, and `GameText`; reads the display version from assembly metadata; hosts `SpriteForgeMainMenuView`; adds character-creation or settings overlays to the same visual tree; forwards status to the menu; shuts down on Quit; and detaches/disposes the views when closed. |
+| `CharacterCreationScreen.cs` | In-window modal host for `SpriteForgeCharacterCreationView`. It supplies the menu-blocking scrim, scales the fixed logical surface down for smaller windows, forwards completion/cancellation, and owns deterministic cleanup. |
+| `GameSettingsDialog.cs` | In-window WPF overlay around `SpriteForgeSettingsView`. Its scrim blocks the menu without creating another operating-system window. It starts settings publication on a worker thread, prevents duplicate Apply operations and closure during a write, reports failures without replacing active settings, and emits completion only after successful durable publication. |
 | `MainWindow.xaml` | Retained expedition-prototype layout. It defines resource/fuel/hull displays, movement and voyage commands, an `EngineViewport`, and renderer playback controls. Most of its player-visible strings predate the current localization boundary. This window is not reachable from the current main menu. |
 | `MainWindow.xaml.cs` | Retained expedition-prototype coordinator. It owns an `ExpeditionSimulation` and current `ExpeditionState`, converts button clicks into typed commands, presents sector/resource results, controls the renderer animation, and can open the shared settings dialog. It is currently inactive because startup creates `MainMenuWindow` instead. |
 
@@ -51,8 +54,10 @@ menu action constructs them.
 
 | File | Responsibility |
 | --- | --- |
-| `GameText.cs` | Application localization facade. It reads the embedded `en-US` and `fr-FR` menu/settings artifacts with size bounds, stages a selected locale and explicit fallback transactionally, supports live locale publication, begins formatting frames, and exposes helpers for static text, option names, formatted values, percentages, and stable diagnostics. |
-| `SpriteForgeMainMenuView.cs` | Current main-menu surface. It loads the packaged `Background.png`, draws it edge-to-edge with aspect-preserving cover scaling, and uses a fixed 1280x720 logical UI canvas. Menu grouping and button fills are transparent, leaving localized labels, the bottom-right application version, and the keyboard focus outline over the artwork. SpriteForge owns retained elements, hit testing, focus, pointer/keyboard processing, and action generation; WPF realizes copied presentation commands and localized text. The view emits only `SettingsRequested` and `QuitRequested`, keeps bounded element/action buffers, and releases its native UI context deterministically. |
+| `CharacterCreationChoices.cs` | Bounded application presentation mapping for the 11 authored first-voyage character, Race, Heritage, and shared Background stable IDs. A confirmed selection also carries the explicit voyage seed; it is not yet an authoritative campaign record. |
+| `GameText.cs` | Application localization facade. It reads the embedded `en-US`, `fr-FR`, and `zh-Hant-TW` menu/settings/creation artifacts with size bounds, stages a selected locale and explicit fallback transactionally, supports live locale publication, begins formatting frames, and exposes helpers for static text, option names, formatted values, percentages, and stable diagnostics. |
+| `SpriteForgeCharacterCreationView.cs` | Character-creation surface on a 1100x680 logical canvas. SpriteForge owns its modal tree, five-button focus order, hit testing, pointer/keyboard actions, and copied presentation. WPF draws the captain monogram and localized captain, lineage, heritage, Background, summary, and explicit seed. Previous/Next cycles the bounded authored templates, Reroll replaces the draft seed, Escape/Back cancels, and Confirm emits a copied selection. |
+| `SpriteForgeMainMenuView.cs` | Current main-menu surface. It loads the packaged `Background.png`, draws it edge-to-edge with aspect-preserving cover scaling, and uses a fixed 1280x720 logical UI canvas. Menu grouping and button fills are transparent, leaving localized New Game, Game Settings, and Quit Game labels, the bottom-right application version, and the keyboard focus outline over the artwork. SpriteForge owns retained elements, hit testing, focus, pointer/keyboard processing, and action generation; WPF realizes copied presentation commands and localized text. The view emits only stable top-level actions, keeps bounded element/action buffers, and releases its native UI context deterministically. |
 | `SpriteForgeSettingsView.cs` | Interactive settings surface and draft editor on an 800x640 logical canvas. It defines SpriteForge language/resolution selectors, sliders, toggles, buttons, modal focus behavior, and accessibility names for display, audio, and interface preferences. Native actions update an immutable draft profile or emit Apply/Cancel events; WPF draws the copied presentation, value labels, focus outlines, and status messages. Reset reconstructs the native document from defaults. |
 | `EngineViewport.cs` | Retained expedition renderer host. It derives from `HwndHost`, creates a child Win32 window, checks SpriteForge rendering ABI v1, creates a renderer and an in-memory RGBA sprite sheet, submits bounded sprite draws, and advances a four-frame animation with a WPF render-priority timer. It owns and destroys the native texture, renderer, and child window. It is only used by the inactive `MainWindow`. |
 
@@ -90,8 +95,15 @@ is presentation and accessibility data.
   embedded as `Spelljammer.Localization.en-US.menu.sfloc`.
 - `Content/Packs/base/Localization/en-US/settings.sfloc.json` is compiled and
   embedded as `Spelljammer.Localization.en-US.settings.sfloc`.
+- `Content/Packs/base/Localization/en-US/creation.sfloc.json` is compiled and
+  embedded as `Spelljammer.Localization.en-US.creation.sfloc`.
 - The corresponding `fr-FR/menu.sfloc.json` and `fr-FR/settings.sfloc.json`
   catalogs are compiled and embedded for the installed French locale.
+- The corresponding `zh-Hant-TW/menu.sfloc.json` and
+  `zh-Hant-TW/settings.sfloc.json` catalogs are compiled and embedded for the
+  installed Traditional Chinese locale.
+- The corresponding French and Traditional Chinese `creation.sfloc.json`
+  catalogs are compiled and embedded for both translated locales.
 - SpriteForge native DLLs come from the configurable `SpriteForgeNativeDir`;
   no developer-specific absolute engine path belongs in the project.
 

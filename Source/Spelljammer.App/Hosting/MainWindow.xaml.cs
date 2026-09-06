@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using Spelljammer.Presentation;
 using Spelljammer.Settings;
 using Spelljammer.Simulation;
@@ -14,6 +16,7 @@ public partial class MainWindow : Window
     private readonly string settingsPath;
     private readonly GameText settingsStrings;
     private ExpeditionState expedition;
+    private GameSettingsDialog? settingsDialog;
     private ulong nextSeed = 0xc0ffeeUL;
 
     internal MainWindow(
@@ -29,6 +32,7 @@ public partial class MainWindow : Window
         SettingsButton.Content = settingsStrings.Get("settings.button.open");
         expedition = simulation.Create(nextSeed);
         Viewport.FrameChanged += Viewport_FrameChanged;
+        Closing += MainWindow_Closing;
         Closed += MainWindow_Closed;
         ShowFrame(0);
         ApplySettings(settings.Active);
@@ -189,12 +193,42 @@ public partial class MainWindow : Window
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        GameSettingsDialog dialog = new(settings, settingsPath, settingsStrings) { Owner = this };
-        if (dialog.ShowDialog() == true)
+        if (settingsDialog is not null)
         {
-            ApplySettings(settings.Active);
-            EventLabel.Text = settingsStrings.Get("settings.status.saved");
+            return;
         }
+
+        settingsDialog = new GameSettingsDialog(settings, settingsPath, settingsStrings);
+        settingsDialog.Applied += SettingsDialog_Applied;
+        settingsDialog.Cancelled += SettingsDialog_Cancelled;
+        Grid.SetRowSpan(settingsDialog, 3);
+        Grid.SetColumnSpan(settingsDialog, 3);
+        RootGrid.Children.Add(settingsDialog);
+    }
+
+    private void SettingsDialog_Applied(object? sender, EventArgs e)
+    {
+        CloseSettingsDialog();
+        settingsStrings.SetLanguage(settings.Active.Language);
+        SettingsButton.Content = settingsStrings.Get("settings.button.open");
+        ApplySettings(settings.Active);
+        EventLabel.Text = settingsStrings.Get("settings.status.saved");
+    }
+
+    private void SettingsDialog_Cancelled(object? sender, EventArgs e) => CloseSettingsDialog();
+
+    private void CloseSettingsDialog()
+    {
+        if (settingsDialog is null)
+        {
+            return;
+        }
+
+        settingsDialog.Applied -= SettingsDialog_Applied;
+        settingsDialog.Cancelled -= SettingsDialog_Cancelled;
+        RootGrid.Children.Remove(settingsDialog);
+        settingsDialog.Dispose();
+        settingsDialog = null;
     }
 
     private void ApplySettings(GameSettingsProfile profile)
@@ -208,7 +242,17 @@ public partial class MainWindow : Window
 
     private void MainWindow_Closed(object? sender, EventArgs e)
     {
+        CloseSettingsDialog();
         Viewport.FrameChanged -= Viewport_FrameChanged;
+        Closing -= MainWindow_Closing;
         Closed -= MainWindow_Closed;
+    }
+
+    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        if (settingsDialog?.ApplyInProgress == true)
+        {
+            e.Cancel = true;
+        }
     }
 }

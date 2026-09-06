@@ -21,6 +21,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
     private static readonly ulong PanelKey = StableKey("spelljammer.menu.panel");
     private static readonly ulong TitleKey = StableKey("spelljammer.menu.title");
     private static readonly ulong SubtitleKey = StableKey("spelljammer.menu.subtitle");
+    private static readonly ulong NewGameButtonKey = StableKey("spelljammer.menu.new-game");
     private static readonly ulong SettingsButtonKey = StableKey("spelljammer.menu.settings");
     private static readonly ulong QuitButtonKey = StableKey("spelljammer.menu.quit");
     private static readonly ulong StatusKey = StableKey("spelljammer.menu.status");
@@ -34,6 +35,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         PanelKey,
         TitleKey,
         SubtitleKey,
+        NewGameButtonKey,
         SettingsButtonKey,
         QuitButtonKey,
         StatusKey,
@@ -61,6 +63,7 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         Unloaded += View_Unloaded;
     }
 
+    internal event EventHandler? NewGameRequested;
     internal event EventHandler? SettingsRequested;
     internal event EventHandler? QuitRequested;
 
@@ -114,6 +117,8 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             TextAlignment.Center, FontWeights.SemiBold);
         DrawText(drawingContext, SubtitleKey, strings.Get("menu.subtitle"), 16, "#C4BBD1",
             TextAlignment.Center, FontWeights.Normal);
+        DrawText(drawingContext, NewGameButtonKey, strings.Get("menu.button.new-game"), 20, "#F4E7CE",
+            TextAlignment.Center, FontWeights.SemiBold);
         DrawText(drawingContext, SettingsButtonKey, strings.Get("menu.button.settings"), 20, "#F4E7CE",
             TextAlignment.Center, FontWeights.SemiBold);
         DrawText(drawingContext, QuitButtonKey, strings.Get("menu.button.quit"), 20, "#F4E7CE",
@@ -277,9 +282,11 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
             customColor: true, color: Color(0, 0, 0, 0)),
         TextElement(TitleKey, 30, 55, 360, 72, strings.Get("menu.title"), allocatedNames),
         TextElement(SubtitleKey, 30, 135, 360, 50, strings.Get("menu.subtitle"), allocatedNames),
-        Button(SettingsButtonKey, 60, 290, 300, 68, 0,
+        Button(NewGameButtonKey, 60, 242, 300, 68, 0,
+            strings.Get("menu.button.new-game"), allocatedNames),
+        Button(SettingsButtonKey, 60, 326, 300, 68, 1,
             strings.Get("menu.button.settings"), allocatedNames),
-        Button(QuitButtonKey, 60, 382, 300, 68, 1,
+        Button(QuitButtonKey, 60, 410, 300, 68, 2,
             strings.Get("menu.button.quit"), allocatedNames),
         TextElement(StatusKey, 35, 485, 350, 58,
             strings.Get("menu.accessibility.status"), allocatedNames),
@@ -439,7 +446,11 @@ internal sealed class SpriteForgeMainMenuView : FrameworkElement, IDisposable
         for (int index = 0; index < actionCount; ++index)
         {
             EngineUiAction action = actions[index];
-            if (action.Source == SettingsButtonKey)
+            if (action.Source == NewGameButtonKey)
+            {
+                NewGameRequested?.Invoke(this, EventArgs.Empty);
+            }
+            else if (action.Source == SettingsButtonKey)
             {
                 SettingsRequested?.Invoke(this, EventArgs.Empty);
             }

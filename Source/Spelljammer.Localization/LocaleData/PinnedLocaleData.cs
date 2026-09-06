@@ -30,7 +30,8 @@ internal static class PinnedLocaleData
         "CLDR-48.2.0|en:0123456789,.;en-cardinal,ordinal|" +
         "fr:0123456789,\\u202f;fr-cardinal,other-ordinal|" +
         "ru:0123456789,\\u00a0;ru-cardinal,other-ordinal|" +
-        "ar:٠١٢٣٤٥٦٧٨٩,٫٬٪;ar-cardinal,other-ordinal";
+        "ar:٠١٢٣٤٥٦٧٨٩,٫٬٪;ar-cardinal,other-ordinal|" +
+        "zh:0123456789,.;other-cardinal,other-ordinal";
 
     private static readonly NumberProfile English = new(
         "en", "0123456789", ".", ",", "%", string.Empty, "%");
@@ -43,6 +44,9 @@ internal static class PinnedLocaleData
 
     private static readonly NumberProfile Arabic = new(
         "ar", "٠١٢٣٤٥٦٧٨٩", "٫", "٬", "٪", string.Empty, "٪");
+
+    private static readonly NumberProfile Chinese = new(
+        "zh", "0123456789", ".", ",", "%", string.Empty, "%");
 
     public static string TableHash { get; } =
         Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(CanonicalTable)));
@@ -60,6 +64,7 @@ internal static class PinnedLocaleData
             "fr" => French,
             "ru" => Russian,
             "ar" => Arabic,
+            "zh" => Chinese,
             _ => null
         };
         return profile is not null;

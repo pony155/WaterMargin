@@ -17,6 +17,10 @@
       "description": "Button that exits the application.",
       "message": "Quit game"
     },
+    "menu.button.new-game": {
+      "description": "Button that opens character creation for a new voyage.",
+      "message": "New game"
+    },
     "menu.button.settings": {
       "description": "Button that opens the game settings dialog.",
       "message": "Game settings"

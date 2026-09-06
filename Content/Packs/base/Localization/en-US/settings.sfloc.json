@@ -161,6 +161,10 @@
       "description": "Name of the French language option.",
       "message": "French"
     },
+    "settings.value.language.zh-hant-tw": {
+      "description": "Name of the Traditional Chinese language option.",
+      "message": "Traditional Chinese"
+    },
     "settings.value.resolution.desktop": {
       "description": "Resolution option that uses the desktop work area.",
       "message": "Desktop"

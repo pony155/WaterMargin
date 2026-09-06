@@ -2,9 +2,9 @@
 
 ## Implemented slice
 
-Spelljammer starts in `MainMenuWindow`. Its current actions are Game Settings
-and Quit Game; it intentionally does not advertise Continue, New Game, or the
-older expedition prototype while those flows are not connected.
+Spelljammer starts in `MainMenuWindow`. Its current actions are New Game, Game
+Settings, and Quit Game. New Game opens the first character-creation UI; it
+does not yet advertise Continue or connect the retained expedition prototype.
 
 The authored background is:
 
@@ -42,15 +42,21 @@ independent presentation constant.
 
 ## Localization and lifecycle
 
-Player-visible strings are authored in the `en-US` and `fr-FR` menu/settings
-catalogs under `Content/Packs/base/Localization`. The offline compiler builds
-all four catalogs before WPF compilation and embeds the artifacts. The
-application stages and publishes both complete namespaces in the selected
-locale on the UI thread before constructing the menu. Applying a language
-change republishes the catalogs and rebuilds the retained menu document.
+Player-visible strings are authored in the `en-US`, `fr-FR`, and
+`zh-Hant-TW` menu, settings, and creation catalogs under
+`Content/Packs/base/Localization`. The offline compiler builds all nine
+catalogs before WPF compilation and embeds the artifacts. The application
+stages and publishes all three complete namespaces in the selected locale on
+the UI thread before constructing the menu. Applying a language change
+republishes the catalogs and rebuilds the retained menu document.
 
-Game Settings opens the existing owner-modal settings dialog. Quit Game emits
-a copied stable action and requests ordinary application shutdown. Closing the
+New Game and Game Settings add modal overlays to the existing main-window
+visual tree; neither creates a second operating-system window or taskbar entry.
+Character creation cycles through the 11 authored first-voyage captain
+templates and records an explicit rerollable voyage seed. Confirm currently
+returns the selection to the host and reports it on the main menu; campaign
+construction, persistence, and launch remain planned. Quit Game emits a copied
+stable action and requests ordinary application shutdown. Closing the
 operating-system window has the same shutdown result. Native UI documents are
 destroyed on their owner thread when the window unloads.
 

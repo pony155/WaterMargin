@@ -37,6 +37,8 @@ internal static class SettingsContracts
 
     private static void Version1ProfilesMigrateToSafeDisplayDefaults()
     {
+        True(GameSettingsChoices.IsSupportedLanguage("zh-Hant-TW"),
+            "Traditional Chinese is not exposed as a stable settings choice.");
         GameSettingsReadResult migrated = GameSettingsCodec.Decode(Encoding.UTF8.GetBytes(
             "{\"schemaVersion\":1,\"masterVolume\":55,\"musicVolume\":45,\"effectsVolume\":35," +
             "\"subtitles\":false,\"reducedMotion\":true,\"screenShake\":false,\"uiScalePercent\":125}"));

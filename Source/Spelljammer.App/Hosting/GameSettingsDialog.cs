@@ -1,17 +1,18 @@
-using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using Spelljammer.Presentation;
 using Spelljammer.Settings;
 
 namespace Spelljammer;
 
-internal sealed class GameSettingsDialog : Window
+internal sealed class GameSettingsDialog : Grid, IDisposable
 {
     private readonly GameSettingsRegistry registry;
     private readonly string settingsPath;
     private readonly SpriteForgeSettingsView settingsView;
     private bool applyInProgress;
+    private bool disposed;
 
     internal GameSettingsDialog(
         GameSettingsRegistry registry,
@@ -20,22 +21,29 @@ internal sealed class GameSettingsDialog : Window
     {
         this.registry = registry;
         this.settingsPath = settingsPath;
-        Title = strings.Get("settings.title.window");
-        Width = 820;
-        Height = 680;
-        MinWidth = 660;
-        MinHeight = 560;
-        WindowStartupLocation = WindowStartupLocation.CenterOwner;
-        ResizeMode = ResizeMode.CanResize;
-        Background = new SolidColorBrush(Color.FromRgb(9, 13, 24));
-        ShowInTaskbar = false;
+        Background = new SolidColorBrush(Color.FromArgb(184, 3, 6, 14));
+        Focusable = true;
+
         settingsView = new SpriteForgeSettingsView(registry.Active, strings);
+        Viewbox viewbox = new()
+        {
+            Child = settingsView,
+            Stretch = Stretch.Uniform,
+            StretchDirection = StretchDirection.DownOnly,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(24),
+        };
+        Children.Add(viewbox);
+
         settingsView.ApplyRequested += SettingsView_ApplyRequested;
         settingsView.CancelRequested += SettingsView_CancelRequested;
-        Content = settingsView;
-        Closing += Dialog_Closing;
-        Closed += Dialog_Closed;
     }
+
+    internal event EventHandler? Applied;
+    internal event EventHandler? Cancelled;
+
+    internal bool ApplyInProgress => applyInProgress;
 
     private async void SettingsView_ApplyRequested(object? sender, GameSettingsApplyRequestedEventArgs e)
     {
@@ -54,25 +62,29 @@ internal sealed class GameSettingsDialog : Window
             return;
         }
 
-        DialogResult = true;
+        Applied?.Invoke(this, EventArgs.Empty);
     }
 
-    private void SettingsView_CancelRequested(object? sender, EventArgs e) => DialogResult = false;
-
-    private void Dialog_Closing(object? sender, CancelEventArgs e)
+    private void SettingsView_CancelRequested(object? sender, EventArgs e)
     {
-        if (applyInProgress)
+        if (!applyInProgress)
         {
-            e.Cancel = true;
+            Cancelled?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    private void Dialog_Closed(object? sender, EventArgs e)
+    public void Dispose()
     {
+        if (disposed)
+        {
+            return;
+        }
+
+        disposed = true;
         settingsView.ApplyRequested -= SettingsView_ApplyRequested;
         settingsView.CancelRequested -= SettingsView_CancelRequested;
         settingsView.Dispose();
-        Closing -= Dialog_Closing;
-        Closed -= Dialog_Closed;
+        Children.Clear();
+        GC.SuppressFinalize(this);
     }
 }
