@@ -418,6 +418,10 @@ actions include:
 - choosing which threatened places receive limited time and resources; and
 - retreating, relocating the home anchorage, or preparing a survival voyage.
 
+When a crisis objective becomes a crew- or ship-scale fight, it uses the shared
+rules in [`Battle.md`](Battle.md). Strategic fronts supply context and
+consequences; they do not create a second incompatible combat system.
+
 Objectives expose their likely contribution, risk, deadline, and dependencies.
 Hidden consequences require discoverable evidence rather than arbitrary
 reversals. No single character Race, Heritage, Talent, skill, spell, ship path,

@@ -63,9 +63,12 @@ classless capability model is split into
 the authored spell catalog, and psychic systems are defined in
 [`Docs/Product/Spells.md`](Docs/Product/Spells.md), and
 [`Docs/Product/PsychicAbilities.md`](Docs/Product/PsychicAbilities.md).
-Planned ship frames, modules, networks, damage, and refits are defined in
-[`Docs/Product/Ships.md`](Docs/Product/Ships.md). The versioned procedural
-galaxy graph, Starways, system generation, and discovery model are defined in
+Ship engagements, boarding, ruin expeditions, EVA fighting, injuries, and
+tactical resolution are defined in
+[`Docs/Product/Battle.md`](Docs/Product/Battle.md). Planned ship frames,
+modules, networks, damage, and refits are defined in
+[`Docs/Product/Ships.md`](Docs/Product/Ships.md). The versioned procedural galaxy
+graph, Starways, system generation, and discovery model are defined in
 [`Docs/Product/GalaxyMap.md`](Docs/Product/GalaxyMap.md). Planned faction
 membership, standing, diplomacy, territory, laws, markets, and conflict are
 defined in [`Docs/Product/Factions.md`](Docs/Product/Factions.md). Optional
@@ -88,6 +91,12 @@ defined in
 | `Docs/Architecture/` | Implemented and planned subsystem boundaries. |
 | `Docs/Archive/` | Historical explorations; not current product authority. |
 | `Build/` | Focused CMake declarations included by the root project. |
+
+Planned implementation contracts are documented in
+[`Docs/Architecture/ContentPacks.md`](Docs/Architecture/ContentPacks.md),
+[`Docs/Architecture/CharacterCapabilities.md`](Docs/Architecture/CharacterCapabilities.md),
+[`Docs/Architecture/Modding.md`](Docs/Architecture/Modding.md), and
+[`Docs/Architecture/ImplementationRoadmap.md`](Docs/Architecture/ImplementationRoadmap.md).
 
 ## Build and run
 

@@ -6,6 +6,9 @@ This document defines the planned attribute model. Character attributes are not
 implemented yet. Races, heritages, and complete character composition are
 defined in [`Races.md`](Races.md); learned capabilities and action resolution
 are defined in [`Skills.md`](Skills.md).
+The planned data definitions, runtime registry, and character-state layout are
+specified in
+[`../Architecture/CharacterCapabilities.md`](../Architecture/CharacterCapabilities.md).
 
 ## Purpose
 

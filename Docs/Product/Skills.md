@@ -8,7 +8,11 @@ systems. They are not implemented yet. Broad capability is defined in
 positions are defined in [`Races.md`](Races.md). Spellcasting rules and the
 authored spell catalog are defined in [`Spells.md`](Spells.md), and psychic
 techniques are expanded in
-[`PsychicAbilities.md`](PsychicAbilities.md).
+[`PsychicAbilities.md`](PsychicAbilities.md). Combat actions and tactical
+contexts are defined in [`Battle.md`](Battle.md).
+The planned data registry, training state, and action-eligibility implementation
+are specified in
+[`../Architecture/CharacterCapabilities.md`](../Architecture/CharacterCapabilities.md).
 
 ## Classless skill system
 

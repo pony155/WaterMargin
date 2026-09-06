@@ -417,7 +417,8 @@ meals, position authority, and cross-duty assignment are exercised. The slice
 needs only four shared needs—rest, nutrition or thirst, safety, and belonging—
 and five duties: navigate, salvage, repair, prepare a meal, and treat an injury.
 Attribute, skill, language, script, ancient-lore, and encounter scope is defined
-in the linked capability documents.
+in the linked capability documents. See [`Battle.md`](Battle.md) for combat,
+injury, surrender, and tactical-position rules.
 
 The slice succeeds when race and heritage change real voyage decisions, every
 crew action has an inspectable reason, and replaying the same seed and commands

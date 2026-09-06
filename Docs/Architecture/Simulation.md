@@ -36,3 +36,10 @@ Introduce a fixed-tick `VoyageWorld` with stable ship, crew, module, and
 encounter identities. Commands should enter a bounded queue and publish a
 read-only snapshot only after a complete tick. The current expedition state can
 then become the strategic navigation layer around the more detailed world.
+
+The staged plan is defined in
+[`ImplementationRoadmap.md`](ImplementationRoadmap.md). Gameplay content and
+character capability contracts are defined in
+[`ContentPacks.md`](ContentPacks.md) and
+[`CharacterCapabilities.md`](CharacterCapabilities.md). The planned untrusted
+mod boundary is defined in [`Modding.md`](Modding.md).

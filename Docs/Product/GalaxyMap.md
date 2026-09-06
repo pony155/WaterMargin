@@ -142,6 +142,10 @@ authored templates, parameters, factions, sites, and consequences. Unique
 landmarks have explicit minimum distance, mutual exclusion, and maximum-count
 rules.
 
+When a site produces a hostile encounter, tactical layout and resolution follow
+[`Battle.md`](Battle.md). Returning to exploration preserves opened routes,
+disabled defenses, damage, hazards, recovered objects, and abandoned actors.
+
 ## Starways and travel
 
 Each Starway stores stable endpoint IDs and authored or generated values for:

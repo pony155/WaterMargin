@@ -6,6 +6,8 @@ This document defines the planned ship-frame, compartment, module, network,
 damage, and refit systems. They are not implemented yet. The current voyage
 prototype stores only aggregate Hull, Fuel, Supplies, and Cargo values; those
 values must not be described as a finished modular-ship simulation.
+Ship engagements, boarding transitions, and shipboard combat are defined in
+[`Battle.md`](Battle.md).
 
 ## Design goals
 

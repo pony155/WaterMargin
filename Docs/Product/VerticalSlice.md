@@ -22,7 +22,7 @@
   content definitions
 - [ ] Language and Literacy skill, race-associated scripts, and ancient-lore
   discovery
-- [ ] Tactical boarding or ship-to-ship encounter
+- [ ] Tactical ship engagement connected to a boarding or ruin encounter
 - [ ] Versioned save/load with validation and atomic publication
 - [ ] Runtime localization bootstrap for all prototype UI text
 - [ ] CI execution of headless deterministic scenario coverage
