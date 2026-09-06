@@ -55,7 +55,9 @@ public sealed record PerkDefinition(
     string DescriptionKey,
     ImmutableArray<RaceId> CompatibleRaceIds,
     ImmutableArray<AccessId> GrantedAccessIds,
-    ImmutableArray<TechniqueId> GrantedTechniqueIds)
+    ImmutableArray<TechniqueId> GrantedTechniqueIds,
+    ImmutableArray<PerkId> GrantedPerkIds,
+    ImmutableArray<ContentId> EffectIds)
     : ContentDefinition(PerkId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
 
 public sealed record RaceDefinition(
@@ -64,7 +66,8 @@ public sealed record RaceDefinition(
     int Revision,
     string NameKey,
     string DescriptionKey,
-    ImmutableArray<PerkId> GrantedPerkIds)
+    ImmutableArray<PerkId> GrantedPerkIds,
+    ImmutableArray<ContentId> RequiredSupportIds)
     : ContentDefinition(RaceId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
 
 public sealed record TrainingProjectDefinition(
@@ -77,3 +80,52 @@ public sealed record TrainingProjectDefinition(
     int WorkUnits,
     ImmutableArray<FeatId> GrantedFeatIds)
     : ContentDefinition(TrainingProjectId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record HeritageDefinition(
+    HeritageId HeritageId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    RaceId RaceId,
+    ImmutableArray<PerkId> GrantedPerkIds)
+    : ContentDefinition(HeritageId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record BackgroundDefinition(
+    BackgroundId BackgroundId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    ImmutableArray<RaceId> CompatibleRaceIds,
+    ImmutableArray<AttributeId> AttributeBonusIds,
+    ImmutableArray<SkillId> FocusSkillIds)
+    : ContentDefinition(BackgroundId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record TechniqueDefinition(
+    TechniqueId TechniqueId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    ImmutableArray<AccessId> RequiredAccessIds,
+    ImmutableArray<PerkId> GrantedPerkIds)
+    : ContentDefinition(TechniqueId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);
+
+public sealed record CharacterDefinition(
+    CharacterId CharacterId,
+    int SchemaVersion,
+    int Revision,
+    string NameKey,
+    string DescriptionKey,
+    RaceId RaceId,
+    HeritageId HeritageId,
+    BackgroundId BackgroundId,
+    ImmutableArray<ScenarioId> ScenarioIds,
+    ContentId PositionId,
+    ImmutableArray<ContentId> LanguageIds,
+    ImmutableArray<ContentId> ScriptIds,
+    ImmutableArray<ContentId> EquipmentIds,
+    ImmutableArray<SkillId> FocusSkillIds,
+    ImmutableArray<ResourceId> ResourceIds)
+    : ContentDefinition(CharacterId.Value, SchemaVersion, Revision, NameKey, DescriptionKey);

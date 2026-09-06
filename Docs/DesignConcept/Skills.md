@@ -3,7 +3,9 @@
 ## Status
 
 This document defines the planned classless skill, language, script, and lore
-systems. They are not implemented yet. Broad capability is defined in
+systems. All 29 Skill definitions and their typed immutable content registry
+are implemented; character values, advancement, actions, languages, scripts,
+and lore state remain planned. Broad capability is defined in
 [`Attributes.md`](Attributes.md), while race, heritage, identity, background,
 and Racial Perks are defined in [`Races.md`](Races.md). Spellcasting rules and the
 authored spell catalog are defined in [`Spells.md`](Spells.md), and psychic

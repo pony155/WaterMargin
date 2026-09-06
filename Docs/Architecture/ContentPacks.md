@@ -6,9 +6,9 @@ This document specifies the gameplay content pipeline. The Milestone 1
 foundation is implemented: explicit-root discovery, strict source validation,
 deterministic ordering, immutable candidate compilation, semantic
 fingerprinting, transactional publication, and offline validation are
-available. Base Attributes and Skills remain compiled prototype data until
-Milestone 2 authors the production base pack. The current expedition behavior
-is unchanged.
+available. Milestone 2 adds the production base Attribute and Skill catalogs,
+typed dense registries, default-locale validation, and registry inspection.
+Character state and the current expedition behavior remain unchanged.
 
 The first implementation moves character Attributes and Skills into a built-in
 base pack without changing the expedition prototype. Later systems reuse the
@@ -217,8 +217,8 @@ enum members. Compilation sorts stable IDs before assigning indices.
 ## Localization boundary
 
 Definitions contain keys such as `nameKey` and `descriptionKey`, not displayed
-prose. Validation checks key syntax and can report missing default-locale
-entries, while Simulation stores and compares gameplay IDs only.
+prose. Validation checks key syntax and rejects missing default-locale entries,
+while Simulation stores and compares gameplay IDs only.
 
 Each pack owns its localization namespace. Gameplay and localization catalogs
 publish independently but use the same validated pack order and transactional

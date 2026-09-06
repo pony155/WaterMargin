@@ -7,6 +7,10 @@ references `Spelljammer.Simulation`, which owns stable gameplay ID wrappers and
 immutable runtime definition types. Simulation never references this project
 and performs no filesystem work.
 
+Milestone 2 additionally provides typed Attribute and Skill registries whose
+dense indices are scoped to one fingerprint, required `en-US` key validation,
+and a headless inspection snapshot used by the offline `report` command.
+
 Public namespaces are:
 
 - `Spelljammer.Content` for versioned limits;

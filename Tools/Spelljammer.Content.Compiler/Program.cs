@@ -8,14 +8,16 @@ const int InvalidContentExitCode = 2;
 const int IoFailureExitCode = 3;
 const int UsageExitCode = 64;
 
-if (args.Length < 2 || args[0] != "validate")
+if (args.Length < 2 || args[0] is not ("validate" or "report"))
 {
-    Console.Error.WriteLine("Usage: Spelljammer.Content.Compiler validate <pack-root> [--game-version X.Y.Z] [--json]");
+    Console.Error.WriteLine("Usage: Spelljammer.Content.Compiler <validate|report> <pack-root>... [--game-version X.Y.Z] [--json]");
     return UsageExitCode;
 }
 
+bool report = args[0] == "report";
 SemanticVersion gameVersion = new(0, 1, 0);
 bool json = false;
+List<string> packRoots = [args[1]];
 for (int index = 2; index < args.Length; index++)
 {
     if (args[index] == "--json")
@@ -26,6 +28,10 @@ for (int index = 2; index < args.Length; index++)
              SemanticVersion.TryParse(args[++index], out SemanticVersion parsed))
     {
         gameVersion = parsed;
+    }
+    else if (!args[index].StartsWith("--", StringComparison.Ordinal))
+    {
+        packRoots.Add(args[index]);
     }
     else
     {
@@ -38,13 +44,26 @@ GameContentCompiler compiler = new();
 ContentCompilationResult result;
 try
 {
-    result = compiler.Compile([new DirectoryContentPackSource(args[1])], gameVersion);
+    result = compiler.Compile(
+        packRoots.Select(root => (IContentPackSource)new DirectoryContentPackSource(root)).ToArray(),
+        gameVersion);
 }
 catch (Exception exception) when (exception is ArgumentException or IOException or UnauthorizedAccessException or NotSupportedException)
 {
     result = new ContentCompilationResult(null, [], new ContentIoFailure(ContentIoFailureKind.ReadFailed, null));
 }
-if (json)
+if (report && result.Succeeded)
+{
+    if (json)
+    {
+        WriteReportJson(result.Snapshot!.Inspect());
+    }
+    else
+    {
+        WriteReportText(result.Snapshot!.Inspect());
+    }
+}
+else if (json)
 {
     WriteJson(result);
 }
@@ -123,6 +142,43 @@ static void WriteJson(ContentCompilationResult result)
         }
 
         writer.WriteEndArray();
+        writer.WriteEndObject();
+    }
+
+    writer.WriteEndArray();
+    writer.WriteEndObject();
+    writer.Flush();
+    Console.WriteLine();
+}
+
+static void WriteReportText(RegistryInspectionSnapshot report)
+{
+    Console.WriteLine($"fingerprint {report.Fingerprint}");
+    Console.WriteLine($"counts packs={report.PackCount} definitions={report.DefinitionCount} attributes={report.AttributeCount} skills={report.SkillCount}");
+    foreach (RegistryInspectionEntry entry in report.Entries)
+    {
+        Console.WriteLine($"{entry.Kind} {entry.Index} {entry.Id} {entry.PackId} revision={entry.Revision}");
+    }
+}
+
+static void WriteReportJson(RegistryInspectionSnapshot report)
+{
+    using Utf8JsonWriter writer = new(Console.OpenStandardOutput(), new JsonWriterOptions { Indented = false });
+    writer.WriteStartObject();
+    writer.WriteString("fingerprint", report.Fingerprint.ToString());
+    writer.WriteNumber("packCount", report.PackCount);
+    writer.WriteNumber("definitionCount", report.DefinitionCount);
+    writer.WriteNumber("attributeCount", report.AttributeCount);
+    writer.WriteNumber("skillCount", report.SkillCount);
+    writer.WriteStartArray("entries");
+    foreach (RegistryInspectionEntry entry in report.Entries)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("kind", entry.Kind);
+        writer.WriteNumber("index", entry.Index);
+        writer.WriteString("id", entry.Id);
+        writer.WriteString("packId", entry.PackId);
+        writer.WriteNumber("revision", entry.Revision);
         writer.WriteEndObject();
     }
 

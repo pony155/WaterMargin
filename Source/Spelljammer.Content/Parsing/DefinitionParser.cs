@@ -10,16 +10,23 @@ internal static class DefinitionParser
 {
     private static readonly string[] CommonRequired = ["schemaVersion", "revision", "id", "nameKey", "descriptionKey"];
 
-    private static readonly IReadOnlyDictionary<DefinitionKind, string[]> KindFields =
-        new Dictionary<DefinitionKind, string[]>
+    private sealed record KindSchema(string[] Required, string[] Optional);
+
+    private static readonly IReadOnlyDictionary<DefinitionKind, KindSchema> KindSchemas =
+        new Dictionary<DefinitionKind, KindSchema>
         {
-            [DefinitionKind.Attribute] = ["minimum", "maximum", "defaultValue", "tags"],
-            [DefinitionKind.Skill] = ["minimum", "maximum", "progressionCurveId", "actionTags"],
-            [DefinitionKind.Access] = ["tags"],
-            [DefinitionKind.Feat] = ["trainingProjectId", "grantedAccessIds"],
-            [DefinitionKind.Perk] = ["compatibleRaceIds", "grantedAccessIds", "grantedTechniqueIds"],
-            [DefinitionKind.Race] = ["grantedPerkIds"],
-            [DefinitionKind.TrainingProject] = ["requiredSkillIds", "workUnits", "grantedFeatIds"],
+            [DefinitionKind.Attribute] = new(["minimum", "maximum", "defaultValue", "tags"], []),
+            [DefinitionKind.Skill] = new(["minimum", "maximum", "progressionCurveId", "actionTags"], []),
+            [DefinitionKind.Access] = new(["tags"], []),
+            [DefinitionKind.Background] = new(["compatibleRaceIds", "attributeBonusIds", "focusSkillIds"], []),
+            [DefinitionKind.Character] = new(
+                ["raceId", "heritageId", "backgroundId", "scenarioIds", "positionId", "languageIds", "scriptIds", "equipmentIds", "focusSkillIds", "resourceIds"], []),
+            [DefinitionKind.Feat] = new(["trainingProjectId", "grantedAccessIds"], []),
+            [DefinitionKind.Heritage] = new(["raceId", "grantedPerkIds"], []),
+            [DefinitionKind.Perk] = new(["compatibleRaceIds", "grantedAccessIds", "grantedTechniqueIds"], ["grantedPerkIds", "effectIds"]),
+            [DefinitionKind.Race] = new(["grantedPerkIds"], ["requiredSupportIds"]),
+            [DefinitionKind.Technique] = new(["requiredAccessIds", "grantedPerkIds"], []),
+            [DefinitionKind.TrainingProject] = new(["requiredSkillIds", "workUnits", "grantedFeatIds"], []),
         };
 
     private static readonly IReadOnlyDictionary<string, DefinitionKind> Directories =
@@ -28,9 +35,13 @@ internal static class DefinitionParser
             ["Attributes"] = DefinitionKind.Attribute,
             ["Skills"] = DefinitionKind.Skill,
             ["Access"] = DefinitionKind.Access,
+            ["Backgrounds"] = DefinitionKind.Background,
+            ["Characters"] = DefinitionKind.Character,
             ["Feats"] = DefinitionKind.Feat,
+            ["Heritages"] = DefinitionKind.Heritage,
             ["Perks"] = DefinitionKind.Perk,
             ["Races"] = DefinitionKind.Race,
+            ["Techniques"] = DefinitionKind.Technique,
             ["TrainingProjects"] = DefinitionKind.TrainingProject,
         };
 
@@ -60,9 +71,10 @@ internal static class DefinitionParser
             return null;
         }
 
-        string[] kindFields = KindFields[kind];
-        string[] required = [.. CommonRequired, .. kindFields];
-        HashSet<string> allowed = new(required, StringComparer.Ordinal);
+        KindSchema schema = KindSchemas[kind];
+        string[] kindFields = [.. schema.Required, .. schema.Optional];
+        string[] required = [.. CommonRequired, .. schema.Required];
+        HashSet<string> allowed = new([.. required, .. schema.Optional], StringComparer.Ordinal);
         JsonElement root = document.RootElement;
         if (!SourceValidation.ValidateProperties(root, allowed, required, diagnostics, packId, relativePath) ||
             !SourceValidation.TrySchemaVersion(root, diagnostics, packId, relativePath))
@@ -88,7 +100,12 @@ internal static class DefinitionParser
         Dictionary<string, ImmutableArray<string>> arrays = new(StringComparer.Ordinal);
         foreach (string field in kindFields)
         {
-            JsonElement value = root.GetProperty(field);
+            if (!root.TryGetProperty(field, out JsonElement value))
+            {
+                arrays.Add(field, []);
+                continue;
+            }
+
             if (value.ValueKind == JsonValueKind.Number)
             {
                 if (!value.TryGetInt32(out int number))
@@ -137,11 +154,14 @@ internal static class DefinitionParser
 
         foreach ((string field, ImmutableArray<string> values) in arrays)
         {
-            if (field == "tags")
+            if (field is "tags" or "effectIds")
             {
-                if (values.Any(value => !SourceValidation.IsIdSegment(value)))
+                bool invalid = field == "tags"
+                    ? values.Any(value => !SourceValidation.IsIdSegment(value))
+                    : values.Any(value => !ContentId.IsCanonical(value));
+                if (invalid)
                 {
-                    diagnostics.Add(ContentDiagnosticCodes.IdInvalid, packId, relativePath, idText, "/tags");
+                    diagnostics.Add(ContentDiagnosticCodes.IdInvalid, packId, relativePath, idText, "/" + field);
                     return null;
                 }
 
@@ -158,7 +178,21 @@ internal static class DefinitionParser
             }
         }
 
+        AttributeSourceDto? attribute = kind == DefinitionKind.Attribute
+            ? new AttributeSourceDto(
+                integers["minimum"],
+                integers["maximum"],
+                integers["defaultValue"],
+                arrays["tags"])
+            : null;
+        SkillSourceDto? skill = kind == DefinitionKind.Skill
+            ? new SkillSourceDto(
+                integers["minimum"],
+                integers["maximum"],
+                new ContentId(strings["progressionCurveId"]),
+                [.. arrays["actionTags"].Select(value => new ContentId(value))])
+            : null;
         return new SourceDefinition(kind, id, 1, revision, nameKey, descriptionKey, packId, relativePath,
-            integers, strings, arrays);
+            integers, strings, arrays, attribute, skill);
     }
 }

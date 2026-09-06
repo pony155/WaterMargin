@@ -2,9 +2,10 @@
 
 ## Status
 
-This document specifies planned data and runtime contracts for Attributes,
-Skills, learned Feats, Racial Perks, supernatural access, and known
-techniques. They are not implemented; the current simulation has no characters.
+This document specifies data and runtime contracts for Attributes, Skills,
+learned Feats, Racial Perks, supernatural access, and known techniques.
+Milestone 2 implements the Attribute and Skill definitions and typed registries;
+the remaining capability systems and character state are not implemented.
 
 Product behavior is defined in
 [`../DesignConcept/Attributes.md`](../DesignConcept/Attributes.md),

@@ -7,6 +7,6 @@
   "dependencies": [],
   "loadAfter": [],
   "definitionRoots": ["Definitions"],
-  "localizationRoots": [],
+  "localizationRoots": ["Localization"],
   "contentRevision": 1
 }

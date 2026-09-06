@@ -85,7 +85,10 @@ Diagnostics MUST NOT contain:
 Developer logs may attach exception type and resolved root through a separate
 privacy-reviewed channel. They do not change the stable diagnostic payload.
 
-## Initial diagnostic registry
+## Diagnostic registry
+
+The first 24 entries were frozen in M0. Milestone 2 adds the final
+default-locale completeness entry below without changing the earlier codes.
 
 | Code | Trigger |
 | --- | --- |
@@ -113,6 +116,7 @@ privacy-reviewed channel. They do not change the stable diagnostic payload.
 | `CONTENT_COLLECTION_DUPLICATE` | A set-like array repeats an entry |
 | `CONTENT_SEMANTIC_INVALID` | Individually valid fields form an impossible definition |
 | `CONTENT_LIMIT_EXCEEDED` | Input would exceed any named inclusive capacity limit |
+| `CONTENT_LOCALIZATION_KEY_MISSING` | A definition's required name or description key is absent from its pack's default-locale catalogs |
 
 Environmental I/O failures use a separate non-content operation result with
 one bounded category: `not-found`, `access-denied`, `changed-during-read`, or
@@ -136,7 +140,8 @@ use this precedence:
 7. duplicate definitions and kind;
 8. reference linking;
 9. value, collection, and semantic validation; and
-10. total content limits.
+10. total content limits; and
+11. required default-locale key completeness.
 
 The loader may report several independent errors after safe parsing, but it must
 emit the precedence winner first for the same property or candidate document.

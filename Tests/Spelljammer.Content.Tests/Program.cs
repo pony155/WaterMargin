@@ -1,9 +1,11 @@
 using System.Text;
 using System.Text.Json;
+using System.Collections.Immutable;
 using Spelljammer.Content;
 using Spelljammer.Content.Compilation;
 using Spelljammer.Content.Manifests;
 using Spelljammer.Content.Sources;
+using Spelljammer.Simulation.Characters;
 using Spelljammer.Simulation.Content;
 
 return ContentContracts.Run();
@@ -12,6 +14,7 @@ internal static class ContentContracts
 {
     private static readonly SemanticVersion GameVersion = new(0, 1, 0);
     private static readonly string FixtureRoot = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Milestone0");
+    private static readonly string Milestone2Root = Path.Combine(AppContext.BaseDirectory, "Fixtures", "Milestone2");
 
     public static int Run()
     {
@@ -19,7 +22,15 @@ internal static class ContentContracts
         ValidFixtureIsCanonicalAndDeterministic();
         EveryFrozenDiagnosticCaseIsRecognized();
         FailedReplacementPreservesPublishedSnapshot();
-        Console.WriteLine("Content foundation contracts passed.");
+        BaseAttributesAndSkillsAreTypedAndIndexed();
+        Milestone2InvalidCasesAreRecognized();
+        AdditiveSkillIsDynamicAndReversible();
+        CharacterDefinitionsRejectInvalidGraphs();
+        BaseRosterIsDeterministicAndDynamic();
+        EligibilityAndResolutionAreAtomic();
+        TrainingGrantsAccessOnlyAtCompletion();
+        RaceCapabilitiesRespectTheirBoundaries();
+        Console.WriteLine("Content and character capability contracts passed.");
         return 0;
     }
 
@@ -101,6 +112,269 @@ internal static class ContentContracts
         True(ReferenceEquals(published, registry.Current), "Failed replacement changed the registry owner.");
     }
 
+    private static void BaseAttributesAndSkillsAreTypedAndIndexed()
+    {
+        ContentCompilationResult result = CompileDirectory(Path.Combine(Milestone2Root, "base"));
+        True(result.Succeeded, Primary(result));
+        GameContentSnapshot snapshot = result.Snapshot!;
+        using JsonDocument expectedFingerprints = JsonDocument.Parse(
+            File.ReadAllBytes(Path.Combine(Milestone2Root, "expected", "fingerprints.json")));
+        Equal(
+            expectedFingerprints.RootElement.GetProperty("baseSha256").GetString()!,
+            snapshot.Fingerprint.ToString(),
+            "The base Attribute and Skill fingerprint changed.");
+        Equal(7, snapshot.AttributeRegistry.Count, "The base Attribute roster is incomplete.");
+        Equal(29, snapshot.SkillRegistry.Count, "The base Skill roster is incomplete.");
+        string[] expectedAttributes =
+        [
+            "attribute.agility", "attribute.charisma", "attribute.intelligence", "attribute.luck",
+            "attribute.strength", "attribute.toughness", "attribute.willpower",
+        ];
+        string[] expectedSkills =
+        [
+            "skill.acrobatics", "skill.alchemy", "skill.ancient-lore", "skill.archery", "skill.astrogation",
+            "skill.athletics", "skill.command", "skill.cooking", "skill.crafting", "skill.deception",
+            "skill.defense", "skill.enchantment", "skill.engineering", "skill.eva", "skill.gunnery",
+            "skill.insight", "skill.language-literacy", "skill.magic", "skill.medicine", "skill.melee",
+            "skill.merchant", "skill.negotiation", "skill.piloting", "skill.psionics", "skill.rigging",
+            "skill.salvage", "skill.sensors", "skill.stealth", "skill.xenology",
+        ];
+        Equal(string.Join('|', expectedAttributes), string.Join('|', snapshot.Attributes.Select(value => value.Id)),
+            "Attribute iteration is incomplete or nondeterministic.");
+        Equal(string.Join('|', expectedSkills), string.Join('|', snapshot.Skills.Select(value => value.Id)),
+            "Skill iteration is incomplete or nondeterministic.");
+
+        SkillId engineeringId = new("skill.engineering");
+        True(snapshot.SkillRegistry.TryGet(engineeringId, out var engineering), "Typed Skill lookup failed.");
+        Equal(engineeringId, engineering!.SkillId, "Typed Skill lookup returned the wrong definition.");
+        True(snapshot.SkillRegistry.TryGetIndex(engineeringId, out ScopedContentIndex<SkillId> index),
+            "Dense Skill index lookup failed.");
+        Equal(engineeringId, snapshot.SkillRegistry.Resolve(index).SkillId, "Dense Skill index resolved incorrectly.");
+    }
+
+    private static void Milestone2InvalidCasesAreRecognized()
+    {
+        using JsonDocument casesDocument = JsonDocument.Parse(File.ReadAllBytes(Path.Combine(Milestone2Root, "invalid", "cases.json")));
+        Dictionary<string, byte[]> baseFiles = ReadFiles(Path.Combine(Milestone2Root, "base"));
+        foreach (JsonElement testCase in casesDocument.RootElement.GetProperty("cases").EnumerateArray())
+        {
+            Dictionary<string, byte[]> files = baseFiles.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray(), StringComparer.Ordinal);
+            ApplyMutations(testCase, files, []);
+            ContentLimits limits = ApplyLimitOverrides(testCase, ContentLimits.Version1);
+            ContentCompilationResult result = new GameContentCompiler(limits).Compile([new MemoryPackSource(files, [])], GameVersion);
+            string expected = testCase.GetProperty("expectedPrimaryDiagnostic").GetString()!;
+            Equal(expected, result.Diagnostics.FirstOrDefault()?.Code ?? "<none>",
+                $"Wrong M2 diagnostic for '{testCase.GetProperty("id").GetString()}'.");
+        }
+    }
+
+    private static void AdditiveSkillIsDynamicAndReversible()
+    {
+        string baseRoot = Path.Combine(Milestone2Root, "base");
+        string modRoot = Path.Combine(Milestone2Root, "additive", "starwrights");
+        GameContentCompiler compiler = new();
+        ContentCompilationResult baseOnly = CompileDirectory(baseRoot);
+        ContentCompilationResult withMod = compiler.Compile(
+            [new DirectoryContentPackSource(modRoot), new DirectoryContentPackSource(baseRoot)], GameVersion);
+        ContentCompilationResult repeated = compiler.Compile(
+            [new DirectoryContentPackSource(baseRoot), new DirectoryContentPackSource(modRoot)], GameVersion);
+        True(baseOnly.Succeeded, Primary(baseOnly));
+        True(withMod.Succeeded, Primary(withMod));
+        True(repeated.Succeeded, Primary(repeated));
+        using JsonDocument expectedFingerprints = JsonDocument.Parse(
+            File.ReadAllBytes(Path.Combine(Milestone2Root, "expected", "fingerprints.json")));
+        Equal(
+            expectedFingerprints.RootElement.GetProperty("basePlusStarwrightsSha256").GetString()!,
+            withMod.Snapshot!.Fingerprint.ToString(),
+            "The additive fixture fingerprint changed.");
+        Equal(30, withMod.Snapshot.SkillRegistry.Count, "The additive Skill did not enter the generic registry.");
+        True(withMod.Snapshot.SkillRegistry.TryGet(new SkillId("skill.mod.starwrights.gravimetry"), out _),
+            "The namespaced Skill was not available through typed lookup.");
+        Equal(withMod.Snapshot.Fingerprint, repeated.Snapshot!.Fingerprint,
+            "Pack input order changed the resolved semantic fingerprint.");
+        True(withMod.Snapshot.Inspect().Entries.Any(entry => entry.Id == "skill.mod.starwrights.gravimetry"),
+            "The headless inspection projection omitted dynamic content.");
+        RosterCreationResult dynamicRoster = CharacterCreator.CreateRoster(
+            withMod.Snapshot.Fingerprint,
+            new ScenarioId("scenario.first-voyage"),
+            41,
+            withMod.Snapshot,
+            FullSupport(withMod.Snapshot));
+        True(dynamicRoster.Succeeded, dynamicRoster.Failure.ToString());
+        Equal(30, dynamicRoster.Roster!.Characters[0].Capabilities.Snapshot(withMod.Snapshot).Skills.Length,
+            "Character capability storage did not expand for an additive Skill.");
+
+        True(baseOnly.Snapshot!.SkillRegistry.TryGetIndex(new SkillId("skill.engineering"), out ScopedContentIndex<SkillId> baseIndex),
+            "Base dense index was unavailable.");
+        Throws<ContentIndexFingerprintMismatchException>(
+            () => withMod.Snapshot.SkillRegistry.Resolve(baseIndex),
+            "A dense index crossed registry fingerprints.");
+
+        ContentCompilationResult restored = CompileDirectory(baseRoot);
+        Equal(baseOnly.Snapshot.Fingerprint, restored.Snapshot!.Fingerprint,
+            "Disabling the additive pack did not restore the base fingerprint.");
+    }
+
+    private static void CharacterDefinitionsRejectInvalidGraphs()
+    {
+        Dictionary<string, byte[]> baseFiles = ReadFiles(Path.Combine(Milestone2Root, "base"));
+        Dictionary<string, byte[]> missingGrant = Clone(baseFiles);
+        ReplaceText(missingGrant, "Definitions/Races/human.json", "perk.race.human.versatility", "perk.race.human.missing");
+        ContentCompilationResult missing = new GameContentCompiler().Compile([new MemoryPackSource(missingGrant, [])], GameVersion);
+        False(missing.Succeeded, "A missing racial grant was published.");
+        Equal("CONTENT_REFERENCE_UNKNOWN", missing.Diagnostics[0].Code, "Missing grants did not fail during linking.");
+
+        Dictionary<string, byte[]> incompatible = Clone(baseFiles);
+        ReplaceText(incompatible, "Definitions/Characters/human.json", "heritage.human.hearthworld", "heritage.elf.dawnweave");
+        ContentCompilationResult wrongHeritage = new GameContentCompiler().Compile([new MemoryPackSource(incompatible, [])], GameVersion);
+        False(wrongHeritage.Succeeded, "An incompatible Heritage was published.");
+        Equal("CONTENT_SEMANTIC_INVALID", wrongHeritage.Diagnostics[0].Code, "Incompatible Heritage used the wrong diagnostic.");
+
+        Dictionary<string, byte[]> cycle = Clone(baseFiles);
+        string path = "Definitions/Perks/race-human.json";
+        string text = Encoding.UTF8.GetString(cycle[path]);
+        cycle[path] = Encoding.UTF8.GetBytes(text.Replace("}\n", ",\"grantedPerkIds\":[\"perk.race.human.versatility\"]}\n", StringComparison.Ordinal));
+        ContentCompilationResult cyclic = new GameContentCompiler().Compile([new MemoryPackSource(cycle, [])], GameVersion);
+        False(cyclic.Succeeded, "A capability grant cycle was published.");
+        Equal("CONTENT_SEMANTIC_INVALID", cyclic.Diagnostics[0].Code, "Grant cycles used the wrong diagnostic.");
+    }
+
+    private static void BaseRosterIsDeterministicAndDynamic()
+    {
+        ContentCompilationResult compiled = CompileDirectory(Path.Combine(Milestone2Root, "base"));
+        True(compiled.Succeeded, Primary(compiled));
+        GameContentSnapshot snapshot = compiled.Snapshot!;
+        CrewSupportProfile support = FullSupport(snapshot);
+        ScenarioId scenario = new("scenario.first-voyage");
+        RosterCreationResult first = CharacterCreator.CreateRoster(snapshot.Fingerprint, scenario, 0x5eedUL, snapshot, support);
+        RosterCreationResult second = CharacterCreator.CreateRoster(snapshot.Fingerprint, scenario, 0x5eedUL, snapshot, support);
+        True(first.Succeeded, first.Failure.ToString());
+        True(second.Succeeded, second.Failure.ToString());
+        Equal(11, first.Roster!.Characters.Length, "The first-voyage roster does not cover all base races.");
+        Equal(
+            Describe(first.Roster, snapshot),
+            Describe(second.Roster!, snapshot),
+            "An identical content fingerprint and seed produced a different roster.");
+        Equal(snapshot.Attributes.Length, first.Roster.AttributeColumns.Length, "Roster Attribute columns are not registry-driven.");
+        Equal(snapshot.Skills.Length, first.Roster.SkillColumns.Length, "Roster Skill columns are not registry-driven.");
+
+        RosterCreationResult unsupported = CharacterCreator.CreateRoster(
+            snapshot.Fingerprint,
+            scenario,
+            0x5eedUL,
+            snapshot,
+            new CrewSupportProfile(ImmutableHashSet<ContentId>.Empty, support.AvailableEquipmentIds));
+        False(unsupported.Succeeded, "An unsupported mixed-race roster was published.");
+        Equal(CharacterCreationFailure.SupportUnavailable, unsupported.Failure, "Missing quarters/care support was not explicit.");
+    }
+
+    private static void EligibilityAndResolutionAreAtomic()
+    {
+        (GameContentSnapshot snapshot, RosterSnapshot roster) = BaseRoster();
+        CharacterState eidolon = roster.Characters.Single(value => value.RaceId == new RaceId("race.eidolon"));
+        ActionDefinition action = RaceCapabilities.CreateSoulAnchorRecoveryAction(eidolon, snapshot)!;
+        ActionRequest missingContext = new(
+            eidolon.Id,
+            action.Id,
+            new ActionTarget(new ContentId("target.self"), true, true),
+            ImmutableHashSet<ContentId>.Empty,
+            new ContentId("practice.soul-anchor.first"),
+            17,
+            0);
+        int before = eidolon.Resources[new ResourceId("resource.resonance")];
+        ActionEligibilityResult rejected = CharacterActionSystem.CheckEligibility(eidolon, action, missingContext, snapshot);
+        False(rejected.Accepted, "An action missing its safe recovery context was accepted.");
+        Equal(ActionRejectionCodes.ContextRequired, rejected.RejectionCode, "Eligibility order returned the wrong reason.");
+        Equal(before, eidolon.Resources[new ResourceId("resource.resonance")], "A rejection consumed a resource.");
+
+        ActionRequest valid = missingContext with
+        {
+            ContextIds = ImmutableHashSet.Create(new ContentId("context.recovery.safe-anchor")),
+        };
+        ActionEligibilityResult eligible = CharacterActionSystem.CheckEligibility(eidolon, action, valid, snapshot);
+        True(eligible.Accepted, eligible.RejectionCode);
+        Equal(before, eidolon.Resources[new ResourceId("resource.resonance")], "Reservation mutated published state.");
+        ActionExecutionResult first = CharacterActionSystem.Resolve(eligible.Reservation!, snapshot);
+        ActionExecutionResult repeated = CharacterActionSystem.Resolve(eligible.Reservation!, snapshot);
+        Equal(first.Resolution!.Roll, repeated.Resolution!.Roll, "Owned action randomness was not reproducible.");
+        Equal(before - 2, first.State.Resources[new ResourceId("resource.resonance")], "Committed Soul Anchor cost was wrong.");
+        True(first.Resolution.AttributeId.IsValid && first.Resolution.SkillId.IsValid, "Resolution explanation omitted contributors.");
+    }
+
+    private static void TrainingGrantsAccessOnlyAtCompletion()
+    {
+        (GameContentSnapshot snapshot, RosterSnapshot roster) = BaseRoster();
+        CharacterState human = roster.Characters.Single(value => value.RaceId == new RaceId("race.human"));
+        AccessId magic = new("access.magic");
+        False(human.Capabilities.Access.Contains(magic), "The human began with unexplained magical access.");
+        TrainingProjectId project = new("training.magic.spellcasting");
+        TrainingContributionResult partial = CharacterTrainingSystem.Contribute(human, project, 40, snapshot);
+        True(partial.Accepted, partial.RejectionCode);
+        False(partial.State.Capabilities.Access.Contains(magic), "Partial training granted partial access.");
+        TrainingContributionResult completed = CharacterTrainingSystem.Contribute(partial.State, project, 60, snapshot);
+        True(completed.Accepted, completed.RejectionCode);
+        True(completed.State.Capabilities.Access.Contains(magic), "Completed training did not atomically grant access.");
+        True(completed.Completion!.GrantedFeatIds.Contains(new FeatId("feat.access.magic")), "Training event omitted the Feat grant.");
+    }
+
+    private static void RaceCapabilitiesRespectTheirBoundaries()
+    {
+        (GameContentSnapshot snapshot, RosterSnapshot roster) = BaseRoster();
+        CharacterState eidolon = roster.Characters.Single(value => value.RaceId == new RaceId("race.eidolon"));
+        CharacterState withoutAnchor = eidolon with { EquipmentIds = eidolon.EquipmentIds.Remove(new ContentId("equipment.soul-anchor.portable")) };
+        ActionDefinition soulRecovery = RaceCapabilities.CreateSoulAnchorRecoveryAction(withoutAnchor, snapshot)!;
+        ActionRequest request = new(
+            withoutAnchor.Id,
+            soulRecovery.Id,
+            new ActionTarget(new ContentId("target.self"), true, true),
+            ImmutableHashSet.Create(new ContentId("context.recovery.safe-anchor")),
+            new ContentId("practice.soul-anchor.boundary"),
+            9,
+            0);
+        ActionEligibilityResult noAnchor = CharacterActionSystem.CheckEligibility(withoutAnchor, soulRecovery, request, snapshot);
+        Equal(ActionRejectionCodes.EquipmentRequired, noAnchor.RejectionCode, "Soul Anchor recovery bypassed the anchor requirement.");
+
+        CharacterState tharun = roster.Characters.Single(value => value.RaceId == new RaceId("race.tharun"));
+        ObservedRouteEvidence evidence = new(new ContentId("route.red-wake"), new ContentId("evidence.engine-trace"), 72);
+        ImmutableArray<TrailInterpretation> interpretations = RaceCapabilities.InterpretObservedTrails(tharun, snapshot, [evidence]);
+        Equal(1, interpretations.Length, "Trail Sense did not interpret observed evidence.");
+        Equal(evidence.RouteId, interpretations[0].RouteId, "Trail Sense produced an unobserved route.");
+        True(interpretations[0].EvidenceIds.All(id => id == evidence.EvidenceId), "Trail Sense exposed evidence it was not given.");
+    }
+
+    private static (GameContentSnapshot Snapshot, RosterSnapshot Roster) BaseRoster()
+    {
+        ContentCompilationResult compiled = CompileDirectory(Path.Combine(Milestone2Root, "base"));
+        True(compiled.Succeeded, Primary(compiled));
+        GameContentSnapshot snapshot = compiled.Snapshot!;
+        RosterCreationResult roster = CharacterCreator.CreateRoster(
+            snapshot.Fingerprint,
+            new ScenarioId("scenario.first-voyage"),
+            0x5eedUL,
+            snapshot,
+            FullSupport(snapshot));
+        True(roster.Succeeded, roster.Failure.ToString());
+        return (snapshot, roster.Roster!);
+    }
+
+    private static CrewSupportProfile FullSupport(GameContentSnapshot snapshot) => new(
+        snapshot.Races.SelectMany(value => value.RequiredSupportIds).ToImmutableHashSet(),
+        snapshot.Characters.SelectMany(value => value.EquipmentIds).ToImmutableHashSet());
+
+    private static string Describe(RosterSnapshot roster, GameContentSnapshot snapshot) => string.Join(
+        ';',
+        roster.Characters.Select(character =>
+            character.Id + ":" + string.Join(',', character.Capabilities.Snapshot(snapshot).Attributes.Select(value => value.Value))));
+
+    private static Dictionary<string, byte[]> Clone(Dictionary<string, byte[]> source) =>
+        source.ToDictionary(pair => pair.Key, pair => pair.Value.ToArray(), StringComparer.Ordinal);
+
+    private static void ReplaceText(Dictionary<string, byte[]> files, string path, string oldValue, string newValue)
+    {
+        string text = Encoding.UTF8.GetString(files[path]);
+        files[path] = Encoding.UTF8.GetBytes(text.Replace(oldValue, newValue, StringComparison.Ordinal));
+    }
+
     private static void ApplyMutations(JsonElement testCase, Dictionary<string, byte[]> files, List<string> duplicateEntries)
     {
         if (testCase.TryGetProperty("removeFiles", out JsonElement removals))
@@ -143,6 +417,35 @@ internal static class ContentContracts
         return version;
     }
 
+    private static ContentCompilationResult CompileDirectory(string root) =>
+        new GameContentCompiler().Compile([new DirectoryContentPackSource(root)], GameVersion);
+
+    private static ContentLimits ApplyLimitOverrides(JsonElement testCase, ContentLimits defaults)
+    {
+        if (!testCase.TryGetProperty("limitOverrides", out JsonElement overrides))
+        {
+            return defaults;
+        }
+
+        ContentLimits result = defaults;
+        if (overrides.TryGetProperty("manifestBytes", out JsonElement manifestBytes))
+        {
+            result = result with { ManifestBytes = manifestBytes.GetInt32() };
+        }
+
+        if (overrides.TryGetProperty("tagsPerDefinition", out JsonElement tags))
+        {
+            result = result with { TagsPerDefinition = tags.GetInt32() };
+        }
+
+        if (overrides.TryGetProperty("referencesPerDefinition", out JsonElement references))
+        {
+            result = result with { ReferencesPerDefinition = references.GetInt32() };
+        }
+
+        return result;
+    }
+
     private static string Primary(ContentCompilationResult result) =>
         result.Diagnostics.FirstOrDefault()?.Code ?? result.IoFailure?.Kind.ToString() ?? "Compilation failed without a diagnostic.";
 
@@ -162,6 +465,21 @@ internal static class ContentContracts
         {
             throw new InvalidOperationException($"{message} Expected '{expected}', got '{actual}'.");
         }
+    }
+
+    private static void Throws<TException>(Action action, string message)
+        where TException : Exception
+    {
+        try
+        {
+            action();
+        }
+        catch (TException)
+        {
+            return;
+        }
+
+        throw new InvalidOperationException(message);
     }
 
     private sealed class MemoryPackSource(Dictionary<string, byte[]> files, IReadOnlyList<string> duplicates) : IContentPackSource

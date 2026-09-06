@@ -31,7 +31,8 @@ Implemented foundations include:
   maps, and seed-derived hazards and rewards;
 - a bounded gameplay-content foundation with validated stable IDs, strict JSON
   pack loading, deterministic dependency ordering, immutable snapshots,
-  canonical SHA-256 fingerprints, and transactional publication;
+  canonical SHA-256 fingerprints, transactional publication, and production
+  registries for seven Attributes and 29 Skills;
 - a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
 - a child Win32 viewport rendered through SpriteForge's native D3D12 sprite
   renderer and a narrow managed/native interop layer;
@@ -97,7 +98,8 @@ defined in
 | `Source/Spelljammer.Localization/` | Game-owned localization runtime and message formatter. |
 | `Tools/Spelljammer.Content.Compiler/` | Offline gameplay-pack validation tool. |
 | `Tools/Spelljammer.Localization.Compiler/` | Source-catalog compiler and validation tools. |
-| `Content/Localization/` | Authored catalogs and pinned locale-data notices. |
+| `Content/Packs/base/` | Built-in Attribute and Skill definitions with their authored localization catalogs. |
+| `Content/Localization/` | Pinned locale-data inputs and third-party notices. |
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only deterministic simulation contracts. |
 | `Tests/Spelljammer.Localization.Tests/` | Compile-only localization contracts. |
 | `Tests/Spelljammer.Content.Tests/` | Compile-only gameplay content and rollback contracts plus frozen v1 fixtures. |
@@ -148,7 +150,7 @@ target other platforms.
 ```powershell
 dotnet run --project .\Tools\Spelljammer.Localization.Compiler\Spelljammer.Localization.Compiler.csproj -- `
     compile `
-    .\Content\Localization\en-US\core.sfloc.json `
+    .\Content\Packs\base\Localization\en-US\core.sfloc.json `
     .\out\Localization\en-US\core.sfloc
 ```
 
@@ -159,8 +161,11 @@ Validate one gameplay content pack without modifying its source:
 
 ```powershell
 dotnet run --project .\Tools\Spelljammer.Content.Compiler\Spelljammer.Content.Compiler.csproj -- `
-    validate .\Tests\Spelljammer.Content.Tests\Fixtures\Milestone0\valid\base
+    validate .\Content\Packs\base
 ```
+
+Use `report` instead of `validate` to list compiled IDs, source packs,
+revisions, dense indices, and registry counts.
 
 ## Contributing
 

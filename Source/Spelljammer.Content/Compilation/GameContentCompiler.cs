@@ -14,6 +14,8 @@ public sealed class GameContentCompiler
         "progression.skill.standard",
         "action.spell.cast",
         "action.spell.identify",
+        "effect.recovery.soul-anchor",
+        "effect.tracking.observed-trail",
     };
 
     private readonly ContentLimits limits;
@@ -119,7 +121,110 @@ public sealed class GameContentCompiler
             return Failed(diagnostics);
         }
 
+        if (!ValidateDefaultLocalization(orderedPacks, definitions, diagnostics, out ioFailure))
+        {
+            return ioFailure is null
+                ? Failed(diagnostics)
+                : new ContentCompilationResult(null, diagnostics.ToImmutable(), ioFailure);
+        }
+
         return CompileSnapshot(orderedPacks, definitions, diagnostics);
+    }
+
+    private bool ValidateDefaultLocalization(
+        ImmutableArray<CandidatePack> packs,
+        IReadOnlyList<SourceDefinition> definitions,
+        DiagnosticSink diagnostics,
+        out ContentIoFailure? ioFailure)
+    {
+        ioFailure = null;
+        foreach (CandidatePack pack in packs)
+        {
+            string packId = pack.Manifest.Id.ToString();
+            HashSet<string> keys = new(StringComparer.Ordinal);
+            SortedSet<string> localeFiles = new(StringComparer.Ordinal);
+            foreach (string localizationRoot in pack.Manifest.LocalizationRoots)
+            {
+                string prefix = localizationRoot + "/" + DefaultLocaleCatalogParser.DefaultLocale + "/";
+                foreach (string entry in pack.Entries)
+                {
+                    if (entry.StartsWith(prefix, StringComparison.Ordinal) &&
+                        entry.EndsWith(".sfloc.json", StringComparison.Ordinal))
+                    {
+                        localeFiles.Add(entry);
+                    }
+                }
+            }
+
+            foreach (string path in localeFiles)
+            {
+                byte[] bytes;
+                try
+                {
+                    bytes = pack.Source.ReadFile(path, limits.DefinitionFileBytes);
+                }
+                catch (ContentSourceLimitException)
+                {
+                    diagnostics.Limit("localization-file-bytes", packId, path);
+                    continue;
+                }
+                catch (ContentSourceException exception)
+                {
+                    ioFailure = CreateIoFailure(exception);
+                    return false;
+                }
+
+                if (!DefaultLocaleCatalogParser.TryReadKeys(bytes, packId, path, limits, diagnostics, out IReadOnlyList<string> sourceKeys))
+                {
+                    continue;
+                }
+
+                foreach (string key in sourceKeys)
+                {
+                    if (!keys.Add(key))
+                    {
+                        diagnostics.Add(ContentDiagnosticCodes.CollectionDuplicate, packId, path, propertyPath: "/messages/" + key);
+                    }
+                }
+            }
+
+            if (!keys.Contains(pack.Manifest.DisplayNameKey))
+            {
+                diagnostics.Add(
+                    ContentDiagnosticCodes.LocalizationKeyMissing,
+                    packId,
+                    "manifest.json",
+                    propertyPath: "/displayNameKey",
+                    arguments: ContentDiagnosticArgument.SafeId(pack.Manifest.DisplayNameKey));
+            }
+
+            foreach (SourceDefinition definition in definitions.Where(value => value.PackId == packId).OrderBy(value => value.Id))
+            {
+                CheckLocalizationKey(definition, definition.NameKey, "/nameKey", keys, diagnostics);
+                CheckLocalizationKey(definition, definition.DescriptionKey, "/descriptionKey", keys, diagnostics);
+            }
+        }
+
+        return !diagnostics.HasErrors;
+    }
+
+    private static void CheckLocalizationKey(
+        SourceDefinition definition,
+        string key,
+        string propertyPath,
+        IReadOnlySet<string> availableKeys,
+        DiagnosticSink diagnostics)
+    {
+        if (!availableKeys.Contains(key))
+        {
+            diagnostics.Add(
+                ContentDiagnosticCodes.LocalizationKeyMissing,
+                definition.PackId,
+                definition.RelativePath,
+                definition.Id.ToString(),
+                propertyPath,
+                ContentDiagnosticArgument.SafeId(key));
+        }
     }
 
     private ImmutableArray<CandidatePack> OrderPacks(
@@ -407,19 +512,38 @@ public sealed class GameContentCompiler
                     CheckReference(definition, definition.Strings["trainingProjectId"], DefinitionKind.TrainingProject, byId, "/trainingProjectId", diagnostics);
                     CheckReferences(definition, definition.Arrays["grantedAccessIds"], DefinitionKind.Access, byId, "/grantedAccessIds", diagnostics);
                     break;
+                case DefinitionKind.Background:
+                    CheckReferences(definition, definition.Arrays["compatibleRaceIds"], DefinitionKind.Race, byId, "/compatibleRaceIds", diagnostics);
+                    CheckReferences(definition, definition.Arrays["attributeBonusIds"], DefinitionKind.Attribute, byId, "/attributeBonusIds", diagnostics);
+                    CheckReferences(definition, definition.Arrays["focusSkillIds"], DefinitionKind.Skill, byId, "/focusSkillIds", diagnostics);
+                    break;
+                case DefinitionKind.Character:
+                    CheckReference(definition, definition.Strings["raceId"], DefinitionKind.Race, byId, "/raceId", diagnostics);
+                    CheckReference(definition, definition.Strings["heritageId"], DefinitionKind.Heritage, byId, "/heritageId", diagnostics);
+                    CheckReference(definition, definition.Strings["backgroundId"], DefinitionKind.Background, byId, "/backgroundId", diagnostics);
+                    CheckReferences(definition, definition.Arrays["focusSkillIds"], DefinitionKind.Skill, byId, "/focusSkillIds", diagnostics);
+                    break;
+                case DefinitionKind.Heritage:
+                    CheckReference(definition, definition.Strings["raceId"], DefinitionKind.Race, byId, "/raceId", diagnostics);
+                    CheckReferences(definition, definition.Arrays["grantedPerkIds"], DefinitionKind.Perk, byId, "/grantedPerkIds", diagnostics);
+                    break;
                 case DefinitionKind.Perk:
                     CheckReferences(definition, definition.Arrays["compatibleRaceIds"], DefinitionKind.Race, byId, "/compatibleRaceIds", diagnostics);
                     CheckReferences(definition, definition.Arrays["grantedAccessIds"], DefinitionKind.Access, byId, "/grantedAccessIds", diagnostics);
                     foreach (string technique in definition.Arrays["grantedTechniqueIds"])
                     {
-                        if (!byId.ContainsKey(technique))
-                        {
-                            Unknown(definition, technique, "/grantedTechniqueIds", diagnostics);
-                        }
+                        CheckReference(definition, technique, DefinitionKind.Technique, byId, "/grantedTechniqueIds", diagnostics);
                     }
+
+                    CheckReferences(definition, definition.Arrays["grantedPerkIds"], DefinitionKind.Perk, byId, "/grantedPerkIds", diagnostics);
+                    CheckPrimitives(definition, definition.Arrays["effectIds"], "/effectIds", diagnostics);
 
                     break;
                 case DefinitionKind.Race:
+                    CheckReferences(definition, definition.Arrays["grantedPerkIds"], DefinitionKind.Perk, byId, "/grantedPerkIds", diagnostics);
+                    break;
+                case DefinitionKind.Technique:
+                    CheckReferences(definition, definition.Arrays["requiredAccessIds"], DefinitionKind.Access, byId, "/requiredAccessIds", diagnostics);
                     CheckReferences(definition, definition.Arrays["grantedPerkIds"], DefinitionKind.Perk, byId, "/grantedPerkIds", diagnostics);
                     break;
                 case DefinitionKind.TrainingProject:
@@ -428,6 +552,9 @@ public sealed class GameContentCompiler
                     break;
             }
         }
+
+
+        ValidateGrantCycles(definitions, diagnostics);
 
         return !diagnostics.HasErrors;
     }
@@ -486,6 +613,20 @@ public sealed class GameContentCompiler
             {
                 case DefinitionKind.Feat:
                     RequireNonempty(definition, "grantedAccessIds", diagnostics);
+                    break;
+                case DefinitionKind.Background:
+                    RequireNonempty(definition, "compatibleRaceIds", diagnostics);
+                    break;
+                case DefinitionKind.Character:
+                    ValidateCharacter(definition, byId, diagnostics);
+                    RequireNonempty(definition, "scenarioIds", diagnostics);
+                    RequireNonempty(definition, "languageIds", diagnostics);
+                    RequireNonempty(definition, "scriptIds", diagnostics);
+                    RequireNonempty(definition, "equipmentIds", diagnostics);
+                    break;
+                case DefinitionKind.Heritage:
+                    ValidateHeritage(definition, byId, diagnostics);
+                    RequireNonempty(definition, "grantedPerkIds", diagnostics);
                     break;
                 case DefinitionKind.Perk:
                     RequireNonempty(definition, "compatibleRaceIds", diagnostics);
@@ -547,31 +688,56 @@ public sealed class GameContentCompiler
         ImmutableArray<AttributeDefinition> attributes = [.. sources.Where(value => value.Kind == DefinitionKind.Attribute).OrderBy(value => value.Id).Select(CompileAttribute)];
         ImmutableArray<SkillDefinition> skills = [.. sources.Where(value => value.Kind == DefinitionKind.Skill).OrderBy(value => value.Id).Select(CompileSkill)];
         ImmutableArray<AccessDefinition> access = [.. sources.Where(value => value.Kind == DefinitionKind.Access).OrderBy(value => value.Id).Select(CompileAccess)];
+        ImmutableArray<BackgroundDefinition> backgrounds = [.. sources.Where(value => value.Kind == DefinitionKind.Background).OrderBy(value => value.Id).Select(CompileBackground)];
+        ImmutableArray<CharacterDefinition> characters = [.. sources.Where(value => value.Kind == DefinitionKind.Character).OrderBy(value => value.Id).Select(CompileCharacter)];
         ImmutableArray<FeatDefinition> feats = [.. sources.Where(value => value.Kind == DefinitionKind.Feat).OrderBy(value => value.Id).Select(CompileFeat)];
+        ImmutableArray<HeritageDefinition> heritages = [.. sources.Where(value => value.Kind == DefinitionKind.Heritage).OrderBy(value => value.Id).Select(CompileHeritage)];
         ImmutableArray<PerkDefinition> perks = [.. sources.Where(value => value.Kind == DefinitionKind.Perk).OrderBy(value => value.Id).Select(CompilePerk)];
         ImmutableArray<RaceDefinition> races = [.. sources.Where(value => value.Kind == DefinitionKind.Race).OrderBy(value => value.Id).Select(CompileRace)];
+        ImmutableArray<TechniqueDefinition> techniques = [.. sources.Where(value => value.Kind == DefinitionKind.Technique).OrderBy(value => value.Id).Select(CompileTechnique)];
         ImmutableArray<TrainingProjectDefinition> training = [.. sources.Where(value => value.Kind == DefinitionKind.TrainingProject).OrderBy(value => value.Id).Select(CompileTraining)];
         ImmutableArray<ContentPackIdentity> identities = [.. packs.Select(pack => new ContentPackIdentity(
             pack.Manifest.Id, pack.Manifest.Version, pack.Manifest.ContentRevision))];
-        ContentDefinition[] all = [.. attributes, .. skills, .. access, .. feats, .. perks, .. races, .. training];
+        ContentDefinition[] all = [.. attributes, .. skills, .. access, .. backgrounds, .. characters, .. feats, .. heritages, .. perks, .. races, .. techniques, .. training];
         (byte[] canonicalBytes, ContentFingerprint fingerprint) = CanonicalSemanticWriter.Write(identities, all);
-        GameContentSnapshot snapshot = new(fingerprint, identities, attributes, skills, access, feats, perks, races, training,
-            [.. canonicalBytes]);
+        Dictionary<ContentId, ContentId> provenance = sources.ToDictionary(
+            source => source.Id,
+            source => new ContentId(source.PackId));
+        GameContentSnapshot snapshot = new(fingerprint, identities, attributes, skills, access, backgrounds, characters, feats, heritages, perks, races, techniques, training,
+            [.. canonicalBytes], provenance);
         return new ContentCompilationResult(snapshot, diagnostics.ToImmutable(), null);
     }
 
     private static AttributeDefinition CompileAttribute(SourceDefinition value) => new(
         new AttributeId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
-        (short)value.Integers["minimum"], (short)value.Integers["maximum"], (short)value.Integers["defaultValue"],
-        Sort(value.Arrays["tags"]));
+        (short)value.Attribute!.Minimum, (short)value.Attribute.Maximum, (short)value.Attribute.DefaultValue,
+        Sort(value.Attribute.Tags));
 
     private static SkillDefinition CompileSkill(SourceDefinition value) => new(
         new SkillId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
-        (byte)value.Integers["minimum"], (byte)value.Integers["maximum"], new ContentId(value.Strings["progressionCurveId"]),
-        Sort(value.Arrays["actionTags"]).Select(item => new ContentId(item)).ToImmutableArray());
+        (byte)value.Skill!.Minimum, (byte)value.Skill.Maximum, value.Skill.ProgressionCurveId,
+        [.. value.Skill.ActionTags.Order()]);
 
     private static AccessDefinition CompileAccess(SourceDefinition value) => new(
         new AccessId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey, Sort(value.Arrays["tags"]));
+
+    private static BackgroundDefinition CompileBackground(SourceDefinition value) => new(
+        new BackgroundId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        Sort(value.Arrays["compatibleRaceIds"]).Select(item => new RaceId(item)).ToImmutableArray(),
+        Sort(value.Arrays["attributeBonusIds"]).Select(item => new AttributeId(item)).ToImmutableArray(),
+        Sort(value.Arrays["focusSkillIds"]).Select(item => new SkillId(item)).ToImmutableArray());
+
+    private static CharacterDefinition CompileCharacter(SourceDefinition value) => new(
+        new CharacterId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new RaceId(value.Strings["raceId"]), new HeritageId(value.Strings["heritageId"]),
+        new BackgroundId(value.Strings["backgroundId"]),
+        Sort(value.Arrays["scenarioIds"]).Select(item => new ScenarioId(item)).ToImmutableArray(),
+        new ContentId(value.Strings["positionId"]),
+        Sort(value.Arrays["languageIds"]).Select(item => new ContentId(item)).ToImmutableArray(),
+        Sort(value.Arrays["scriptIds"]).Select(item => new ContentId(item)).ToImmutableArray(),
+        Sort(value.Arrays["equipmentIds"]).Select(item => new ContentId(item)).ToImmutableArray(),
+        Sort(value.Arrays["focusSkillIds"]).Select(item => new SkillId(item)).ToImmutableArray(),
+        Sort(value.Arrays["resourceIds"]).Select(item => new ResourceId(item)).ToImmutableArray());
 
     private static FeatDefinition CompileFeat(SourceDefinition value) => new(
         new FeatId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
@@ -582,10 +748,23 @@ public sealed class GameContentCompiler
         new PerkId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
         Sort(value.Arrays["compatibleRaceIds"]).Select(item => new RaceId(item)).ToImmutableArray(),
         Sort(value.Arrays["grantedAccessIds"]).Select(item => new AccessId(item)).ToImmutableArray(),
-        Sort(value.Arrays["grantedTechniqueIds"]).Select(item => new TechniqueId(item)).ToImmutableArray());
+        Sort(value.Arrays["grantedTechniqueIds"]).Select(item => new TechniqueId(item)).ToImmutableArray(),
+        Sort(value.Arrays["grantedPerkIds"]).Select(item => new PerkId(item)).ToImmutableArray(),
+        Sort(value.Arrays["effectIds"]).Select(item => new ContentId(item)).ToImmutableArray());
 
     private static RaceDefinition CompileRace(SourceDefinition value) => new(
         new RaceId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        Sort(value.Arrays["grantedPerkIds"]).Select(item => new PerkId(item)).ToImmutableArray(),
+        Sort(value.Arrays["requiredSupportIds"]).Select(item => new ContentId(item)).ToImmutableArray());
+
+    private static HeritageDefinition CompileHeritage(SourceDefinition value) => new(
+        new HeritageId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        new RaceId(value.Strings["raceId"]),
+        Sort(value.Arrays["grantedPerkIds"]).Select(item => new PerkId(item)).ToImmutableArray());
+
+    private static TechniqueDefinition CompileTechnique(SourceDefinition value) => new(
+        new TechniqueId(value.Id), 1, value.Revision, value.NameKey, value.DescriptionKey,
+        Sort(value.Arrays["requiredAccessIds"]).Select(item => new AccessId(item)).ToImmutableArray(),
         Sort(value.Arrays["grantedPerkIds"]).Select(item => new PerkId(item)).ToImmutableArray());
 
     private static TrainingProjectDefinition CompileTraining(SourceDefinition value) => new(
@@ -598,9 +777,10 @@ public sealed class GameContentCompiler
 
     private static void ValidateAttribute(SourceDefinition definition, DiagnosticSink diagnostics)
     {
-        int minimum = definition.Integers["minimum"];
-        int maximum = definition.Integers["maximum"];
-        int defaultValue = definition.Integers["defaultValue"];
+        AttributeSourceDto source = definition.Attribute!;
+        int minimum = source.Minimum;
+        int maximum = source.Maximum;
+        int defaultValue = source.DefaultValue;
         bool storageValid = minimum >= short.MinValue && maximum <= short.MaxValue && minimum <= maximum &&
             defaultValue >= minimum && defaultValue <= maximum;
         bool baseRangeValid = definition.PackId != "spelljammer.base" || minimum == 1 && maximum == 10;
@@ -612,8 +792,9 @@ public sealed class GameContentCompiler
 
     private static void ValidateSkill(SourceDefinition definition, DiagnosticSink diagnostics)
     {
-        int minimum = definition.Integers["minimum"];
-        int maximum = definition.Integers["maximum"];
+        SkillSourceDto source = definition.Skill!;
+        int minimum = source.Minimum;
+        int maximum = source.Maximum;
         bool storageValid = minimum >= byte.MinValue && maximum <= byte.MaxValue && minimum <= maximum;
         bool baseRangeValid = definition.PackId != "spelljammer.base" || minimum == 0 && maximum == 100;
         if (!storageValid || !baseRangeValid)
@@ -631,6 +812,78 @@ public sealed class GameContentCompiler
             {
                 diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, race.PackId, race.RelativePath, race.Id.ToString(), "/grantedPerkIds");
             }
+        }
+    }
+
+    private static void ValidateHeritage(SourceDefinition heritage, IReadOnlyDictionary<string, SourceDefinition> byId, DiagnosticSink diagnostics)
+    {
+        string raceId = heritage.Strings["raceId"];
+        foreach (string perkId in heritage.Arrays["grantedPerkIds"])
+        {
+            SourceDefinition perk = byId[perkId];
+            if (!perk.Arrays["compatibleRaceIds"].Contains(raceId, StringComparer.Ordinal))
+            {
+                diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, heritage.PackId, heritage.RelativePath,
+                    heritage.Id.ToString(), "/grantedPerkIds");
+            }
+        }
+    }
+
+    private static void ValidateCharacter(SourceDefinition character, IReadOnlyDictionary<string, SourceDefinition> byId, DiagnosticSink diagnostics)
+    {
+        string raceId = character.Strings["raceId"];
+        SourceDefinition heritage = byId[character.Strings["heritageId"]];
+        SourceDefinition background = byId[character.Strings["backgroundId"]];
+        if (heritage.Strings["raceId"] != raceId)
+        {
+            diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, character.PackId, character.RelativePath,
+                character.Id.ToString(), "/heritageId");
+        }
+
+        if (!background.Arrays["compatibleRaceIds"].Contains(raceId, StringComparer.Ordinal))
+        {
+            diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, character.PackId, character.RelativePath,
+                character.Id.ToString(), "/backgroundId");
+        }
+    }
+
+    private static void ValidateGrantCycles(IReadOnlyList<SourceDefinition> definitions, DiagnosticSink diagnostics)
+    {
+        Dictionary<string, SourceDefinition> grantNodes = definitions
+            .Where(value => value.Kind is DefinitionKind.Perk or DefinitionKind.Technique)
+            .ToDictionary(value => value.Id.ToString(), StringComparer.Ordinal);
+        Dictionary<string, byte> marks = new(StringComparer.Ordinal);
+        foreach (SourceDefinition node in grantNodes.Values.OrderBy(value => value.Id))
+        {
+            Visit(node);
+        }
+
+        void Visit(SourceDefinition node)
+        {
+            string id = node.Id.ToString();
+            if (marks.TryGetValue(id, out byte mark))
+            {
+                if (mark == 1)
+                {
+                    diagnostics.Add(ContentDiagnosticCodes.SemanticInvalid, node.PackId, node.RelativePath, id, "/grants");
+                }
+
+                return;
+            }
+
+            marks[id] = 1;
+            IEnumerable<string> successors = node.Kind == DefinitionKind.Perk
+                ? node.Arrays["grantedPerkIds"].Concat(node.Arrays["grantedTechniqueIds"])
+                : node.Arrays["grantedPerkIds"];
+            foreach (string successor in successors.Order(StringComparer.Ordinal))
+            {
+                if (grantNodes.TryGetValue(successor, out SourceDefinition? target))
+                {
+                    Visit(target);
+                }
+            }
+
+            marks[id] = 2;
         }
     }
 
@@ -699,9 +952,13 @@ public sealed class GameContentCompiler
         DefinitionKind.Attribute => "attribute.",
         DefinitionKind.Skill => "skill.",
         DefinitionKind.Access => "access.",
+        DefinitionKind.Background => "background.",
+        DefinitionKind.Character => "character.",
         DefinitionKind.Feat => "feat.",
+        DefinitionKind.Heritage => "heritage.",
         DefinitionKind.Perk => "perk.",
         DefinitionKind.Race => "race.",
+        DefinitionKind.Technique => "technique.",
         DefinitionKind.TrainingProject => "training.",
         _ => throw new ArgumentOutOfRangeException(nameof(kind)),
     };

@@ -44,9 +44,40 @@ add_custom_target(SpelljammerLocalizationCatalogs
         -p:Platform=AnyCPU
         --no-build
         -- compile
-        ${SPELLJAMMER_ROOT}/Content/Localization/en-US/core.sfloc.json
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/core.sfloc.json
         ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/core.sfloc
-    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/core.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/content-pack.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/content-pack.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/attributes.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/attributes.sfloc
+    COMMAND ${CMAKE_COMMAND} -E env DOTNET_CLI_TELEMETRY_OPTOUT=1
+        ${SPELLJAMMER_DOTNET_EXECUTABLE} run
+        --project ${SPELLJAMMER_ROOT}/Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj
+        --configuration ${SPELLJAMMER_DOTNET_CONFIGURATION}
+        -p:Platform=AnyCPU
+        --no-build
+        -- compile
+        ${SPELLJAMMER_ROOT}/Content/Packs/base/Localization/en-US/skills.sfloc.json
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/skills.sfloc
+    BYPRODUCTS
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/core.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/content-pack.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/attributes.sfloc
+        ${CMAKE_CURRENT_BINARY_DIR}/Localization/en-US/skills.sfloc
     WORKING_DIRECTORY ${SPELLJAMMER_ROOT}
     COMMENT "Compiling deterministic Spelljammer localization catalogs"
     VERBATIM

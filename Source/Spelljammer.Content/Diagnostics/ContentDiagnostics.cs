@@ -29,6 +29,7 @@ public static class ContentDiagnosticCodes
     public const string CollectionDuplicate = "CONTENT_COLLECTION_DUPLICATE";
     public const string SemanticInvalid = "CONTENT_SEMANTIC_INVALID";
     public const string LimitExceeded = "CONTENT_LIMIT_EXCEEDED";
+    public const string LocalizationKeyMissing = "CONTENT_LOCALIZATION_KEY_MISSING";
 }
 
 public enum ContentDiagnosticSeverity : byte

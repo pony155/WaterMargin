@@ -91,7 +91,7 @@ Compile a catalog from the Spelljammer repository root:
 
 ```powershell
 dotnet run --project Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj -- `
-  compile Content/Localization/en-US/core.sfloc.json out/core.sfloc
+  compile Content/Packs/base/Localization/en-US/core.sfloc.json out/core.sfloc
 ```
 
 Generate a deterministic development pseudo-catalog or print a sorted
@@ -99,9 +99,9 @@ completeness report:
 
 ```powershell
 dotnet run --project Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj -- `
-  pseudo AccentedExpanded Content/Localization/en-US/core.sfloc.json out/core.qps.sfloc
+  pseudo AccentedExpanded Content/Packs/base/Localization/en-US/core.sfloc.json out/core.qps.sfloc
 dotnet run --project Tools/Spelljammer.Localization.Compiler/Spelljammer.Localization.Compiler.csproj -- `
-  report Content/Localization/en-US/core.sfloc.json path/to/translation.sfloc.json
+  report Content/Packs/base/Localization/en-US/core.sfloc.json path/to/translation.sfloc.json
 ```
 
 The compiler sorts artifact key tables by stable ID and canonical name, writes

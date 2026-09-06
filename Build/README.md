@@ -17,7 +17,7 @@ content, and localization declarations.
 | --- | --- |
 | `SpelljammerLocalizationRuntime` | Compile the localization runtime assembly. |
 | `SpelljammerLocalizationCompiler` | Compile the source-catalog compiler. |
-| `SpelljammerLocalizationCatalogs` | Compile the authored `en-US` catalog. |
+| `SpelljammerLocalizationCatalogs` | Compile the authored base `en-US` catalogs. |
 | `SpelljammerLocalizationUnitTests` | Compile, but do not execute, the test program. |
 
 `Content.cmake` declares these targets:
@@ -25,7 +25,8 @@ content, and localization declarations.
 | Target | Purpose |
 | --- | --- |
 | `SpelljammerContentRuntime` | Compile the bounded gameplay content runtime. |
-| `SpelljammerContentCompiler` | Compile the offline content validator. |
+| `SpelljammerContentCompiler` | Compile the offline content validator and registry reporter. |
+| `SpelljammerContentPacks` | Validate the built-in gameplay content pack. |
 | `SpelljammerContentUnitTests` | Compile, but do not execute, the content contract program. |
 
 Configure and compile runtime test targets from the repository root:

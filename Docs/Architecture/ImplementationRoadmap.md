@@ -248,52 +248,52 @@ Move only Attribute and Skill lists into `Content/Packs/base`.
 
 ### Phase M2.1: define Attribute documents
 
-- [ ] **M2.1.1** Create source DTO, immutable definition, validator, and
+- [x] **M2.1.1** Create source DTO, immutable definition, validator, and
   diagnostic codes for Attributes.
-- [ ] **M2.1.2** Validate ID, revision, localization keys, minimum, maximum,
+- [x] **M2.1.2** Validate ID, revision, localization keys, minimum, maximum,
   default, and bounded tags.
-- [ ] **M2.1.3** Add the seven base Attribute JSON files with the IDs and 1–10
+- [x] **M2.1.3** Add the seven base Attribute JSON files with the IDs and 1–10
   range from `Attributes.md`.
-- [ ] **M2.1.4** Add focused valid, missing-field, invalid-range, duplicate-tag,
+- [x] **M2.1.4** Add focused valid, missing-field, invalid-range, duplicate-tag,
   and capacity fixtures.
 
 ### Phase M2.2: define Skill documents
 
-- [ ] **M2.2.1** Create source DTO, immutable definition, validator, and
+- [x] **M2.2.1** Create source DTO, immutable definition, validator, and
   diagnostics for Skills.
-- [ ] **M2.2.2** Validate the 0–100 range, progression-curve reference,
+- [x] **M2.2.2** Validate the 0–100 range, progression-curve reference,
   localization keys, and bounded action tags.
-- [ ] **M2.2.3** Add every Skill currently listed in `Skills.md` to the base
+- [x] **M2.2.3** Add every Skill currently listed in `Skills.md` to the base
   pack without changing spelling or identity.
-- [ ] **M2.2.4** Add focused unknown-curve, invalid-range, duplicate-tag, and
+- [x] **M2.2.4** Add focused unknown-curve, invalid-range, duplicate-tag, and
   capacity fixtures.
 
 ### Phase M2.3: compile typed registries
 
-- [ ] **M2.3.1** Link Attribute and Skill references through typed IDs.
-- [ ] **M2.3.2** Sort stable IDs and assign fingerprint-scoped dense indices.
-- [ ] **M2.3.3** Expose immutable lookup by typed ID and deterministic iteration.
-- [ ] **M2.3.4** Reject use of a dense index with a different registry
+- [x] **M2.3.1** Link Attribute and Skill references through typed IDs.
+- [x] **M2.3.2** Sort stable IDs and assign fingerprint-scoped dense indices.
+- [x] **M2.3.3** Expose immutable lookup by typed ID and deterministic iteration.
+- [x] **M2.3.4** Reject use of a dense index with a different registry
   fingerprint.
 
 ### Phase M2.4: connect localization and inspection
 
-- [ ] **M2.4.1** Validate required default-locale keys without introducing a
+- [x] **M2.4.1** Validate required default-locale keys without introducing a
   Simulation-to-Localization dependency.
-- [ ] **M2.4.2** Add missing base names and descriptions to the authored
+- [x] **M2.4.2** Add missing base names and descriptions to the authored
   localization source.
-- [ ] **M2.4.3** Add an offline registry report listing IDs, provenance,
+- [x] **M2.4.3** Add an offline registry report listing IDs, provenance,
   revisions, indices, and counts.
-- [ ] **M2.4.4** Project registry entries into an inspection-only WPF view or a
+- [x] **M2.4.4** Project registry entries into an inspection-only WPF view or a
   headless snapshot adapter.
 
 ### Phase M2.5: prove dynamic content
 
-- [ ] **M2.5.1** Create an additive fixture pack defining one namespaced Skill.
-- [ ] **M2.5.2** Compile base-only and base-plus-fixture snapshots repeatedly.
-- [ ] **M2.5.3** Verify the added Skill appears without changing Simulation
+- [x] **M2.5.1** Create an additive fixture pack defining one namespaced Skill.
+- [x] **M2.5.2** Compile base-only and base-plus-fixture snapshots repeatedly.
+- [x] **M2.5.3** Verify the added Skill appears without changing Simulation
   enums, character properties, or UI layout code.
-- [ ] **M2.5.4** Verify disabling the fixture restores the exact base-only
+- [x] **M2.5.4** Verify disabling the fixture restores the exact base-only
   fingerprint and registry.
 
 Deliverables:

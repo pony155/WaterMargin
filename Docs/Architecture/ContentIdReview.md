@@ -6,8 +6,9 @@ This document completes roadmap tasks `M0.1.2` and `M0.1.3`. It classifies the
 152 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
 the spelling and collision review performed before version 1 loader work.
 
-No gameplay content loader or public save format exists yet. Classification is
-a design commitment, not an implementation claim.
+The gameplay content loader and the M2 base Attribute and Skill definitions now
+exist. No public save format exists yet; classifications for later milestones
+remain design commitments rather than implementation claims.
 
 ## Classification model
 

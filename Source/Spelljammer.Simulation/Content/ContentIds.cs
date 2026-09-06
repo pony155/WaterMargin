@@ -160,6 +160,39 @@ public readonly record struct RaceId : IComparable<RaceId>
     public static bool TryParse(string? value, out RaceId id) => TypedContentId.TryParse(value, "race.", out id);
 }
 
+public readonly record struct CharacterId : IComparable<CharacterId>
+{
+    public CharacterId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "character.");
+    public CharacterId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(CharacterId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+    public static bool TryParse(string? value, out CharacterId id) => TypedContentId.TryParse(value, "character.", out id);
+}
+
+public readonly record struct HeritageId : IComparable<HeritageId>
+{
+    public HeritageId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "heritage.");
+    public HeritageId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(HeritageId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+    public static bool TryParse(string? value, out HeritageId id) => TypedContentId.TryParse(value, "heritage.", out id);
+}
+
+public readonly record struct BackgroundId : IComparable<BackgroundId>
+{
+    public BackgroundId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "background.");
+    public BackgroundId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(BackgroundId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+    public static bool TryParse(string? value, out BackgroundId id) => TypedContentId.TryParse(value, "background.", out id);
+}
+
 public readonly record struct TrainingProjectId : IComparable<TrainingProjectId>
 {
     public TrainingProjectId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "training.");
@@ -173,7 +206,7 @@ public readonly record struct TrainingProjectId : IComparable<TrainingProjectId>
 
 public readonly record struct TechniqueId : IComparable<TechniqueId>
 {
-    public TechniqueId(ContentId value) => Value = value.IsValid ? value : throw new ArgumentException("Technique ID is invalid.", nameof(value));
+    public TechniqueId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "technique.");
     public TechniqueId(string value) : this(new ContentId(value)) { }
     public ContentId Value { get; }
     public bool IsValid => Value.IsValid;
@@ -181,15 +214,57 @@ public readonly record struct TechniqueId : IComparable<TechniqueId>
     public override string ToString() => Value.ToString();
     public static bool TryParse(string? value, out TechniqueId id)
     {
-        if (ContentId.TryParse(value, out ContentId parsed))
+        return TypedContentId.TryParse(value, "technique.", out id);
+    }
+}
+
+public readonly record struct ScenarioId : IComparable<ScenarioId>
+{
+    public ScenarioId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "scenario.");
+    public ScenarioId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ScenarioId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ActionId : IComparable<ActionId>
+{
+    public ActionId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "action.");
+    public ActionId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ActionId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ResourceId : IComparable<ResourceId>
+{
+    public ResourceId(ContentId value) => Value = TypedContentId.RequirePrefix(value, "resource.");
+    public ResourceId(string value) : this(new ContentId(value)) { }
+    public ContentId Value { get; }
+    public bool IsValid => Value.IsValid;
+    public int CompareTo(ResourceId other) => Value.CompareTo(other.Value);
+    public override string ToString() => Value.ToString();
+}
+
+public readonly record struct ContentFingerprint
+{
+    public ContentFingerprint(string hexadecimal)
+    {
+        ArgumentNullException.ThrowIfNull(hexadecimal);
+        if (hexadecimal.Length != 64 || hexadecimal.Any(character =>
+                character is not (>= '0' and <= '9' or >= 'a' and <= 'f')))
         {
-            id = new TechniqueId(parsed);
-            return true;
+            throw new ArgumentException("A content fingerprint must be a lowercase SHA-256 value.", nameof(hexadecimal));
         }
 
-        id = default;
-        return false;
+        Hexadecimal = hexadecimal;
     }
+
+    public string? Hexadecimal { get; }
+    public bool IsValid => Hexadecimal is not null;
+    public override string ToString() => Hexadecimal ?? string.Empty;
 }
 
 file static class TypedContentId

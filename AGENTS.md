@@ -122,7 +122,8 @@ smallest playable vertical slice before broadening the simulation surface.
 | `Source/Spelljammer.Simulation/` | Headless authoritative voyage state, seeded sector generation, and typed commands. |
 | `Source/Spelljammer.Localization/` | Game-owned catalog runtime, formatting, identity, and limits. |
 | `Tools/Spelljammer.Localization.Compiler/` | Offline source-catalog parser and compiler. |
-| `Content/Localization/` | Authored locale catalogs and pinned locale-data notices. |
+| `Content/Packs/base/` | Built-in gameplay definitions and their authored localization catalogs. |
+| `Content/Localization/` | Pinned locale-data inputs and notices. |
 | `Tests/Spelljammer.Localization.Tests/` | Headless localization contracts and corruption/formatting coverage. |
 | `Tests/Spelljammer.Simulation.Tests/` | Compile-only determinism, rejection, bounds, and resource-loop contracts. |
 | `Docs/DesignConcept/` | Current product direction and playable-slice scope. |

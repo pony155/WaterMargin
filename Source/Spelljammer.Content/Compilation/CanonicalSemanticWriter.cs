@@ -73,6 +73,23 @@ internal static class CanonicalSemanticWriter
             case AccessDefinition value:
                 properties["tags"] = output => WriteStrings(output, value.Tags);
                 break;
+            case BackgroundDefinition value:
+                properties["attributeBonusIds"] = output => WriteIds(output, value.AttributeBonusIds.Select(id => id.Value));
+                properties["compatibleRaceIds"] = output => WriteIds(output, value.CompatibleRaceIds.Select(id => id.Value));
+                properties["focusSkillIds"] = output => WriteIds(output, value.FocusSkillIds.Select(id => id.Value));
+                break;
+            case CharacterDefinition value:
+                properties["backgroundId"] = output => WriteString(output, value.BackgroundId.ToString());
+                properties["equipmentIds"] = output => WriteIds(output, value.EquipmentIds);
+                properties["focusSkillIds"] = output => WriteIds(output, value.FocusSkillIds.Select(id => id.Value));
+                properties["heritageId"] = output => WriteString(output, value.HeritageId.ToString());
+                properties["languageIds"] = output => WriteIds(output, value.LanguageIds);
+                properties["positionId"] = output => WriteString(output, value.PositionId.ToString());
+                properties["raceId"] = output => WriteString(output, value.RaceId.ToString());
+                properties["resourceIds"] = output => WriteIds(output, value.ResourceIds.Select(id => id.Value));
+                properties["scenarioIds"] = output => WriteIds(output, value.ScenarioIds.Select(id => id.Value));
+                properties["scriptIds"] = output => WriteIds(output, value.ScriptIds);
+                break;
             case FeatDefinition value:
                 properties["grantedAccessIds"] = output => WriteIds(output, value.GrantedAccessIds.Select(id => id.Value));
                 properties["trainingProjectId"] = output => WriteString(output, value.TrainingProjectId.ToString());
@@ -81,9 +98,32 @@ internal static class CanonicalSemanticWriter
                 properties["compatibleRaceIds"] = output => WriteIds(output, value.CompatibleRaceIds.Select(id => id.Value));
                 properties["grantedAccessIds"] = output => WriteIds(output, value.GrantedAccessIds.Select(id => id.Value));
                 properties["grantedTechniqueIds"] = output => WriteIds(output, value.GrantedTechniqueIds.Select(id => id.Value));
+                if (!value.EffectIds.IsEmpty)
+                {
+                    properties["effectIds"] = output => WriteIds(output, value.EffectIds);
+                }
+
+                if (!value.GrantedPerkIds.IsEmpty)
+                {
+                    properties["grantedPerkIds"] = output => WriteIds(output, value.GrantedPerkIds.Select(id => id.Value));
+                }
+
                 break;
             case RaceDefinition value:
                 properties["grantedPerkIds"] = output => WriteIds(output, value.GrantedPerkIds.Select(id => id.Value));
+                if (!value.RequiredSupportIds.IsEmpty)
+                {
+                    properties["requiredSupportIds"] = output => WriteIds(output, value.RequiredSupportIds);
+                }
+
+                break;
+            case HeritageDefinition value:
+                properties["grantedPerkIds"] = output => WriteIds(output, value.GrantedPerkIds.Select(id => id.Value));
+                properties["raceId"] = output => WriteString(output, value.RaceId.ToString());
+                break;
+            case TechniqueDefinition value:
+                properties["grantedPerkIds"] = output => WriteIds(output, value.GrantedPerkIds.Select(id => id.Value));
+                properties["requiredAccessIds"] = output => WriteIds(output, value.RequiredAccessIds.Select(id => id.Value));
                 break;
             case TrainingProjectDefinition value:
                 properties["grantedFeatIds"] = output => WriteIds(output, value.GrantedFeatIds.Select(id => id.Value));
@@ -114,11 +154,15 @@ internal static class CanonicalSemanticWriter
     {
         AccessDefinition => 0,
         AttributeDefinition => 1,
-        FeatDefinition => 2,
-        RaceDefinition => 3,
-        SkillDefinition => 4,
-        PerkDefinition => 5,
-        TrainingProjectDefinition => 6,
+        BackgroundDefinition => 2,
+        CharacterDefinition => 3,
+        FeatDefinition => 4,
+        HeritageDefinition => 5,
+        RaceDefinition => 6,
+        SkillDefinition => 7,
+        PerkDefinition => 8,
+        TechniqueDefinition => 9,
+        TrainingProjectDefinition => 10,
         _ => throw new ArgumentOutOfRangeException(nameof(definition)),
     };
 

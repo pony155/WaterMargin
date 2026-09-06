@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Phases 1 and 2 implemented; production content and application UI wiring remain planned |
+| Status | Phases 1 and 2 plus M2 base Attribute/Skill catalogs implemented; application UI wiring and the full production workflow remain planned |
 | Scope | Game text catalogs, locale selection, message formatting, language profiles, subtitles, and translation workflow |
 | Owner | Spelljammer with game-owned offline tooling |
 | Runtime language | C# gameplay/application layer with copy-only Engine boundaries |
