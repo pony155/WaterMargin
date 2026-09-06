@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Spelljammer.Settings;
 
 public sealed record GameSettingsProfile(
@@ -27,6 +29,7 @@ public sealed record GameSettingsProfile(
         true,
         100);
 
+    [JsonIgnore]
     public bool IsValid =>
         SchemaVersion == CurrentSchemaVersion &&
         MasterVolume is >= MinimumVolume and <= MaximumVolume &&

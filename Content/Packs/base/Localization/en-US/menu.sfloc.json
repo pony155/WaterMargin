@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "locale": "en-US",
+  "namespace": "menu",
+  "fallbacks": [],
+  "textDirection": "ltr",
+  "messages": {
+    "menu.accessibility.main": {
+      "description": "Accessible name for the main menu panel.",
+      "message": "Main menu"
+    },
+    "menu.accessibility.status": {
+      "description": "Accessible name for the main menu status text.",
+      "message": "Main menu status"
+    },
+    "menu.button.quit": {
+      "description": "Button that exits the application.",
+      "message": "Quit game"
+    },
+    "menu.button.settings": {
+      "description": "Button that opens the game settings dialog.",
+      "message": "Game settings"
+    },
+    "menu.subtitle": {
+      "description": "Short main-menu product description.",
+      "message": "A voidfaring sandbox among the stars"
+    },
+    "menu.title": {
+      "description": "Main-menu game title.",
+      "message": "Spelljammer"
+    },
+    "menu.window-title": {
+      "description": "Operating-system title for the main-menu window.",
+      "message": "Spelljammer"
+    }
+  }
+}

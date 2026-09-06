@@ -57,7 +57,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private readonly Dictionary<ulong, EngineUiElementSnapshot> snapshots = [];
     private readonly EngineUiPresentationCommand[] presentation = new EngineUiPresentationCommand[ElementCapacity];
     private readonly EngineUiAction[] actions = new EngineUiAction[ActionCapacity];
-    private readonly GameSettingsStrings strings;
+    private readonly GameText strings;
     private nint context;
     private ulong document;
     private ulong inputSequence;
@@ -66,7 +66,7 @@ internal sealed class SpriteForgeSettingsView : FrameworkElement, IDisposable
     private bool statusIsError;
     private bool disposed;
 
-    internal SpriteForgeSettingsView(GameSettingsProfile initial, GameSettingsStrings strings)
+    internal SpriteForgeSettingsView(GameSettingsProfile initial, GameText strings)
     {
         draft = initial;
         this.strings = strings;

@@ -16,7 +16,7 @@ internal sealed class GameSettingsDialog : Window
     internal GameSettingsDialog(
         GameSettingsRegistry registry,
         string settingsPath,
-        GameSettingsStrings strings)
+        GameText strings)
     {
         this.registry = registry;
         this.settingsPath = settingsPath;

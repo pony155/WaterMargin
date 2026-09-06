@@ -12,7 +12,7 @@ public partial class MainWindow : Window
     private readonly ExpeditionSimulation simulation = new();
     private readonly GameSettingsRegistry settings;
     private readonly string settingsPath;
-    private readonly GameSettingsStrings settingsStrings;
+    private readonly GameText settingsStrings;
     private ExpeditionState expedition;
     private ulong nextSeed = 0xc0ffeeUL;
 
@@ -20,7 +20,7 @@ public partial class MainWindow : Window
         GameSettingsRegistry settings,
         string settingsPath,
         GameSettingsDiagnostic startupDiagnostic,
-        GameSettingsStrings settingsStrings)
+        GameText settingsStrings)
     {
         this.settings = settings;
         this.settingsPath = settingsPath;

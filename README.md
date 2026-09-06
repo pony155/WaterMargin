@@ -21,7 +21,10 @@ characters, rules, content, code, artwork, and sound remain original.
 > connected to the WPF shell. Milestone 6 adds headless content-locked campaign
 > saves, validation, recovery, and migration. A first localized SpriteForge UI
 > game-settings dialog now persists bounded local preferences transactionally,
-> while WPF save controls, campaign-rule settings, crew
+> and the application now opens on a background-art main menu whose current
+> actions are Game Settings and Quit Game. The expedition prototype remains in
+> source but is not currently reachable from that menu. WPF save controls,
+> campaign-rule settings, crew
 > schedules and relationships, trading, procedural ship interiors, and a full
 > game UI remain planned.
 
@@ -56,6 +59,8 @@ Implemented foundations include:
 - a versioned local settings profile with strict bounded JSON, durable
   replacement/recovery, stable diagnostics, and a keyboard-operable localized
   SpriteForge UI modal;
+- a localized SpriteForge UI main menu using the base-pack background asset,
+  with bounded keyboard/pointer actions for Game Settings and Quit Game;
 - authored equipment, a six-zone Glass Observatory ruin, a Wayfarer ship frame,
   Arcane and Industrial module packages, and two cannon configurations;
 - a .NET 10, C# 14, Windows x64 WPF host that presents the expedition loop;
@@ -145,6 +150,7 @@ Planned implementation contracts are documented in
 [`Docs/Architecture/CharacterCapabilities.md`](Docs/Architecture/CharacterCapabilities.md),
 [`Docs/Architecture/CampaignSaves.md`](Docs/Architecture/CampaignSaves.md),
 [`Docs/Architecture/GameSettings.md`](Docs/Architecture/GameSettings.md),
+[`Docs/Architecture/MainMenu.md`](Docs/Architecture/MainMenu.md),
 [`Docs/Architecture/Modding.md`](Docs/Architecture/Modding.md), and
 [`Docs/Architecture/ImplementationRoadmap.md`](Docs/Architecture/ImplementationRoadmap.md).
 The frozen version 1 identity, serialization, bounds, and diagnostic contracts

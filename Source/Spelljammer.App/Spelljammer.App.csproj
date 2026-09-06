@@ -15,15 +15,20 @@
     <ProjectReference Include="..\..\Tools\Spelljammer.Localization.Compiler\Spelljammer.Localization.Compiler.csproj"
                       ReferenceOutputAssembly="false"
                       PrivateAssets="all" />
+    <EmbeddedResource Include="$(IntermediateOutputPath)Localization\en-US\menu.sfloc"
+                      LogicalName="Spelljammer.Localization.en-US.menu.sfloc" />
     <EmbeddedResource Include="$(IntermediateOutputPath)Localization\en-US\settings.sfloc"
                       LogicalName="Spelljammer.Localization.en-US.settings.sfloc" />
+    <Resource Include="..\..\Content\Packs\base\Assets\UI\MainMenu\Background.png"
+              Link="Assets\UI\MainMenu\Background.png" />
   </ItemGroup>
 
-  <Target Name="CompileSettingsLocalizationCatalog"
+  <Target Name="CompileApplicationLocalizationCatalogs"
           BeforeTargets="CoreCompile"
-          Inputs="$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\settings.sfloc.json"
-          Outputs="$(IntermediateOutputPath)Localization\en-US\settings.sfloc">
+          Inputs="$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\menu.sfloc.json;$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\settings.sfloc.json"
+          Outputs="$(IntermediateOutputPath)Localization\en-US\menu.sfloc;$(IntermediateOutputPath)Localization\en-US\settings.sfloc">
     <MakeDir Directories="$(IntermediateOutputPath)Localization\en-US" />
+    <Exec Command="dotnet &quot;$(MSBuildProjectDirectory)\..\..\Tools\Spelljammer.Localization.Compiler\bin\$(Configuration)\net10.0\Spelljammer.Localization.Compiler.dll&quot; compile &quot;$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\menu.sfloc.json&quot; &quot;$(IntermediateOutputPath)Localization\en-US\menu.sfloc&quot;" />
     <Exec Command="dotnet &quot;$(MSBuildProjectDirectory)\..\..\Tools\Spelljammer.Localization.Compiler\bin\$(Configuration)\net10.0\Spelljammer.Localization.Compiler.dll&quot; compile &quot;$(MSBuildProjectDirectory)\..\..\Content\Packs\base\Localization\en-US\settings.sfloc.json&quot; &quot;$(IntermediateOutputPath)Localization\en-US\settings.sfloc&quot;" />
   </Target>
 

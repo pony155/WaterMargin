@@ -25,6 +25,8 @@ internal static class SettingsContracts
         byte[] first = GameSettingsCodec.Encode(profile);
         byte[] second = GameSettingsCodec.Encode(profile);
         True(first.AsSpan().SequenceEqual(second), "Identical settings produced different bytes.");
+        False(Encoding.UTF8.GetString(first).Contains("isValid", StringComparison.Ordinal),
+            "Computed validation state leaked into the persisted schema.");
         GameSettingsReadResult decoded = GameSettingsCodec.Decode(first);
         True(decoded.Loaded, decoded.Diagnostic.ToString());
         Equal(profile, decoded.Profile, "Settings did not round-trip.");
