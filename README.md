@@ -125,7 +125,7 @@ defined in
 
 | Path | Purpose |
 | --- | --- |
-| `Source/Spelljammer.App/` | WPF host, expedition presentation, SpriteForge interop, and renderer viewport. |
+| [`Source/Spelljammer.App/`](Source/Spelljammer.App/README.md) | WPF host, current main menu and settings presentation, retained expedition prototype, and SpriteForge interop. |
 | `Source/Spelljammer.Simulation/` | Headless authoritative expedition and character-capability state and commands. |
 | `Source/Spelljammer.Content/` | Pack loading, validation, immutable registries, and semantic fingerprints. |
 | `Source/Spelljammer.Persistence/` | Content-locked campaign saves, validation, recovery, and migrations. |
