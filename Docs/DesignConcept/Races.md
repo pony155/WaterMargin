@@ -100,6 +100,13 @@ allowing an Elf to learn and cast spells without the Spellcasting Training
 Feat; it provides no free Magic ranks or spells. Elves enter a short trance
 instead of normal sleep; they still need safe downtime.
 
+Many elven cultures actively disdain industrial technology, especially heavy
+factories, reactors, powered armor, and mass-produced energy weapons. They
+favor natural environments, living craft, Arcane navigation, wards, and
+enchantment instead. This is a cultural and historical tendency, not a
+biological restriction: an individual Elf may study Engineering or use any
+compatible Industrial equipment.
+
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |
 | Dawnweave | `heritage.elf.dawnweave` | Gains focus in strong natural or stellar light | Darkness increases fatigue unless quarters provide tuned lighting |
@@ -130,6 +137,12 @@ demanding physical environments. Their Racial Perk, **Braced Stance**, reduces
 forced movement and work interruption. Their mass raises acceleration costs,
 and cramped does not mean weightless: ship layout and rescue equipment must
 support them.
+
+Many dwarven cultures devote generations to technology and industry. Their
+foundries, shipyards, reactors, precision fabrication, powered armor, laser
+weapons, and plasma weapons represent a deliberate industrial tradition rather
+than an innate racial ability. An individual dwarf may still reject that
+tradition and pursue Arcane or natural practices.
 
 | Heritage | Stable ID | Heritage Perk | Cost |
 | --- | --- | --- | --- |

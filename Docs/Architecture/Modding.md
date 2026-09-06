@@ -91,7 +91,7 @@ document may resemble:
 {
   "schemaVersion": 1,
   "id": "patch.mod.example.brace-ward-balance",
-  "targetId": "spell.warding.brace-ward",
+  "targetId": "spell.evocation.magic-missile",
   "targetPackId": "spelljammer.base",
   "expectedRevision": 1,
   "operations": []

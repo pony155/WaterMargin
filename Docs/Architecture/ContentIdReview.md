@@ -3,7 +3,7 @@
 ## Status
 
 This document completes roadmap tasks `M0.1.2` and `M0.1.3`. It classifies the
-174 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
+152 explicit IDs in [`ContentIdInventory.md`](ContentIdInventory.md) and records
 the spelling and collision review performed before version 1 loader work.
 
 No gameplay content loader or public save format exists yet. Classification is
@@ -28,17 +28,17 @@ precedence over base ownership until content authoring promotes it explicitly.
 
 Every ID in an inventory section inherits the classification below unless an
 exception is listed. This grouping marks every inventoried ID without copying a
-second 174-row table that could drift from the canonical inventory.
+second 152-row table that could drift from the canonical inventory.
 
 | Inventory group | Count | Ownership | Earliest registry | Delivery note |
 | --- | ---: | --- | --- | --- |
 | Attributes | 7 | Base-owned | M2 | All seven are required base definitions |
 | Skills | 29 | Base-owned | M2 | All 29 are required base definitions |
 | Racial Perks | 12 | Base-owned | M3/M4 | Registry begins in M3; supernatural grants become executable in M4 |
-| Equipment | 8 | Base-owned | M5 | Initial weapons, armor, tools, medical gear, and Arcane focus |
+| Equipment | 11 | Base-owned | M5 | Initial weapons, powered armor, tools, medical gear, and Arcane focus |
 | Learned Feats | 2 | Base-owned | M4 | Both are required access paths |
 | Access gates | 2 | Base-owned | M4 | Both are required access definitions |
-| Spells | 32 | Base-owned | M4 | Four are first-slice; 28 are deferred catalog content |
+| Spells | 7 | Base-owned | M4 | Four are first-slice; three are deferred catalog content |
 | Psychic techniques | 4 | Base-owned | M4 | All four are first-slice content |
 | Combat contexts | 6 | Base-owned | M5 | Three initial contexts and three deferred contexts |
 | Travel events | 8 | Base-owned | M8 | Four first-voyage events and four deferred events |
@@ -59,13 +59,13 @@ public save contract.
 The first M4 Spell slice is:
 
 ```text
-spell.radiance.lantern-spark
-spell.seeking.aether-trace
-spell.vectoring.vector-tether
-spell.warding.brace-ward
+spell.divination.detect-invisibility
+spell.evocation.burning-hands
+spell.evocation.magic-missile
+spell.illusion.phantasmal-image
 ```
 
-The other 28 Spell IDs remain base-owned deferred catalog content.
+The other three Spell IDs remain base-owned deferred catalog content.
 
 The initial M5 combat contexts are:
 
@@ -171,7 +171,7 @@ is complete.
 
 ## Collision review
 
-The 174 inventoried IDs are unique. No one ID maps to two different display
+The 152 inventoried IDs are unique. No one ID maps to two different display
 labels, and ordinal comparison produces no case-only collision.
 
 The following similar forms are intentional:
@@ -194,7 +194,7 @@ Illustrative third-party IDs previously used a pack ID that looked more
 specific than their shared namespace. Version 1 resolves this by using a pack
 ID of the form `mod.<namespace>`, for example `mod.starwrights`, with definitions
 such as `skill.mod.starwrights.gravimetry`. These examples are not base IDs and
-are excluded from the 174 count.
+are excluded from the 152 count.
 
 ## Review conclusion
 

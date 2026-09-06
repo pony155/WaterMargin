@@ -17,7 +17,8 @@ Industrial technology begins in a rugged **dieselpunk** era of compression
 engines, generators, armored hulls, analog controls, propellant drives, and
 shell cannon. Its advanced frontier is **atompunk**: reactors, radiothermal
 power, nuclear-thermal propulsion, shielded installations, and high-energy
-industry. These terms describe the setting's functional technology level, not
+industry. The latest atompunk equipment includes powered armor, laser weapons,
+and plasma weapons. These terms describe the setting's functional technology level, not
 a requirement to simulate every pipe, fuel mixture, or reactor detail.
 
 ## Two coexisting traditions
@@ -38,8 +39,9 @@ visible slot and resource cost.
 The setting should feel lived-in. Magic and advanced machinery shape work,
 commerce, medicine, warfare, exploration, language, and law. They also create
 different opportunities: a ward can protect a hatch, a reactor can power a
-station, an enchantment can preserve a tool, and a shell cannon can breach
-armor. None is a universal answer.
+station, an enchantment can preserve a tool, a powered suit can protect a
+boarder, and a laser or plasma weapon can challenge armor. None is a universal
+answer.
 
 The game presents these ideas through readable choices rather than technical
 simulation. A player sees useful values and consequences—such as Focus, Aether,

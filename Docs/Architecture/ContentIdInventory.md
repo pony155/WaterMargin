@@ -35,9 +35,9 @@ inventoried when their definition schemas enter roadmap scope.
 | Skills | 29 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Learned Feats | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
 | Racial Perks | 12 | [`Races.md`](../DesignConcept/Races.md) |
-| Equipment | 8 | [`Equipments.md`](../DesignConcept/Equipments.md) |
+| Equipment | 11 | [`Equipments.md`](../DesignConcept/Equipments.md) |
 | Access gates | 2 | [`Skills.md`](../DesignConcept/Skills.md) |
-| Spells | 32 | [`Spells.md`](../DesignConcept/Spells.md) |
+| Spells | 7 | [`Spells.md`](../DesignConcept/Spells.md) |
 | Psychic techniques | 4 | [`PsychicAbilities.md`](../DesignConcept/PsychicAbilities.md) |
 | Combat contexts | 6 | [`Battle.md`](../DesignConcept/Battle.md) |
 | Travel events | 8 | [`Events.md`](../DesignConcept/Events.md) |
@@ -48,7 +48,7 @@ inventoried when their definition schemas enter roadmap scope.
 | Crisis families | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis phases | 7 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
 | Crisis resolutions | 3 | [`Endgame_Crisis.md`](../DesignConcept/Endgame_Crisis.md) |
-| **Total** | **174** | |
+| **Total** | **152** | |
 
 ## Attributes
 
@@ -129,12 +129,15 @@ above; the inventory does not synthesize IDs from Heritage IDs or display text.
 | Display label | Stable ID |
 | --- | --- |
 | Casting focus | `item.arcane.casting-focus` |
+| Powered armor | `item.armor.powered-armor` |
 | Pressure suit | `item.armor.pressure-suit` |
 | Field medkit | `item.medical.field-medkit` |
 | Repair kit | `item.tool.repair-kit` |
 | Survey scanner | `item.tool.survey-scanner` |
 | Aether projector | `item.weapon.aether-projector` |
 | Boarding blade | `item.weapon.boarding-blade` |
+| Laser carbine | `item.weapon.laser-carbine` |
+| Plasma rifle | `item.weapon.plasma-rifle` |
 | Service pistol | `item.weapon.service-pistol` |
 
 ## Access gates
@@ -146,77 +149,27 @@ above; the inventory does not synthesize IDs from Heritage IDs or display text.
 
 ## Spells
 
-### Passage
+### Divination
 
 | Display label | Stable ID |
 | --- | --- |
-| Anchor Step | `spell.passage.anchor-step` |
-| Cargo Aperture | `spell.passage.cargo-aperture` |
-| Paired Threshold | `spell.passage.paired-threshold` |
-| Starway Accord | `spell.passage.starway-accord` |
+| Detect Invisibility | `spell.divination.detect-invisibility` |
 
-### Radiance
+### Evocation
 
 | Display label | Stable ID |
 | --- | --- |
-| Dawn Array | `spell.radiance.dawn-array` |
-| Heat Draw | `spell.radiance.heat-draw` |
-| Lantern Spark | `spell.radiance.lantern-spark` |
-| Starflare Beacon | `spell.radiance.starflare-beacon` |
+| Burning Hands | `spell.evocation.burning-hands` |
+| Lightning Bolt | `spell.evocation.lightning-bolt` |
+| Magic Missile | `spell.evocation.magic-missile` |
+| Magic Missile Storm | `spell.evocation.magic-missile-storm` |
 
-### Seeking
-
-| Display label | Stable ID |
-| --- | --- |
-| Aether Trace | `spell.seeking.aether-trace` |
-| Fault Echo | `spell.seeking.fault-echo` |
-| Starway Sounding | `spell.seeking.starway-sounding` |
-| Waymark Compass | `spell.seeking.waymark-compass` |
-
-### Shaping
+### Illusion
 
 | Display label | Stable ID |
 | --- | --- |
-| Cutline | `spell.shaping.cutline` |
-| Formwright Chorus | `spell.shaping.formwright-chorus` |
-| Hullskin | `spell.shaping.hullskin` |
-| Seam Press | `spell.shaping.seam-press` |
-
-### Vectoring
-
-| Display label | Stable ID |
-| --- | --- |
-| Driftstep | `spell.vectoring.driftstep` |
-| Gravity Knot | `spell.vectoring.gravity-knot` |
-| Keel Turn | `spell.vectoring.keel-turn` |
-| Vector Tether | `spell.vectoring.vector-tether` |
-
-### Veiling
-
-| Display label | Stable ID |
-| --- | --- |
-| False Wake | `spell.veiling.false-wake` |
-| Ghost Rig | `spell.veiling.ghost-rig` |
-| Masked Hold | `spell.veiling.masked-hold` |
-| Quiet Silhouette | `spell.veiling.quiet-silhouette` |
-
-### Vitality
-
-| Display label | Stable ID |
-| --- | --- |
-| Borrowed Breath | `spell.vitality.borrowed-breath` |
-| Draw Taint | `spell.vitality.draw-taint` |
-| Sanctuary Vigil | `spell.vitality.sanctuary-vigil` |
-| Steady Pulse | `spell.vitality.steady-pulse` |
-
-### Warding
-
-| Display label | Stable ID |
-| --- | --- |
-| Brace Ward | `spell.warding.brace-ward` |
-| Haven Circuit | `spell.warding.haven-circuit` |
-| Spellbreak Lattice | `spell.warding.spellbreak-lattice` |
-| Threshold Seal | `spell.warding.threshold-seal` |
+| Invisibility | `spell.illusion.invisibility` |
+| Phantasmal Image | `spell.illusion.phantasmal-image` |
 
 ## Psychic techniques
 
@@ -362,7 +315,7 @@ by this inventory.
 
 ## Review result
 
-The requested categories contain 174 unique explicit gameplay IDs. No duplicate
+The requested categories contain 152 unique explicit gameplay IDs. No duplicate
 ID is assigned to two different labels within these tables. Repeated references
 to the same ID across design documents were consolidated under one entry.
 

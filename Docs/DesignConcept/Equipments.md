@@ -55,8 +55,8 @@ found items as cargo, but must equip them to use their active effect.
 | Category | Examples | Typical visible effect |
 | --- | --- | --- |
 | Melee weapons | blade, axe, shock baton, Arcane staff | Damage type and one combat tag |
-| Ranged weapons | bow, pistol, rifle, Aether projector | Damage, range, and ammunition or charge cost |
-| Armor and suits | leather rig, pressure suit, plated coat, reactor suit | Armor Value and one environmental protection tag |
+| Ranged weapons | bow, pistol, rifle, Aether projector, laser carbine, plasma rifle | Damage, range, and ammunition or charge cost |
+| Armor and suits | leather rig, pressure suit, plated coat, reactor suit, powered armor | Armor Value and one environmental protection tag |
 | Shields and wards | riot shield, buckler, ward charm | A brief defense or protection effect |
 | Tools | repair kit, cutter, survey scanner, lock kit | Enables or improves one declared action |
 | Medical equipment | medkit, trauma injector, diagnostic wand | Stabilize, treat, or diagnose within Medicine rules |
@@ -71,6 +71,13 @@ its definition says so. Industrial equipment may use ammunition or stored
 energy. Atompunk equipment can be powerful and rare, but it remains a simple
 item with a visible effect; radiation, reactor management, and exotic fuel
 chemistry are not ordinary equipment statistics.
+
+The latest Industrial equipment includes powered armor, laser weapons, and
+plasma weapons. Powered armor is Body-slot armor with a visible Armor Value and
+an optional energy cost; it does not model servos, heat, batteries, or joint
+maintenance. Laser and plasma weapons use a displayed charge cost and their
+declared damage type; they do not need ammunition caliber, cooling, or recoil
+statistics.
 
 An item never grants unrestricted spellcasting, psychic influence, or immunity
 to all hazards. A casting focus helps an authorized caster; it does not replace
@@ -101,7 +108,10 @@ The first personal-combat slice needs only a small mixed set:
 | Boarding blade | `item.weapon.boarding-blade` | Reliable melee weapon |
 | Service pistol | `item.weapon.service-pistol` | Short-range industrial sidearm |
 | Aether projector | `item.weapon.aether-projector` | Short-range Arcane energy weapon using charge |
+| Laser carbine | `item.weapon.laser-carbine` | Atompunk ranged weapon with laser damage and charge cost |
+| Plasma rifle | `item.weapon.plasma-rifle` | Atompunk ranged weapon with plasma damage and charge cost |
 | Pressure suit | `item.armor.pressure-suit` | Basic armor and vacuum protection |
+| Powered armor | `item.armor.powered-armor` | Atompunk Body armor with high Armor Value and optional energy cost |
 | Repair kit | `item.tool.repair-kit` | Support Engineering repair actions |
 | Survey scanner | `item.tool.survey-scanner` | Support Sensors and ruin exploration |
 | Field medkit | `item.medical.field-medkit` | Stabilize or treat an injury |
